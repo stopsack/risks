@@ -1,15 +1,17 @@
 Package: risks
-Title: What the Package Does (One Line, Title Case)
+Title: Estimate relative risks and risk differences with log-binomial models
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Konrad",
+           family = "Stopsack",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "stopsack@mskcc.org"),
+    person(given = "Travis",
+           family = "Gerke",
+           role = c("aut"),
+           email = "travis.gerke@moffitt.org"))
+Description: Offers several methods for estimating convergent loglinear models for relative risks (risk ratios) and risk differences.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
