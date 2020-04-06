@@ -63,8 +63,8 @@ estimate_risk <- function(data,                 # dataset
         print("Neither the Poisson nor the binomial model for RD converged with glm().")
         print("Fitting RD binomial model with addbin(method = 'em').")
       }
-      require(addreg)
-      fitbin <- tryCatch(addreg(formula = formula, data = data, family = binomial, method = "em"),
+
+      fitbin <- tryCatch(addreg::addreg(formula = formula, data = data, family = binomial, method = "em"),
                          error   = function(x) { NA },
                          warning = function(x) { NA })
       if(is.na(fitbin[1]) & is.na(fitpois[1]))
@@ -92,8 +92,7 @@ estimate_risk <- function(data,                 # dataset
 
   # Estimate robust covariance for Poisson if binomial model did not converge or verbose output is requested
   if((is.na(result.bin[1, 1]) | verbose == TRUE) & !is.na(fitpois[1])) {
-    require(sandwich)
-    fitpois.se <- sqrt(diag(vcovHC(fitpois, type = "HC0")))  # consider HC3 (even more conservative)
+    fitpois.se <- sqrt(diag(sandwich::vcovHC(fitpois, type = "HC0")))  # consider HC3 (even more conservative)
     zcritical <- qnorm(1-((1-level)/2))
     result.pois <- switch(EXPR = estimate,
                           rr = exp(data.frame(RR = fitpois.coe,
