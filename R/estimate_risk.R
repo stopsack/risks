@@ -1,4 +1,4 @@
-# relrisk
+# estimate_risk
 # -------  Fit risk ratio and risk difference models using robust Poisson and binomial models
 #          1) Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or Prevalence Ratios and Differences.
 #             Am J Epidemiol 2005;162:199-200.  (overview)
@@ -7,7 +7,7 @@
 #          3) Zou G. A modified Poisson regression approach to prospective studies with binary data.
 #             Am J Epidemiol 2004;159:702-706.  (Poisson with sandwich SE)
 #          4) Marschner's addbin package
-relrisk <- function(data,                 # dataset
+estimate_risk <- function(data,                 # dataset
                     formula,              # regular GLM formula
                     estimate     = "rr",  # estimate risk (prevalence) ratio or difference?
                     level        = 0.95,  # confidence interval width
