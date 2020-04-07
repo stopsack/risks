@@ -117,3 +117,13 @@ usethis::use_test("estimate_risk")
 usethis::use_package("sandwich")
 usethis::use_package("addreg")
 ```
+
+  - After initializing the directory `dev/` in which this README lives
+    (and other directories/files which are not related to the package
+    build), make sure to add them to `.Rbuildignore`
+
+<!-- end list -->
+
+``` r
+usethis::use_build_ignore("dev")
+```
