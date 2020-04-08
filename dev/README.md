@@ -138,4 +138,17 @@ usethis::use_build_ignore("dev")
     `estimate_risk.R`. Among other documentation that we’ll go ahead and
     add, the key line is `#' @import stats`. After we build the
     documentation and rebuild the package, roxygen2 automatically
-    updates the NAMESPACE file appropriately.
+    updates the NAMESPACE file appropriately. Don’t forget to also
+    `usethis::use_package("stats")` to update the DESCRIPTION file.
+
+  - Configure [`pkgdown`](https://pkgdown.r-lib.org/) to build a
+    documentation website.
+
+<!-- end list -->
+
+``` r
+# if an update is needed
+# devtools::install_github("r-lib/pkgdown")
+usethis::use_pkgdown()
+pkgdown::build_site()
+```
