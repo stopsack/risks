@@ -1,23 +1,48 @@
-# estimate_risk
-# -------  Fit risk ratio and risk difference models using robust Poisson and binomial models
-#          1) Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or Prevalence Ratios and Differences.
-#             Am J Epidemiol 2005;162:199-200.  (overview)
-#          2) Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences.
-#             Am J Epidemiol 1986;123:174-184.  (log-binomial model)
-#          3) Zou G. A modified Poisson regression approach to prospective studies with binary data.
-#             Am J Epidemiol 2004;159:702-706.  (Poisson with sandwich SE)
-#          4) Marschner's addbin package
-estimate_risk <- function(data,                 # dataset
-                    formula,              # regular GLM formula
-                    estimate     = "rr",  # estimate risk (prevalence) ratio or difference?
-                    level        = 0.95,  # confidence interval width
-                    pvalue       = FALSE, # add p-value to table of results?
-                    sourcecolumn = FALSE, # add column with source of final estimates (binomial vs. Poisson)
-                    verbose      = TRUE,  # print all model summaries, or just final coefficients?
-                    logistic     = FALSE, # show logistic regression for comparison?
-                    addbin       = TRUE,  # attempt addbin() if glm() fits fail to converge
-                    ...) {                # passed on to both calls of glm()
-  # Find out which link function to use
+#' Fit risk ratio and risk difference models
+#'
+#' \code{estimate_risk} Fits risk ratio and risk difference models using robust
+#' Poisson and binomial models.
+#'
+#' This is a paragraph which includes important methods details to be described.
+#'
+#' @param data a \code{tibble}(?) or \code{data.frame} object
+#' @param formula a formula object
+#' @param estimate the type of estimate to report: risk (prevalance) ratio
+#'   ("rr") or risk difference ("rd")
+#' @param level confidence interval width
+#' @param pvalue a logical value indicating whether to add p-values to the table
+#'   of results
+#' @param sourcecolumn a logical value indicating whether to add column with
+#'   source of final estimates (binomial vs. Poisson)
+#' @param verbose a logical indicating whether to print all model summaries or
+#'   just final coefficients
+#' @param logistic a logical indicating whether to show logistic regression for
+#'   comparison
+#' @param addbin a logical indicating whether to attempt \code{addbin()} if
+#'   \code{glm()} fits fail to converge
+#' @param ... further arguments passed to \code{glm}
+#'
+#' @references Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or
+#'   Prevalence Ratios and Differences. Am J Epidemiol 2005;162:199-200.
+#'   (overview)
+#' @references Wacholder S. Binomial regression in GLIM: Estimating risk ratios
+#'   and risk differences. Am J Epidemiol 1986;123:174-184. (log-binomial model)
+#' @references Zou G. A modified Poisson regression approach to prospective
+#'   studies with binary data. Am J Epidemiol 2004;159:702-706. (Poisson with
+#'   sandwich SE)
+#' @references Marschner's addbin package
+#'
+
+estimate_risk <- function(data,
+                    formula,
+                    estimate     = "rr",
+                    level        = 0.95,
+                    pvalue       = FALSE,
+                    sourcecolumn = FALSE,
+                    verbose      = TRUE,
+                    logistic     = FALSE,
+                    addbin       = TRUE,
+                    ...) {
   link <- switch(EXPR = estimate,
                  rr = "log",
                  rd = "identity")
