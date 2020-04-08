@@ -44,7 +44,7 @@ usethis::use_mit_license("Konrad Stopsack; Travis Gerke")
 usethis::use_readme_rmd()
 ```
 
-- Using [tic](https://github.com/ropensci/tic), set up CI with Travis CI and Appveyor (useful for Windows compatibility monitoring), as well as codecov. Note that this step requires some external interfacing with the Travis and Appveyor sites to get the connections right.
+- Using [tic](https://github.com/ropensci/tic), set up CI with Travis CI, GitHub Actions, Appveyor/CircleCI (useful for Windows compatibility monitoring), as well as codecov. Note that this step requires some external interfacing with the external CI sites to get the connections right.
 
 ```r
 # update, if necessary
@@ -53,13 +53,9 @@ usethis::use_readme_rmd()
 # install.packages("sodium") #also necessary
 tic::use_tic() #guides through the tic setup wizard
 
-usethis::use_travis()
-usethis::use_appveyor()
-```
+## Appveyor
+tic::use_appveyor_yml(type = "windows")
 
-- Add test coverage reports
-```r
-usethis::use_coverage("codecov")
 ```
 
 - Initialize first function
