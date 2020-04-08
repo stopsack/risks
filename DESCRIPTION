@@ -23,4 +23,5 @@ Suggests:
     testthat
 Imports: 
     sandwich,
-    addreg
+    addreg,
+    stats
