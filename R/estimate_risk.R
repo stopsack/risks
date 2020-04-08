@@ -5,6 +5,8 @@
 #'
 #' This is a paragraph which includes important methods details to be described.
 #'
+#' @import stats
+#'
 #' @param data a \code{tibble}(?) or \code{data.frame} object
 #' @param formula a formula object
 #' @param estimate the type of estimate to report: risk (prevalance) ratio

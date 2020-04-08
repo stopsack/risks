@@ -127,3 +127,15 @@ usethis::use_package("addreg")
 ``` r
 usethis::use_build_ignore("dev")
 ```
+
+  - At this point, if we run `devtools::check()` (or shortcut with `Cmd
+    \+ Shift \+ E`), we get some notes like “no visible global function
+    definition for `glm`”. There’s a suggestion about adding
+    `importFrom()` to the NAMESPACE file (which is what needs to be
+    done). Most such warnings appear to refer to functions from the
+    `stats` package, so let’s import that namespace as a whole. We do
+    that by [roxygenizing](https://roxygen2.r-lib.org/index.html)
+    `estimate_risk.R`. Among other documentation that we’ll go ahead and
+    add, the key line is `#' @import stats`. After we build the
+    documentation and rebuild the package, roxygen2 automatically
+    updates the NAMESPACE file appropriately.

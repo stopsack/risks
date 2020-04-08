@@ -7,7 +7,7 @@ output: github_document
 Many of the setup steps are drawn from Emil Hvitfeldt's useful summary of `usethis` focused package development [here](https://www.hvitfeldt.me/blog/usethis-workflow-for-package-development/).
 
 - First, update some packages
-```r 
+```r
 devtools::install_github("r-lib/devtools")
 devtools::install_github("r-lib/usethis")
 devtools::install_github("r-lib/roxygen2")
@@ -72,7 +72,11 @@ usethis::use_test("estimate_risk")
 usethis::use_package("sandwich")
 usethis::use_package("addreg")
 ```
-- After initializing the directory `dev/` in which this README lives (and other directories/files which are not related to the package build), make sure to add them to `.Rbuildignore` 
+- After initializing the directory `dev/` in which this README lives (and other directories/files which are not related to the package build), make sure to add them to `.Rbuildignore`
 ```r
 usethis::use_build_ignore("dev")
 ```
+
+- At this point, if we run `devtools::check()` (or shortcut with `Cmd \+ Shift \+ E`), we get some notes like "no visible global function definition for `glm`". There's a suggestion about adding `importFrom()` to the NAMESPACE file (which is what needs to be done). Most such warnings appear to refer to functions from the `stats` package, so let's import that namespace as a whole. We do that by [roxygenizing](https://roxygen2.r-lib.org/index.html) `estimate_risk.R`. Among other documentation that we'll go ahead and add, the key line is `#' @import stats`. After we build the documentation and rebuild the package, roxygen2 automatically updates the NAMESPACE file appropriately.
+
+
