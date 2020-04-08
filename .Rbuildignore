@@ -3,9 +3,10 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^\.travis\.yml$
-^appveyor\.yml$
-^codecov\.yml$
 ^dev$
-^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.ccache$
+^\.github$
+^clang-.*
+^tic\.R$
