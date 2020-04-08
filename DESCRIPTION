@@ -24,4 +24,6 @@ Suggests:
 Imports: 
     sandwich,
     addreg,
-    stats
+    stats,
+    lifecycle
+RdMacros: lifecycle

@@ -152,3 +152,47 @@ usethis::use_build_ignore("dev")
 usethis::use_pkgdown()
 pkgdown::build_site()
 ```
+
+  - Make it possible to add lifecycle information to individual
+    functions
+
+<!-- end list -->
+
+``` r
+usethis::use_lifecycle()
+```
+
+  - A note from this code output tells us the following:
+
+<!-- end list -->
+
+    ✓ Adding 'lifecycle' to Imports field in DESCRIPTION
+    ● Copy and paste the following lines into '/Users/gerketa/Desktop/risks/R/risks-package.R':
+      ## usethis namespace: start
+      #' @importFrom lifecycle deprecate_soft
+      ## usethis namespace: end
+      NULL
+
+  - We also learn that we can update the badge status with
+
+<!-- end list -->
+
+    ● Add badges in documentation topics by inserting one of:
+    - \lifecycle{experimental}
+    - \lifecycle{maturing}
+    - \lifecycle{stable}
+    - \lifecycle{superseded}
+    - \lifecycle{questioning}
+    - \lifecycle{soft-deprecated}
+    - \lifecycle{deprecated}
+    - \lifecycle{defunct}
+    - \lifecycle{archived}
+
+  - Let’s now add a lifecycle badge for the whole package (currently
+    “maturing”).
+
+<!-- end list -->
+
+``` r
+usethis::use_lifecycle_badge("maturing")
+```

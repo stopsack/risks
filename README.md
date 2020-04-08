@@ -11,9 +11,12 @@ status](https://travis-ci.com/tgerke/risks.svg?branch=master)](https://travis-ci
 status](https://ci.appveyor.com/api/projects/status/github/tgerke/risks?branch=master&svg=true)](https://ci.appveyor.com/project/tgerke/risks)
 [![Codecov test
 coverage](https://codecov.io/gh/tgerke/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/tgerke/risks?branch=master)
+[![Lifecycle:
+maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
-The goal of risks is to …
+The goal of risks is to … Further details are available at
+[tgerke.github.io/risks/](https://tgerke.github.io/risks/).
 
 ## Installation
 
