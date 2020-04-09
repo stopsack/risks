@@ -53,6 +53,19 @@ usethis::use_readme_rmd()
 # install.packages("sodium") #also necessary
 tic::use_tic() #guides through the tic setup wizard
 ```
+- I set it up so that `tic` will run a linux build through Travis CI, then perform GitHub Actions R checks on Windows, Mac, and Ubuntu. By default, it also runs in Mac OSX development version, but I found this unstable. To turn that off, go to `.github/workflows/main.yml` and comment out the appropriate line:
+```r
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # comment out lines if you do not want to build on certain platforms
+          - { os: windows-latest, r: "release" }
+          - { os: macOS-latest, r: "release", pkgdown: "true" }
+          #- { os: macOS-latest, r: "devel" }
+          - { os: ubuntu-latest, r: "release" }
+```
+- I also let GitHub Actions build the [`pkgdown`](https://pkgdown.r-lib.org/) site in the `gh-pages` branch. Make sure to wire that up in Settings -> GitHub Pages in GitHub.
 
 - Initialize first function
 ```r
@@ -76,14 +89,6 @@ usethis::use_build_ignore("dev")
 ```
 
 - At this point, if we run `devtools::check()` (or shortcut with `Cmd \+ Shift \+ E`), we get some notes like "no visible global function definition for `glm`". There's a suggestion about adding `importFrom()` to the NAMESPACE file (which is what needs to be done). Most such warnings appear to refer to functions from the `stats` package, so let's import that namespace as a whole. We do that by [roxygenizing](https://roxygen2.r-lib.org/index.html) `estimate_risk.R`. Among other documentation that we'll go ahead and add, the key line is `#' @import stats`. After we build the documentation and rebuild the package, roxygen2 automatically updates the NAMESPACE file appropriately. Don't forget to also `usethis::use_package("stats")` to update the DESCRIPTION file.
-
-- Configure [`pkgdown`](https://pkgdown.r-lib.org/) to build a documentation website.
-```r
-# if an update is needed
-# devtools::install_github("r-lib/pkgdown")
-usethis::use_pkgdown()
-pkgdown::build_site()
-```
 
 - Make it possible to add lifecycle information to individual functions
 ```r

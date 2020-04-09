@@ -84,6 +84,31 @@ usethis::use_readme_rmd()
 tic::use_tic() #guides through the tic setup wizard
 ```
 
+  - I set it up so that `tic` will run a linux build through Travis CI,
+    then perform GitHub Actions R checks on Windows, Mac, and Ubuntu. By
+    default, it also runs in Mac OSX development version, but I found
+    this unstable. To turn that off, go to `.github/workflows/main.yml`
+    and comment out the appropriate line:
+
+<!-- end list -->
+
+``` r
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # comment out lines if you do not want to build on certain platforms
+          - { os: windows-latest, r: "release" }
+          - { os: macOS-latest, r: "release", pkgdown: "true" }
+          #- { os: macOS-latest, r: "devel" }
+          - { os: ubuntu-latest, r: "release" }
+```
+
+  - I also let GitHub Actions build the
+    [`pkgdown`](https://pkgdown.r-lib.org/) site in the `gh-pages`
+    branch. Make sure to wire that up in Settings -\> GitHub Pages in
+    GitHub.
+
   - Initialize first function
 
 <!-- end list -->
@@ -133,18 +158,6 @@ usethis::use_build_ignore("dev")
     documentation and rebuild the package, roxygen2 automatically
     updates the NAMESPACE file appropriately. Don’t forget to also
     `usethis::use_package("stats")` to update the DESCRIPTION file.
-
-  - Configure [`pkgdown`](https://pkgdown.r-lib.org/) to build a
-    documentation website.
-
-<!-- end list -->
-
-``` r
-# if an update is needed
-# devtools::install_github("r-lib/pkgdown")
-usethis::use_pkgdown()
-pkgdown::build_site()
-```
 
   - Make it possible to add lifecycle information to individual
     functions
