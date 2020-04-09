@@ -52,10 +52,6 @@ usethis::use_readme_rmd()
 # remotes::install_github("ropenscilabs/travis") #also necessary
 # install.packages("sodium") #also necessary
 tic::use_tic() #guides through the tic setup wizard
-
-## Appveyor
-tic::use_appveyor_yml(type = "windows")
-
 ```
 
 - Initialize first function
