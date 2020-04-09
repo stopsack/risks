@@ -104,6 +104,10 @@ tic::use_tic() #guides through the tic setup wizard
           - { os: ubuntu-latest, r: "release" }
 ```
 
+  - I renamed the GitHub Actions workflow in
+    `.github/workflows/main.yml` for more descriptive badge appearance.
+    The badge can be copied into README from the Actions tab in GitHub.
+
   - I also let GitHub Actions build the
     [`pkgdown`](https://pkgdown.r-lib.org/) site in the `gh-pages`
     branch. Make sure to wire that up in Settings -\> GitHub Pages in

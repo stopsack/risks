@@ -9,10 +9,10 @@
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Travis build
 status](https://travis-ci.com/tgerke/risks.svg?branch=master)](https://travis-ci.com/tgerke/risks)
-![R CMD Check
-Windows/MacOS/Ubuntu](https://github.com/tgerke/risks/workflows/R%20CMD%20Check%20via%20%7Btic%7D/badge.svg)
 [![Codecov test
 coverage](https://codecov.io/gh/tgerke/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/tgerke/risks?branch=master)
+![R CMD Check
+Windows/MacOS/Ubuntu](https://github.com/tgerke/risks/workflows/R%20CMD%20Check%20Windows/MacOS/Ubuntu/badge.svg)
 <!-- badges: end -->
 
 The goal of risks is to … Further details are available at
