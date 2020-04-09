@@ -70,8 +70,7 @@ usethis::use_readme_rmd()
 ```
 
   - Using [tic](https://github.com/ropensci/tic), set up CI with Travis
-    CI, GitHub Actions, Appveyor/CircleCI (useful for Windows
-    compatibility monitoring), as well as codecov. Note that this step
+    CI and GitHub Actions, as well as codecov. Note that this step
     requires some external interfacing with the external CI sites to get
     the connections right.
 
