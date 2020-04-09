@@ -9,8 +9,8 @@ Authors@R:
     person(given = "Travis",
            family = "Gerke",
            role = c("aut"),
-           email = "travis.gerke@moffitt.org"),
-           comment = c(ORCID = "0000-0002-9500-8907"))
+           email = "travis.gerke@moffitt.org",
+           comment = c(ORCID = "YOUR-ORCID-ID")))
 Description: Offers several methods for estimating convergent loglinear models for relative risks (risk ratios) and risk differences.
 License: MIT + file LICENSE
 Encoding: UTF-8
