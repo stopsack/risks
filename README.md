@@ -8,7 +8,7 @@
 [![Lifecycle:
 maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![Travis build
-status](https://img.shields.io/travis/tgerke/risks/master?logo=travis&style=flat-square&label=Linux)](https://travis-ci.com/tgerke/risks)
+status](https://img.shields.io/travis/tgerke/risks/master?logo=travis&style=flat&label=Linux)](https://travis-ci.com/tgerke/risks)
 [![Codecov test
 coverage](https://codecov.io/gh/tgerke/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/tgerke/risks?branch=master)
 [![R CMD Check
