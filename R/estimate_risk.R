@@ -1,197 +1,232 @@
 #' Fit risk ratio and risk difference models
 #'
-#' \code{estimate_risk} Fits risk ratio and risk difference models using robust
-#' Poisson and binomial models.
+#' @description
 #'
-#' This is a paragraph which includes important methods details to be described.
+#' \code{estimate_risk} Fits risk ratio and risk difference models.
 #'
-#' @import stats
+#' \code{estimate_risk} provides a flexible interface to fitting
+#' risk ratio and risk difference models.
+#' Implemented are Poisson models with robust covariance, binomial models,
+#' binomial models aided in convergence by starting values obtained
+#' through Poisson models, binomial models fitted via
+#' combinatorial expectation maximization, and estimates
+#' obtained via regression standardization.
 #'
-#' @param data a \code{tibble}(?) or \code{data.frame} object
-#' @param formula a formula object
-#' @param estimate the type of estimate to report: risk (prevalance) ratio
-#'   ("rr") or risk difference ("rd")
-#' @param level confidence interval width
-#' @param pvalue a logical value indicating whether to add p-values to the table
-#'   of results
-#' @param sourcecolumn a logical value indicating whether to add column with
-#'   source of final estimates (binomial vs. Poisson)
-#' @param verbose a logical indicating whether to print all model summaries or
-#'   just final coefficients
-#' @param logistic a logical indicating whether to show logistic regression for
-#'   comparison
-#' @param addbin a logical indicating whether to attempt \code{addbin()} if
-#'   \code{glm()} fits fail to converge
-#' @param ... further arguments passed to \code{glm}
+#' @import stats, tidyverse, logbin, addreg, rsample
 #'
+#' @param formula A formula object of the form 'response ~ predictors'
+#' @param data A \code{tibble} or \code{data.frame} object
+#' @param estimate Optional: the type of estimate to report: risk ratio
+#' (\code{"rr"}, default) or risk difference (\code{"rd"})
+#' @param approach Optional: Method for model fitting.
+#' \code{"auto"} (default) is recommended; it selects the most efficient
+#'   approach that converges and ensures that predicted probabilities are
+#'   within range (< 1; see Details). \code{"all"} will attempt to fit
+#'   the model via all implemented approaches to allow for comparisons.
+#'   The other options allow for directly selecting a fitting approach,
+#'   which may not converge or yield out-of-range  predicted probabilities.
+#' @param variable Optional: variable use for marginal standardization.
+#'   If \code{variable} is not provided and marginal standardization is
+#'   attempted, then the first binary or categorical variable in the model
+#'   is used as the exposure. Levels are determined automatically for
+#'   variables types \code{logical}, \code{character}, \code{factor},
+#'   and \code{numeric} (only if no more than 2 levels for the latter);
+#'   otherwise levels must be supplied via \code{at =}.
+#' @param at Optional: Levels of variable \{variable} for marginal
+#'   standardization. See details.
+#' @param ... further arguments passed to fitting functions (\code{glm},
+#'   \code{logbin}, or \code{addreg})
+#'
+#' @references Wacholder S. Binomial regression in GLIM: Estimating risk ratios
+#'   and risk differences. Am J Epidemiol 1986;123:174-184.
+#'   (Binomial regression models; approach = "glm")
 #' @references Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or
 #'   Prevalence Ratios and Differences. Am J Epidemiol 2005;162:199-200.
-#'   (overview)
-#' @references Wacholder S. Binomial regression in GLIM: Estimating risk ratios
-#'   and risk differences. Am J Epidemiol 1986;123:174-184. (log-binomial model)
+#'   (Binomial models fitted used starting values from Poisson models;
+#'   approach = "glm_start")
 #' @references Zou G. A modified Poisson regression approach to prospective
-#'   studies with binary data. Am J Epidemiol 2004;159:702-706. (Poisson with
-#'   sandwich SE)
-#' @references Marschner's addbin package
+#'   studies with binary data. Am J Epidemiol 2004;159:702-706.
+#'   (Poisson model with robust/sandwich standard errors;
+#'   approach = "robpoisson")
+#' @references Donoghoe MW, Marschner IC. logbin: An R Package for
+#'   Relative Risk Regression Using the Log-Binomial Model.
+#'   J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
+#'   expectation maximization; estimate = "rr", approach = "glm_cem")
+#' @references Donoghoe MW, Marschner IC. Stable computational methods
+#'   for additive binomial models with application to adjusted risk differences.
+#'   Comput Stat Data Anal 2014;80:184-96. (Additive binomial models
+#'   fitted via combinatorial expectation maximization;
+#'   estimate = "rd", approach = "glm_cem")
+#' @references Localio AR, Margolis DJ, Berlin JA.
+#'   Relative risks and confidence intervals were easily computed
+#'   indirectly from multivariable logistic regression.
+#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after
+#'   logistic model; approach = "margstd)
 #'
 
-estimate_risk <- function(data,
-                    formula,
-                    estimate     = "rr",
-                    level        = 0.95,
-                    pvalue       = FALSE,
-                    sourcecolumn = FALSE,
-                    verbose      = TRUE,
-                    logistic     = FALSE,
-                    addbin       = TRUE,
-                    ...) {
-  link <- switch(EXPR = estimate,
-                 rr = "log",
-                 rd = "identity")
 
-  # Try to fit Poisson model
-  fitpois <- tryCatch(glm(formula, family = poisson(link = link), data = data, ...),
-                      error   = function(x) { NA },
-                      warning = function(x) { NA })
 
-  # Try to fit binomial model with starting values from Poisson if the latter converged
-  if(!is.na(fitpois[1])) {
-    fitpois.coe <- coef(fitpois)
-    fitbin <- tryCatch(
-      glm(formula, family = binomial(link = link), data = data, start = fitpois.coe, ...),
-      error   = function(x) { NA },
-      warning = function(x) { NA })
-    maxprob.pois <- max(predict(fitpois, type = "response"))
-  } else {  # still try to fit binomial model
-    fitbin <- tryCatch(
-      glm(formula, family = binomial(link = link), data = data, ...),
-      error   = function(x) { NA },
-      warning = function(x) { NA })
-  }
+# new wrapper
+estimate_risk <- function(formula, data,
+                          estimate = c("rr", "rd"),
+                          approach = c("auto", "all", "robpoisson", "glm", "glm_start",
+                                       "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                          variable = NULL,
+                          at = NULL,
+                          ...) {
+  link <- switch(EXPR = estimate[1], rr = "log", rd = "identity")
+  if(is.null(link))
+    stop(paste0("Unknown estimate '", estimate,
+                "'. Possible are 'rr', relative risks; 'rd', risk differences."))
+  if(!(approach[1] %in% c("auto", "all", "robpoisson", "glm", "glm_start",
+                          "glm_cem", "glm_cem_start", "margstd", "logistic")))
+    stop(paste("Approach '", approach[1], "' is not implemented."))
 
-  # Did either model converge? If not, try to fit binomial model using addbin() for RD models
-  tryaddbin <- FALSE
-  if(is.na(fitbin[1])) {
-    tryaddbin <- TRUE
-  } else {
-    if(!is.na(fitpois[1]))
-      if(maxprob.pois > 1) {
-        print(paste("Poisson model converged, but yielded out-of-range probabilities. Maximum:", maxprob.pois))
-        tryaddbin <- TRUE
-      }
-  }
+  fit <- switch(EXPR = approach[1],
+                # Automated model fitting
+                auto = {
+                  # 1) try regular GLM with Fisher scoring
+                  fit_glm <- possibly_estimate_glm(formula = formula, data = data, link = link, ...)
+                  if(fit_glm$converged == TRUE &
+                     fit_glm$maxprob < implausible &
+                     fit_glm$boundary == FALSE)
+                    return(fit_glm)
 
-  if(addbin == FALSE)
-    tryaddbin <- FALSE
+                  # 2) try GLM with starting values from Poisson
+                  fit_poisson <- possibly_estimate_poisson(formula = formula, data = data, link = link, ...)
+                  if(fit_poisson$converged == TRUE) {
+                    fit_glm_start <- possibly_estimate_glm(formula = formula, data = data, link = link,
+                                                           start = coef(fit_poisson), ...)
+                    if(fit_glm_start$converged == TRUE &
+                       fit_glm_start$maxprob < implausible  &
+                       fit_glm_start$boundary == FALSE)
+                      return(fit_glm_start)
+                  }
 
-  if(tryaddbin == TRUE) {
-    if(estimate == "rd") {
-      if(verbose == TRUE) {
-        print("Neither the Poisson nor the binomial model for RD converged with glm().")
-        print("Fitting RD binomial model with addbin(method = 'em').")
-      }
+                  # 3) try GLM fitted via CEM
+                  if(link == "log")
+                    fit_glm_cem <- possibly_estimate_logbin(formula = formula, data = data, ...)
+                  else
+                    fit_glm_cem <- possibly_estimate_addreg(formula = formula, data = data, ...)
 
-      fitbin <- tryCatch(addreg::addreg(formula = formula, data = data, family = binomial, method = "em"),
-                         error   = function(x) { NA },
-                         warning = function(x) { NA })
-      if(is.na(fitbin[1]) & is.na(fitpois[1]))
-        stop("Neither the Poisson, binomial, nor addreg() binomial model converged.")
-    } else {
-      stop("Neither the binomial nor the Poisson model for RR converged (or had out-of-range probabilities only).")
-    }
-  }
+                  if(fit_glm_cem$converged == TRUE &
+                     fit_glm_cem$maxprob < implausible  &
+                     fit_glm_cem$boundary == FALSE)
+                    return(fit_glm_cem)
 
-  if(is.na(fitbin[1])) {
-    result.bin <- data.frame(NA)
-  } else {
-    fitbin.ci <- confint.default(fitbin, level = level)
-    result.bin <- switch(EXPR = estimate,
-                         rr   = exp(data.frame(RR = coef(fitbin),
-                                               LL = fitbin.ci[, 1],
-                                               UL = fitbin.ci[, 2])),
-                         rd   = data.frame(RD     = coef(fitbin),
-                                           LL     = fitbin.ci[, 1],
-                                           UL     = fitbin.ci[, 2]))
-    if(pvalue == TRUE)
-      result.bin <- data.frame(result.bin, P = summary(fitbin)$coefficients[, "Pr(>|z|)"])
-    maxprob.bin <- max(predict(fitbin, type = "response"))
-  }
+                  # 4) Try marginal standardization after logistic model
+                  fit_margstd <- possibly_estimate_margstd(formula = formula, data = data,
+                                                           estimate = estimate, ...)
+                  if(fit_margstd$converged == TRUE &
+                     fit_margstd$maxprob < implausible &
+                     fit_margstd$boundary == FALSE)
+                    return(fit_margstd)
 
-  # Estimate robust covariance for Poisson if binomial model did not converge or verbose output is requested
-  if((is.na(result.bin[1, 1]) | verbose == TRUE) & !is.na(fitpois[1])) {
-    fitpois.se <- sqrt(diag(sandwich::vcovHC(fitpois, type = "HC0")))  # consider HC3 (even more conservative)
-    zcritical <- qnorm(1-((1-level)/2))
-    result.pois <- switch(EXPR = estimate,
-                          rr = exp(data.frame(RR = fitpois.coe,
-                                              LL = fitpois.coe - zcritical * fitpois.se,
-                                              UL = fitpois.coe + zcritical * fitpois.se)),
-                          rd =     data.frame(RD = fitpois.coe,
-                                              LL = fitpois.coe - zcritical * fitpois.se,
-                                              UL = fitpois.coe + zcritical * fitpois.se))
-    if(pvalue == TRUE)
-      result.pois <- data.frame(result.pois, P = 2 * pnorm(abs(fitpois.coe/fitpois.se), lower.tail = FALSE))
-  }
+                  # 5) If 1-4 do not work, return at least the Poisson model
+                  if(fit_poisson$converged == TRUE &
+                     fit_poisson$maxprob < implausible &
+                     fit_margstd$boundary == FALSE) {
+                    warning("Only the Poisson model converged")
+                    return(fit_poisson)
+                  }
 
-  if(logistic == TRUE) {
-    print("**************************************")
-    print("*** FOR COMPARISON: LOGISTIC MODEL ***")
-    logistic(data = data, formula = formula)
-  }
+                  stop("No model converged or had within-range predicted probabilities of < 1.")
+                },
 
-  if(verbose == TRUE) {
-    print("######################################")
-    print(paste("### CALL:", as.character(formula), " *** Estimate: ", estimate, "###"))
-    print("**************************************")
-    print("***        POISSON MODEL           ***")
-    print("***  (ignore SEs, p in 1st table)  ***")
-    if(!is.na(fitpois[1])) {
-      print(summary(fitpois))
-      print(result.pois)
-    } else {
-      print("Poisson model did not converge")
-    }
-    print("")
-    print("**************************************")
-    print("***        BINOMIAL MODEL          ***")
-    if(is.na(result.bin[1, 1])) {
-      print("Binomial model did not converge")
-    } else {
-      # Check that predicted probabilites are meaningful
-      if(maxprob.bin > 1) {
-        print(paste("Binomial model converged, but yielded out-of-range predicted probabilities. Maximum:", maxprob.bin))
-      } else {
-        print(summary(fitbin))
-        print(result.bin)
-      }
-    }
-    print("######################################")
-  }
+                # All models requested to fit
+                all  = {
+                  fit1 <- possibly_estimate_poisson(formula = formula, data = data, link = link, ...)
+                  if(fit1$converged == FALSE)
+                    class(fit1) <- c("risks", "robpoisson", "glm", "lm")
 
-  # Return results from binomial model if converged and in-range predicted probabilities
-  if(is.na(result.bin[1, 1])) {
-    returnpoisson <- TRUE
-  } else {
-    if(maxprob.bin > 1) {  # cannot add to the if() above becase maxprob.bin may be non-existant
-      returnpoisson <- TRUE
-    } else {
-      returnpoisson <- FALSE
-      result <- result.bin
-      if(sourcecolumn == TRUE) {
-        if(tryaddbin == TRUE)
-          result <- data.frame(result, model = "Binomial_addbin")
-        else
-          result <- data.frame(result, model = "Binomial")
-      }
-    }
-  }
+                  fit2 <- possibly_estimate_glm(formula = formula, data = data, link = link, ...)
+                  if(fit2$converged == FALSE)
+                    class(fit2) <- c("risks", "glm", "lm")
 
-  # Otherwise return results from Poisson model
-  if(returnpoisson == TRUE) {
-    result <- result.pois
-    if(sourcecolumn == TRUE)
-      result <- data.frame(result, model = "Poisson")
-  }
+                  if(!is.null(coef(fit1)))  # attempt only if Poisson converged
+                    fit3 <- possibly_estimate_glm(formula = formula, data = data, link = link,
+                                                  start = coef(fit1), ...)
+                  else  # make possibly_estimate_glm return a non-converged object
+                    fit3 <- possibly_estimate_glm(formula = nonsense, data = nodata)
+                  if(fit3$converged == FALSE)
+                    class(fit3) <- c("risks", "glm_start", "glm", "lm")
 
-  # Return table of estimates
-  result
+                  if(link == "log") {
+                    fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
+                    if(fit4$converged == FALSE)
+                      class(fit4) <- c("risks", "logbin", "glm", "lm")
+                  } else {
+                    fit4 <- possibly_estimate_addreg(formula = formula, data = data, ...)
+                    if(fit4$converged == FALSE)
+                      class(fit4) <- c("risks", "addreg", "glm", "lm")
+                  }
+
+                  if(link == "log") {
+                    if(!is.null(coef(fit1))) # attempt only if Poisson converged
+                      fit5 <- possibly_estimate_logbin(formula = formula, data = data,
+                                                       start = coef(fit1), ...)
+                    else
+                      fit5 <- possibly_estimate_logbin(formula = nonsense, data = nodata)
+                    if(fit5$converged == FALSE)
+                      class(fit5) <- c("risks", "logbin", "glm", "lm")
+                  } else {
+                    if(!is.null(coef(fit1))) # attempt only if Poisson converged
+                      fit5 <- possibly_estimate_addreg(formula = formula, data = data,
+                                                       start = coef(fit1), ...)
+                    else
+                      fit5 <- possibly_estimate_addreg(formula = nonsense, data = nodata)
+                    if(fit5$converged == FALSE)
+                      class(fit5) <- c("risks", "addreg", "glm", "lm")
+                  }
+
+                  fit6 <- possibly_estimate_margstd(formula = formula, data = data,
+                                                    estimate = estimate,
+                                                    variable = variable, at = at, ...)
+                  if(fit6$converged == FALSE)
+                    class(fit6) <- c("risks", "margstd", "glm", "lm")
+
+                  # If RR requested, add on plain logistic model for comparison
+                  if(estimate[1] == "rr") {
+                    fit7 <- possibly_estimate_logistic(formula = formula, data = data, ...)
+                    if(fit7$converged == FALSE)
+                      class(fit7) <- c("risks", "logistic", "glm", "lm")
+
+                    fit1$all_models = list(
+                      model1 = fit1, model2 = fit2, model3 = fit3, model4 = fit4,
+                      model5 = fit5, model6 = fit6, model7 = fit7)
+                  } else
+                    fit1$all_models = list(
+                      model1 = fit1, model2 = fit2, model3 = fit3, model4 = fit4,
+                      model5 = fit5, model6 = fit6)
+                  fit1
+                },
+
+                # Specific models that were directly requested
+                robpoisson = estimate_poisson(formula = formula, data = data, link = link, ...),
+                glm        = estimate_glm(formula = formula, data = data, link = link, ...),
+                glm_start  = {
+                  fit_poisson <- estimate_poisson(formula = formula, data = data, link = link, ...)
+                  estimate_glm(formula = formula, data = data, link = link, start = coef(fit_poisson), ...)
+                },
+                glm_cem    = {
+                  if(link == "log")
+                    estimate_logbin(formula = formula, data = data, ...)
+                  else
+                    estimate_addreg(formula = formula, data = data, ...)
+                },
+                glm_cem_start = {
+                  fit_poisson <- estimate_poisson(formula = formula, data = data, link = link, ...)
+                  if(link == "log")
+                    estimate_logbin(formula = formula, data = data, start = coef(fit_poisson), ...)
+                  else
+                    estimate_addreg(formula = formula, data = data, start = coef(fit_poisson), ...)
+                },
+                margstd    = estimate_margstd(formula = formula, data = data, estimate = estimate,
+                                              variable = variable, at = at, ...),
+                logistic = {
+                  if(estimate[1] == "rd")
+                    stop("Odds difference models are not implemented.")
+                  estimate_logistic(formula = formula, data = data, ...)
+                })
+  return(fit)
 }
