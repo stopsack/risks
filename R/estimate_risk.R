@@ -12,7 +12,9 @@
 #' combinatorial expectation maximization, and estimates
 #' obtained via regression standardization.
 #'
-#' @import stats, tidyverse, logbin, addreg, rsample
+#' @import stats tidyverse rsample
+#' @importFrom logbin logbin
+#' @importFrom addreg addreg
 #'
 #' @param formula A formula object of the form 'response ~ predictors'
 #' @param data A \code{tibble} or \code{data.frame} object
@@ -32,7 +34,7 @@
 #'   variables types \code{logical}, \code{character}, \code{factor},
 #'   and \code{numeric} (only if no more than 2 levels for the latter);
 #'   otherwise levels must be supplied via \code{at =}.
-#' @param at Optional: Levels of variable \{variable} for marginal
+#' @param at Optional: Levels of variable \code{variable} for marginal
 #'   standardization. See details.
 #' @param ... further arguments passed to fitting functions (\code{glm},
 #'   \code{logbin}, or \code{addreg})

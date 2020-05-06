@@ -5,63 +5,86 @@
 \title{Fit risk ratio and risk difference models}
 \usage{
 estimate_risk(
-  data,
   formula,
-  estimate = "rr",
-  level = 0.95,
-  pvalue = FALSE,
-  sourcecolumn = FALSE,
-  verbose = TRUE,
-  logistic = FALSE,
-  addbin = TRUE,
+  data,
+  estimate = c("rr", "rd"),
+  approach = c("auto", "all", "robpoisson", "glm", "glm_start", "glm_cem",
+    "glm_cem_start", "margstd", "logistic"),
+  variable = NULL,
+  at = NULL,
   ...
 )
 }
 \arguments{
-\item{data}{a \code{tibble}(?) or \code{data.frame} object}
+\item{formula}{A formula object of the form 'response ~ predictors'}
 
-\item{formula}{a formula object}
+\item{data}{A \code{tibble} or \code{data.frame} object}
 
-\item{estimate}{the type of estimate to report: risk (prevalance) ratio
-("rr") or risk difference ("rd")}
+\item{estimate}{Optional: the type of estimate to report: risk ratio
+(\code{"rr"}, default) or risk difference (\code{"rd"})}
 
-\item{level}{confidence interval width}
+\item{approach}{Optional: Method for model fitting.
+\code{"auto"} (default) is recommended; it selects the most efficient
+approach that converges and ensures that predicted probabilities are
+within range (< 1; see Details). \code{"all"} will attempt to fit
+the model via all implemented approaches to allow for comparisons.
+The other options allow for directly selecting a fitting approach,
+which may not converge or yield out-of-range  predicted probabilities.}
 
-\item{pvalue}{a logical value indicating whether to add p-values to the table
-of results}
+\item{variable}{Optional: variable use for marginal standardization.
+If \code{variable} is not provided and marginal standardization is
+attempted, then the first binary or categorical variable in the model
+is used as the exposure. Levels are determined automatically for
+variables types \code{logical}, \code{character}, \code{factor},
+and \code{numeric} (only if no more than 2 levels for the latter);
+otherwise levels must be supplied via \code{at =}.}
 
-\item{sourcecolumn}{a logical value indicating whether to add column with
-source of final estimates (binomial vs. Poisson)}
+\item{at}{Optional: Levels of variable \code{variable} for marginal
+standardization. See details.}
 
-\item{verbose}{a logical indicating whether to print all model summaries or
-just final coefficients}
-
-\item{logistic}{a logical indicating whether to show logistic regression for
-comparison}
-
-\item{addbin}{a logical indicating whether to attempt \code{addbin()} if
-\code{glm()} fits fail to converge}
-
-\item{...}{further arguments passed to \code{glm}}
+\item{...}{further arguments passed to fitting functions (\code{glm},
+\code{logbin}, or \code{addreg})}
 }
 \description{
-\code{estimate_risk} Fits risk ratio and risk difference models using robust
-Poisson and binomial models.
-}
-\details{
-This is a paragraph which includes important methods details to be described.
+\code{estimate_risk} Fits risk ratio and risk difference models.
+
+\code{estimate_risk} provides a flexible interface to fitting
+risk ratio and risk difference models.
+Implemented are Poisson models with robust covariance, binomial models,
+binomial models aided in convergence by starting values obtained
+through Poisson models, binomial models fitted via
+combinatorial expectation maximization, and estimates
+obtained via regression standardization.
 }
 \references{
+Wacholder S. Binomial regression in GLIM: Estimating risk ratios
+and risk differences. Am J Epidemiol 1986;123:174-184.
+(Binomial regression models; approach = "glm")
+
 Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or
 Prevalence Ratios and Differences. Am J Epidemiol 2005;162:199-200.
-(overview)
-
-Wacholder S. Binomial regression in GLIM: Estimating risk ratios
-and risk differences. Am J Epidemiol 1986;123:174-184. (log-binomial model)
+(Binomial models fitted used starting values from Poisson models;
+approach = "glm_start")
 
 Zou G. A modified Poisson regression approach to prospective
-studies with binary data. Am J Epidemiol 2004;159:702-706. (Poisson with
-sandwich SE)
+studies with binary data. Am J Epidemiol 2004;159:702-706.
+(Poisson model with robust/sandwich standard errors;
+approach = "robpoisson")
 
-Marschner's addbin package
+Donoghoe MW, Marschner IC. logbin: An R Package for
+Relative Risk Regression Using the Log-Binomial Model.
+J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
+expectation maximization; estimate = "rr", approach = "glm_cem")
+
+Donoghoe MW, Marschner IC. Stable computational methods
+for additive binomial models with application to adjusted risk differences.
+Comput Stat Data Anal 2014;80:184-96. (Additive binomial models
+fitted via combinatorial expectation maximization;
+estimate = "rd", approach = "glm_cem")
+
+Localio AR, Margolis DJ, Berlin JA.
+Relative risks and confidence intervals were easily computed
+indirectly from multivariable logistic regression.
+J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after
+logistic model; approach = "margstd)
 }
