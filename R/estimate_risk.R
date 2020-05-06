@@ -65,6 +65,8 @@
 #'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after
 #'   logistic model; approach = "margstd)
 #'
+#' @export
+#'
 
 
 
