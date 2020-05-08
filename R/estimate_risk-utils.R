@@ -1,0 +1,48 @@
+#' Helper functions for estimate_risk()
+
+# Fitting functions for individual models
+# Estimate maximum predicted probability, ensure later it is < 1
+estimate_maxprob <- function(fit, start = NULL) {
+  implausible <- 0.99999  # logbin and addreg predicted probablities do not exact reach 1
+                          # in case they converge on implausible values
+  fit$maxprob <- maxprob <- max(predict(fit, type = "response"))
+  if(maxprob > implausible)
+    message(paste("Implausible predicted probability >", implausible, "occurred:", maxprob))
+  if(!is.null(start))
+    fit$risks_start <- "_start"
+  else
+    fit$risks_start <- ""
+  class(fit) <- c("risks", class(fit))
+  return(fit)
+}
+
+# Exception handlers
+possibly_estimate_poisson <- possibly(
+  .f = estimate_poisson,
+  otherwise = list(family = list(family = "poisson"),
+                   converged = FALSE, boundary = FALSE, maxprob  = NA_real_))
+
+possibly_estimate_glm <- possibly(
+  .f = estimate_glm,
+  otherwise = list(family = list(family = "binomial"),
+                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+
+possibly_estimate_logbin <- possibly(
+  .f = estimate_logbin,
+  otherwise = list(family = list(family = "binomial", link = "log"),
+                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+
+possibly_estimate_addreg <- possibly(
+  .f = estimate_addreg,
+  otherwise = list(family = list(family = "binomial", link = "identity"),
+                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+
+possibly_estimate_logistic <- possibly(
+  .f = estimate_logistic,
+  otherwise = list(family = list(family = "binomial", link = "logit"),
+                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+
+possibly_estimate_margstd <- possibly(
+  .f = estimate_margstd,
+  otherwise = list(family = list(family = "binomial", link = "logit"),
+                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
