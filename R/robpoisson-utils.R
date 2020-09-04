@@ -1,9 +1,11 @@
 # Helper functions for estimate_risk(approach = "robpoisson") and
 # the use of Poisson models in approach = "auto" or approach = "all"
 
+#' @import stats
+
 # (1) Poisson
 estimate_poisson <- function(formula, data, link, ...) {
-  fit <- glm(formula = formula, family = poisson(link = link), data = data)
+  fit <- stats::glm(formula = formula, family = poisson(link = link), data = data)
   class(fit) <- c("robpoisson", class(fit))
   fit <- estimate_maxprob(fit)
   return(fit)
@@ -19,7 +21,7 @@ confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
   #  parm <- pnames[parm]
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- stats:::format.perc(a, 3)
+  pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
   fac <- qnorm(a)
   ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
   # Robust covariance, but not the HC3.
@@ -41,7 +43,7 @@ risks_meat <- function (x, type = "HC0", omega = NULL, ...) {
   n <- NROW(X)
   diaghat <- try(hatvalues(x), silent = TRUE)
   df <- n - NCOL(X)
-  ef <- sandwich:::estfun(x, ...)
+  ef <- sandwich::estfun(x, ...)
   res <- rowMeans(ef/X, na.rm = TRUE)
   res[apply(abs(ef) < .Machine$double.eps, 1L, all)] <- 0
   if (is.null(omega)) {
@@ -76,7 +78,9 @@ summary.robpoisson <- function (object, dispersion = NULL, correlation = FALSE,
   p <- object$rank
   if (p > 0) {
     p1 <- 1L:p
-    Qr <- stats:::qr.lm(object)
+    Qr <- object$qr
+    if(is.null(Qr))
+      stop("lm object does not have a proper 'qr' component.\n Rank zero or should not have used lm(.., qr=FALSE).")
     coef.p <- object$coefficients[Qr$pivot[p1]]
     ###### changes here #######
     # needed to avoid recursive calls:

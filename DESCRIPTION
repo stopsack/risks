@@ -1,5 +1,5 @@
 Package: risks
-Title: Estimate relative risks and risk differences with log-binomial models
+Title: Estimate relative risks and risk differences using regression
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Konrad",
@@ -12,20 +12,29 @@ Authors@R:
            role = c("aut"),
            email = "travis.gerke@moffitt.org",
            comment = c(ORCID = "0000-0002-9500-8907")))
-Description: Offers several methods for estimating convergent loglinear models for relative risks (risk ratios) and risk differences.
+Description: Offers several methods for estimating convergent regression models for relative risks (risk ratios) and risk differences.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0.9000
-URL: https://github.com/tgerke/risks
-BugReports: https://github.com/tgerke/risks/issues
+RoxygenNote: 7.1.1
+URL: https://github.com/stopsack/risks
+BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
     covr,
     testthat
 Imports: 
-    sandwich,
     addreg,
+    dplyr,
+    lifecycle,
+    logbin,
+    magrittr,
+    purrr,
+    rlang,
+    rsample,
+    sandwich,
     stats,
-    lifecycle
+    tibble,
+    tidyr,
+    tidyverse
 RdMacros: lifecycle

@@ -13,8 +13,8 @@
 #' obtained via regression standardization.
 #'
 #' @import stats tidyverse rsample
-#' @importFrom logbin logbin
 #' @importFrom addreg addreg
+#' @importFrom logbin logbin
 #'
 #' @param formula A formula object of the form 'response ~ predictors'
 #' @param data A \code{tibble} or \code{data.frame} object
@@ -78,6 +78,7 @@ estimate_risk <- function(formula, data,
                           variable = NULL,
                           at = NULL,
                           ...) {
+  implausible <- 0.99999
   link <- switch(EXPR = estimate[1], rr = "log", rd = "identity")
   if(is.null(link))
     stop(paste0("Unknown estimate '", estimate,
@@ -151,7 +152,7 @@ estimate_risk <- function(formula, data,
                     fit3 <- possibly_estimate_glm(formula = formula, data = data, link = link,
                                                   start = coef(fit1), ...)
                   else  # make possibly_estimate_glm return a non-converged object
-                    fit3 <- possibly_estimate_glm(formula = nonsense, data = nodata)
+                    fit3 <- possibly_estimate_glm(formula = "nonsense", data = "nodata")
                   if(fit3$converged == FALSE)
                     class(fit3) <- c("risks", "glm_start", "glm", "lm")
 
@@ -170,7 +171,7 @@ estimate_risk <- function(formula, data,
                       fit5 <- possibly_estimate_logbin(formula = formula, data = data,
                                                        start = coef(fit1), ...)
                     else
-                      fit5 <- possibly_estimate_logbin(formula = nonsense, data = nodata)
+                      fit5 <- possibly_estimate_logbin(formula = "nonsense", data = "nodata")
                     if(fit5$converged == FALSE)
                       class(fit5) <- c("risks", "logbin", "glm", "lm")
                   } else {
@@ -178,7 +179,7 @@ estimate_risk <- function(formula, data,
                       fit5 <- possibly_estimate_addreg(formula = formula, data = data,
                                                        start = coef(fit1), ...)
                     else
-                      fit5 <- possibly_estimate_addreg(formula = nonsense, data = nodata)
+                      fit5 <- possibly_estimate_addreg(formula = "nonsense", data = "nodata")
                     if(fit5$converged == FALSE)
                       class(fit5) <- c("risks", "addreg", "glm", "lm")
                   }

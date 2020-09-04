@@ -1,5 +1,14 @@
-# Postestimation methods for 'risks' models:
+# Postestimation methods for 'risks' models
+#
 # print(), summary(), summary.print(), and tidy()
+
+#' @import stats tidyverse rsample
+#' @importFrom rlang .data
+
+norowname <- function(x) {
+  rownames(x) <- NULL
+  x
+}
 
 # Helper function for tidy.risks()
 risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
@@ -46,10 +55,10 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
       CI <- CI[piv, , drop = FALSE]
     }
     colnames(CI) <- c("conf.low", "conf.high")
-    ret <- cbind(ret, trans(broom:::unrowname(CI)))
+    ret <- cbind(ret, trans(norowname(CI)))  # instead of :::unrowname
   }
   ret$estimate <- trans(ret$estimate)
-  as_tibble(ret)
+  tibble::as_tibble(ret)
 }
 
 # tidy() for "risks"
@@ -61,23 +70,26 @@ tidy.risks <- function(
   exponentiate = FALSE,
   default      = TRUE,  # normality-based CIs from confint.default()
   ...) {
-  if(is.null(pluck(x, "all_models"))) {
-    ret <- broom:::tidy.summary.lm(summary(x))
+  tidysummarylm <- get("tidy.summary.lm", envir = asNamespace("broom"), inherits = FALSE)
+
+  if(is.null(purrr::pluck(x, "all_models"))) {
+    #ret <- broom:::tidy.summary.lm(summary(x))
+    ret <- tidysummarylm(summary(x))
     risks_process_lm(ret, x, conf.int = conf.int, conf.level = conf.level,
                      bootreps = bootrepeats,
                      exponentiate = exponentiate, default = default, ...) %>%
-      mutate(model = paste0(class(x)[2], x$risks_start))
+      dplyr::mutate(model = paste0(class(x)[2], x$risks_start))
   } else {  # in case estimate_risk(approach = "all") was called
-    map_dfr(
-      .x = pluck(x, "all_models"),
+    purrr::map_dfr(
+      .x = purrr::pluck(x, "all_models"),
       .f = ~{
-        if((pluck(.x, "converged") == TRUE) & (pluck(.x, "boundary") == FALSE)) {
+        if((purrr::pluck(.x, "converged") == TRUE) & (purrr::pluck(.x, "boundary") == FALSE)) {
           tryCatch({
-            ret <- broom:::tidy.summary.lm(summary(.x))
+            ret <- tidysummarylm(summary(.x))
             risks_process_lm(ret, .x, conf.int = conf.int, conf.level = conf.level,
                              bootreps = bootrepeats,
                              exponentiate = exponentiate, default = default, ...) %>%
-              mutate(model = paste0(class(.x)[2], .x$risks_start))
+              dplyr::mutate(model = paste0(class(.x)[2], .x$risks_start))
           },
           error   = function(x) { tibble() })
         }
@@ -85,18 +97,18 @@ tidy.risks <- function(
   }
 }
 
-
-
 print.risks <- function(x, ...) {
   if(!is.null(x$estimate))
     estimate <- x$estimate
   else
     estimate <- ""
   cat(paste("\nRisk",
-            if_else(x$family$link == "identity" | estimate == "rd",
+            dplyr::if_else(x$family$link == "identity" | estimate == "rd",
                     true = "difference", false = "ratio"),
             "model"))
-  stats:::print.glm(x, ...)
+  #stats:::print.glm(x, ...)
+  print_glm <- get("print.glm", envir = asNamespace("stats"), inherits = FALSE)
+  print_glm(x, ...)
 }
 
 summary.risks <- function(object, ...) {
@@ -104,7 +116,7 @@ summary.risks <- function(object, ...) {
   # Retrieve the first converged model to make sure summary() does not fail
   if(object$converged == FALSE & !is.null(object$all_models)) {
     all_models <- object$all_models
-    converged <- min(which(map(object$all_models, .f = ~pluck(.x, "converged")) == TRUE))
+    converged <- min(which(purrr::map(object$all_models, .f = ~purrr::pluck(.x, "converged")) == TRUE))
     if(is.null(converged))
       stop("No summary: No model converged")
     object <- object$all_models[[converged]]
@@ -114,7 +126,7 @@ summary.risks <- function(object, ...) {
   # Call regular summary.*()
   mysummary <- switch(
     EXPR = class(object)[2],
-    addreg = summary.addreg(object, ...),
+    addreg = addreg::summary.addreg(object, ...),
     margstd = summary.margstd(object, ...),
     summary.glm(object, ...))
   myclass <- class(mysummary)
@@ -135,7 +147,7 @@ summary.risks <- function(object, ...) {
     "logbin_start" = "as binomial model with combinatorial expectation maximization, starting values",
     "margstd"      = "via marginal standardization of a logistic model")
   modeldescr <- paste0("\nRisk ",
-                       if_else(object$family$link == "identity" | estimate == "rd",
+                       dplyr::if_else(object$family$link == "identity" | estimate == "rd",
                                true = "difference", false = "ratio"),
                        " model, fitted ",
                        modeltypes[modeltype], " (", modeltype, ").")
@@ -144,8 +156,8 @@ summary.risks <- function(object, ...) {
   mysummary <- append(mysummary, list(modeldescr = modeldescr,
                                       modeltype  = class(object)[2],
                                       object     = object))
-  if(!is.null(pluck(object, "all_models")))
-    mysummary <- append(mysummary, list(all_models = pluck(object, "all_models")))
+  if(!is.null(purrr::pluck(object, "all_models")))
+    mysummary <- append(mysummary, list(all_models = purrr::pluck(object, "all_models")))
 
   # Return a class of 'summary.risks' for calling of print.summary.risks()
   class(mysummary) <- c("summary.risks", myclass)
@@ -159,25 +171,29 @@ print.summary.risks <- function(
   ...) {
 
   # If estimate_risk(approach = "all") was called:
-  if(!is.null(pluck(x, "all_models"))) {
+  if(!is.null(purrr::pluck(x, "all_models"))) {
     cat("\nAll fitted models:\n")
-    pluck(x, "all_models") %>%
-      map_dfr(.f = ~tibble(
-        Model       = paste0(class(.x)[2], pluck(.x, "risks_start")),
-        Converged   = pluck(.x, "converged"),
-        `Max.prob.` = pluck(.x, "maxprob"))) %>%
-      as.data.frame() %>% print(.)
+    toprint <- purrr::pluck(x, "all_models") %>%
+      purrr::map_dfr(.f = ~tibble(
+        Model       = paste0(class(.x)[2], purrr::pluck(.x, "risks_start")),
+        Converged   = purrr::pluck(.x, "converged"),
+        `Max.prob.` = purrr::pluck(.x, "maxprob"))) %>%
+      as.data.frame()
+    print(toprint)
     cat(paste0("Access these models via '", deparse(substitute(x)), "$all_models'.\n"))
   }
 
   # Print type of final model
   cat(x$modeldescr)
 
+  # copy unexported function
+  printsummaryglm <- get("print.summary.glm", envir = asNamespace("stats"), inherits = FALSE)
+
   # Call regular print.summary.*()
   if("addreg" %in% class(x))
     addreg::print.summary.addreg(x, ...)
   else
-    stats:::print.summary.glm(x, ...)
+    printsummaryglm(x, ...)
 
   # Print confidence intervals
   if(conf.int == TRUE &   # addreg and logbin use standard CIs
@@ -195,12 +211,12 @@ print.summary.risks <- function(
   if(conf.int == TRUE & "margstd" %in% class(x$object)) {
     cat("Confidence intervals for coefficients (bootstrap-based):\n")
     ci <- x$conf.int %>%
-      select(conf.low, conf.high) %>%
+      dplyr::select(.data$conf.low, .data$conf.high) %>%
       as.matrix()
     a <- (1 - x$level)/2
     a <- c(a, 1 - a)
-    colnames(ci) <- stats:::format.perc(a, 3)
-    rownames(ci) <- x$conf.int %>% pull(term)
+    colnames(ci) <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+    rownames(ci) <- x$conf.int %>% dplyr::pull("term")
     print(ci)
   }
 }

@@ -1,20 +1,25 @@
 # Helper functions for marginal standardization after
 # fitting a logistic regression model
 
+#' @import stats tidyverse rsample
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+
+
 # Helper function to obtain predicted values and their contrasts
 eststd <- function(x, data, predictor, levels) {
-  tibble(term = levels) %>%
-    mutate(data = map(.x = term,
-                      .f = ~mutate(.data = data,
-                                   !!!predictor := .x)),
-           response = map(.x = data,
-                          .f = ~predict(object = x, newdata = .x,
+  tibble::tibble(term = levels) %>%
+    dplyr::mutate(data = purrr::map(.x = .data$term,
+                             .f = ~dplyr::mutate(.data = .data$data,
+                                                 !!!predictor := .x)),
+           response = purrr::map(.x = .data$data,
+                          .f = ~stats::predict(object = x, newdata = .x,
                                         type = "response"))) %>%
-    transmute(
-      term  = paste0(predictor, term),
-      means = map_dbl(.x = response, .f = mean),
-      rd    = means - means[1],
-      rr    = means / means[1])
+    dplyr::transmute(
+      term  = paste0(.data$predictor, .data$term),
+      means = purrr::map_dbl(.x = .data$response, .f = mean),
+      rd    = .data$means - .data$means[1],
+      rr    = .data$means / .data$means[1])
 }
 
 # Main function for marginal standardization
@@ -22,10 +27,10 @@ estimate_margstd <- function(
   formula,
   data,
   estimate   = c("rr", "rd"),
-  variable   = NULL,    # where to standardized;
+  variable   = NULL,    # where to standardize;
   # default: 1st binary var/categorical var/numeric var w/2 levels
   at         = NULL) {  # level of variable to standardize at)
-  fit <- glm(formula = formula, family = binomial(link = "logit"), data = data)
+  fit <- stats::glm(formula = formula, family = binomial(link = "logit"), data = data)
 
   # find variable to standardize over
   if(!is.null(variable)) {
@@ -38,13 +43,15 @@ estimate_margstd <- function(
                     "and no values to standardize at are given via 'at ='."))
     predictor <- variable
   } else {
-    model_vars <- tibble(vars = names(fit$model)) %>%
-      mutate(type    = map_chr(.x = vars, .f = ~class(fit$model %>% pull(.x))),
-             nlevels = map_int(.x = vars, .f = ~length(unique(fit$model %>% pull(.x))))) %>%
-      slice(-1) %>%
-      filter(type %in% c("character", "factor", "logical") |
-               (type == "numeric" & nlevels == 2)) %>%
-      slice(1)
+    model_vars <- tibble::tibble(vars = names(fit$model)) %>%
+      dplyr::mutate(type    = purrr::map_chr(.x = .data$vars,
+                                             .f = ~class(fit$model %>% dplyr::pull(.x))),
+                    nlevels = purrr::map_int(.x = .data$vars,
+                                             .f = ~length(unique(fit$model %>% dplyr::pull(.x))))) %>%
+      dplyr::slice(-1) %>%
+      filter(.data$type %in% c("character", "factor", "logical") |
+               (.data$type == "numeric" & .$data$nlevels == 2)) %>%
+      dplyr::slice(1)
 
     if(nrow(model_vars) > 0)
       predictor <- model_vars$vars
@@ -57,15 +64,15 @@ estimate_margstd <- function(
   if(!is.null(at)) {
     if(length(at) < 2)
       stop("Because 'at' has less than 2 levels, contrasts cannot be estimated.")
-    if(class(fit$model %>% pull(predictor)) %in% c("character", "factor", "logical") &
-       sum(at %in% unique(fit$model %>% pull(predictor))) != length(at))
+    if(class(fit$model %>% dplyr::pull(predictor)) %in% c("character", "factor", "logical") &
+       sum(at %in% unique(fit$model %>% dplyr::pull(predictor))) != length(at))
       stop(paste0("Some of the levels, specificied via 'at =', ",
                   "of the non-numeric variable '",
                   predictor,
                   "' were not found in the model data."))
-    if(class(fit$model %>% pull(predictor)) == "numeric")
-      if(min(fit$model %>% pull(predictor)) > min(at) |
-         max(fit$model %>% pull(predictor)) < max(at))
+    if(class(fit$model %>% dplyr::pull(predictor)) == "numeric")
+      if(min(fit$model %>% dplyr::pull(predictor)) > min(at) |
+         max(fit$model %>% dplyr::pull(predictor)) < max(at))
         warning(paste0("Numeric levels provided via 'at =' will lead to out-of-range predictions ",
                        "for the variable '", predictor, "'."))
     levels <- at
@@ -74,9 +81,9 @@ estimate_margstd <- function(
       if(predictor %in% names(fit$xlevels))  # retain level ordering as in model
         levels <- fit$xlevels[[predictor]]
       else
-        levels <- fit$model %>% pull(predictor) %>% unique(.)
+        levels <- unique(fit$model %>% dplyr::pull(predictor))
       else  # if "hidden" categorical, use level orderings as in data
-        levels <- fit$model %>% pull(predictor) %>% unique(.)
+        levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
   eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels)
@@ -107,9 +114,9 @@ eststd_boot <- function(x, reps, failsafe = TRUE) {
   set.seed(123)
   if(failsafe == TRUE) {
     res <- bootstraps(data = x$data, times = reps) %>%
-      mutate(res = map(.x = splits,
+      dplyr::mutate(res = purrr::map(.x = .data$splits,
                        .f = ~{
-                         tryCatch({glm(formula = x$formula,
+                         tryCatch({stats::glm(formula = x$formula,
                                        family  = binomial(link = "logit"),
                                        data    = analysis(.x)) %>%
                              eststd(data      = analysis(.x),
@@ -119,9 +126,9 @@ eststd_boot <- function(x, reps, failsafe = TRUE) {
                        }))
   } else {
     res <- bootstraps(data = x$data, times = reps) %>%
-      mutate(res = map(.x = splits,
+      dplyr::mutate(res = purrr::map(.x = .data$splits,
                        .f = ~{
-                         glm(formula = x$formula,
+                         stats::glm(formula = x$formula,
                              family  = binomial(link = "logit"),
                              data    = analysis(.x)) %>%
                            eststd(data      = analysis(.x),
@@ -130,9 +137,9 @@ eststd_boot <- function(x, reps, failsafe = TRUE) {
                        }))
   }
   res %>%
-    select(-splits) %>%
-    unnest(col = res) %>%
-    group_by(term)
+    dplyr::select(-.data$splits) %>%
+    tidyr::unnest(col = res) %>%
+    dplyr::group_by(.data$term)
 }
 
 # Bootstrapped CIs
@@ -143,23 +150,23 @@ confint.margstd <- function(object, parm = NULL, level = 0.95,
   pnames <- names(cf)
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- stats:::format.perc(a, 3)
+  pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
   ci <- array(NA, dim = c(length(pnames), 2L), dimnames = list(pnames, pct))
 
   boots <- eststd_boot(x = object, reps = bootrepeats, failsafe = na.rm)
 
   res <- if(object$estimate == "rr") {
     boots %>%
-      summarize(log(quantile(rr, probs = a[1], na.rm = na.rm)),
-                log(quantile(rr, probs = a[2], na.rm = na.rm)))
+      dplyr::summarize(log(quantile(.data$rr, probs = a[1], na.rm = na.rm)),
+                       log(quantile(.data$rr, probs = a[2], na.rm = na.rm)))
   } else {
     boots %>%
-      summarize(quantile(rd, probs = a[1]),
-                quantile(rd, probs = a[2]))
+      dplyr::summarize(quantile(.data$rd, probs = a[1]),
+                       quantile(.data$rd, probs = a[2]))
   }
   ci[] <- res %>%
-    ungroup() %>%
-    select(-term) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-.data$term) %>%
     as.matrix()
 
   return(ci)
@@ -173,16 +180,16 @@ margstd_stderror <- function(object, level = 0.95, bootreps, ...) {
 
   if(object$estimate == "rr") {
     boots %>%
-      summarize(estimate  = mean(log(rr)),
-                conf.low  = log(quantile(rr, probs = a[1])),
-                conf.high = log(quantile(rr, probs = a[2])),
-                std.error = sqrt(var(log(rr))))
+      dplyr::summarize(estimate  = mean(log(.data$rr)),
+                       conf.low  = log(quantile(.data$rr, probs = a[1])),
+                       conf.high = log(quantile(.data$rr, probs = a[2])),
+                       std.error = sqrt(var(log(.data$rr))))
   } else {
     boots %>%
-      summarize(estimate  = mean(rd),
-                conf.low  = quantile(rd, probs = a[1]),
-                conf.high = quantile(rd, probs = a[2]),
-                std.error = sqrt(var(rd)))
+      dplyr::summarize(estimate  = mean(.data$rd),
+                       conf.low  = quantile(.data$rd, probs = a[1]),
+                       conf.high = quantile(.data$rd, probs = a[2]),
+                       std.error = sqrt(var(.data$rd)))
   }
 }
 
@@ -208,7 +215,9 @@ summary.margstd <- function(object, dispersion = NULL,
   p <- object$rank
   if (p > 0) {
     p1 <- 1L:p
-    Qr <- stats:::qr.lm(object)
+    Qr <- object$qr
+    if(is.null(Qr))
+      stop("lm object does not have a proper 'qr' component.\n Rank zero or should not have used lm(.., qr=FALSE).")
     #coef.p <- object$coefficients[Qr$pivot[p1]]
     coef.p <- object$coefficients
     stderror <- margstd_stderror(object = object, level = level,

@@ -3,9 +3,14 @@
 # via combinatorial expectation maximization (logbin::logbin and addreg::addreg)
 # via logit link--the logistic model just for comparison
 
+#' @import stats
+#' @importFrom addreg addreg
+#' @importFrom logbin logbin
+
+
 # (2) Binomial
 estimate_glm <- function(formula, data, link, start = NULL, ...) {
-  fit <- glm(formula, data = data, family = binomial(link = link), start = start, ...)
+  fit <- stats::glm(formula, data = data, family = binomial(link = link), start = start, ...)
   if(!is.null(start))
     class(fit) <- c("glm_start", class(fit))
   fit <- estimate_maxprob(fit)
@@ -22,14 +27,14 @@ estimate_logbin <- function(formula, data, start = NULL, method = "cem", ...) {
 # (3d) Additive binomial via addreg::
 estimate_addreg <- function(formula, data, start = NULL, method = "cem", ...) {
   fit <- addreg::addreg(formula = formula, data = data,
-                        family = binomial(link = "identity"),
+                        family = stats::binomial(link = "identity"),
                         method = method, start = start, ...)
   return(estimate_maxprob(fit, start = start))
 }
 
 # (5) Logistic model, for comparison only
 estimate_logistic <- function(formula, data, ...) {
-  fit <- glm(formula, data = data, family = binomial(link = "logit"), ...)
+  fit <- stats::glm(formula, data = data, family = stats::binomial(link = "logit"), ...)
   class(fit) <- c("logistic", class(fit))
   fit <- estimate_maxprob(fit)
   return(fit)
