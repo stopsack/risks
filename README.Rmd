@@ -15,13 +15,6 @@ knitr::opts_chunk$set(
 
 # risks
 
-<!-- badges: start -->
-[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![Travis build status](https://img.shields.io/travis/tgerke/risks/master?logo=travis&style=flat&label=Linux)](https://travis-ci.com/tgerke/risks)
-[![Codecov test coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
-[![R CMD Check Windows/MacOS/Ubuntu](https://github.com/stopsack/risks/workflows/R%20CMD%20Check%20Windows/MacOS/Ubuntu/badge.svg)](https://github.com/stopsack/risks/actions?query=workflow%3A%22R+CMD+Check+Windows%2FMacOS%2FUbuntu%22)
-<!-- badges: end -->
-
 ## Installation
 
 Once released on [CRAN](https://CRAN.R-project.org), installation will be possible with:
@@ -51,11 +44,13 @@ Implemented are Poisson models with robust covariance, binomial models, binomial
 We define a cohort of women with breast cancer, used by Spiegelman and Hertzmark (Am J Epidemiol 2005) and Greenland (Am J Epidemiol 2004). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
 
 ```{r}
-knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r load, results = "hide", message = FALSE}
 library(risks)
+library(tidyverse)
+library(broom)  # tidy() for model summaries
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
@@ -174,7 +169,7 @@ Marginal standardization, `approach = "margstd"`, makes use of the good converge
 
 We fit the same risk difference model as in section 2:
 
-```{r margstd}
+```{r margstd, eval = FALSE}
 fit_margstd <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd")
 summary(fit_margstd, bootrepeats = 500)
@@ -186,7 +181,7 @@ Note that coefficients and standard errors are only estimated for the exposure v
 
 Requesting a different exposure variable:
 
-```{r margstd2}
+```{r margstd2, eval = FALSE}
 fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)

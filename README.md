@@ -3,18 +3,6 @@
 
 # risks
 
-<!-- badges: start -->
-
-[![Lifecycle:
-maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
-[![Travis build
-status](https://img.shields.io/travis/tgerke/risks/master?logo=travis&style=flat&label=Linux)](https://travis-ci.com/tgerke/risks)
-[![Codecov test
-coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
-[![R CMD Check
-Windows/MacOS/Ubuntu](https://github.com/stopsack/risks/workflows/R%20CMD%20Check%20Windows/MacOS/Ubuntu/badge.svg)](https://github.com/stopsack/risks/actions?query=workflow%3A%22R+CMD+Check+Windows%2FMacOS%2FUbuntu%22)
-<!-- badges: end -->
-
 ## Installation
 
 Once released on [CRAN](https://CRAN.R-project.org), installation will
@@ -29,7 +17,7 @@ Currently, you can install the development version from
 
 ``` r
 # install.packages("devtools")  # The devtools package needs to be installed
-library(devtolls)
+library(devtools)
 devtools::install_github("stopsack/risks")
 ```
 
@@ -60,11 +48,13 @@ the categorical exposure is `stage`, the binary outcome is `death`, and
 the binary confounder is `receptor`.
 
 ``` r
-knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ``` r
 library(risks)
+library(tidyverse)
+library(broom)  # tidy() for model summaries
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
@@ -86,6 +76,31 @@ must be supplied:
 ``` r
 fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
 summary(fit_rr)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = binomial(link = link), 
+#>     data = data, start = start)
+#> 
+#> Deviance Residuals: 
+#>     Min       1Q   Median       3Q      Max  
+#> -2.0209  -0.7436  -0.4472   0.5272   2.1689  
+#> 
+#> Coefficients:
+#>                Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)     -2.3521     0.3602  -6.531 6.55e-11 ***
+#> stageStage II    0.9314     0.3930   2.370   0.0178 *  
+#> stageStage III   1.7695     0.3851   4.595 4.33e-06 ***
+#> receptorLow      0.4436     0.1968   2.254   0.0242 *  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 228.15  on 191  degrees of freedom
+#> Residual deviance: 185.85  on 188  degrees of freedom
+#> AIC: 193.85
+#> 
+#> Number of Fisher Scoring iterations: 4
 ```
 
   
@@ -95,6 +110,31 @@ risk differences, add the option `estimate = "rd"`:
 ``` r
 fit_rd <- estimate_risk(formula = death ~ stage + receptor, data = dat, estimate = "rd")
 summary(fit_rd)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = binomial(link = link), 
+#>     data = data, start = start)
+#> 
+#> Deviance Residuals: 
+#>     Min       1Q   Median       3Q      Max  
+#> -1.8441  -0.7284  -0.4184   0.6350   2.2268  
+#> 
+#> Coefficients:
+#>                Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)     0.08381    0.03633   2.307  0.02107 *  
+#> stageStage II   0.14921    0.05755   2.593  0.00953 ** 
+#> stageStage III  0.57227    0.09472   6.042 1.52e-09 ***
+#> receptorLow     0.16131    0.07587   2.126  0.03349 *  
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 228.15  on 191  degrees of freedom
+#> Residual deviance: 186.38  on 188  degrees of freedom
+#> AIC: 194.38
+#> 
+#> Number of Fisher Scoring iterations: 5
 ```
 
 For example, the risk of death was 57 percentage points higher in women
@@ -119,6 +159,13 @@ default.
 
 ``` r
 tidy(fit_rd)
+#> # A tibble: 4 x 5
+#>   term           estimate std.error statistic       p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>         <dbl>
+#> 1 (Intercept)      0.0838    0.0363      2.31 0.0211       
+#> 2 stageStage II    0.149     0.0576      2.59 0.00953      
+#> 3 stageStage III   0.572     0.0947      6.04 0.00000000152
+#> 4 receptorLow      0.161     0.0759      2.13 0.0335
 ```
 
   
@@ -129,6 +176,13 @@ TRUE)`:
 
 ``` r
 tidy(fit_rr, exponentiate = TRUE)
+#> # A tibble: 4 x 5
+#>   term           estimate std.error statistic  p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)      0.0952     0.360     -6.53 6.55e-11
+#> 2 stageStage II    2.54       0.393      2.37 1.78e- 2
+#> 3 stageStage III   5.87       0.385      4.60 4.33e- 6
+#> 4 receptorLow      1.56       0.197      2.25 2.42e- 2
 ```
 
 For example, the risk of death was 5.87 times higher in women with stage
@@ -215,6 +269,17 @@ Selecting a binomial model with starting values from the Poisson model:
 
 ``` r
 estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
+#> 
+#> Call:  stats::glm(formula = formula, family = binomial(link = link), 
+#>     data = data, start = start)
+#> 
+#> Coefficients:
+#>    (Intercept)   stageStage II  stageStage III     receptorLow  
+#>        -2.3521          0.9314          1.7695          0.4436  
+#> 
+#> Degrees of Freedom: 191 Total (i.e. Null);  188 Residual
+#> Null Deviance:       228.1 
+#> Residual Deviance: 185.9     AIC: 193.9
 ```
 
   
@@ -222,6 +287,7 @@ However, the binomial model without starting values does not converge:
 
 ``` r
 estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm")
+#> Error: no valid set of coefficients has been found: please supply starting values
 ```
 
 ## Marginal standardization
@@ -291,7 +357,62 @@ at the beginning of `summary(fit)`:
 ``` r
 fit_all <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                          estimate = "rd", approach = "all")
+#> Loading required package: doParallel
+#> Loading required package: foreach
+#> 
+#> Attaching package: 'foreach'
+#> The following objects are masked from 'package:purrr':
+#> 
+#>     accumulate, when
+#> Loading required package: iterators
+#> Loading required package: parallel
+#> Loading required package: numDeriv
+#> Loading required package: quantreg
+#> Loading required package: SparseM
+#> 
+#> Attaching package: 'SparseM'
+#> The following object is masked from 'package:base':
+#> 
+#>     backsolve
+#> 
+#> Attaching package: 'turboEM'
+#> The following objects are masked from 'package:numDeriv':
+#> 
+#>     grad, hessian
+#> Warning in data.matrix(data): NAs introduced by coercion
+
+#> Warning in data.matrix(data): NAs introduced by coercion
+#> Warning: Unknown or uninitialised column: `data`.
+#> Warning: `slice_()` is deprecated as of dplyr 0.7.0.
+#> Please use `slice()` instead.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_warnings()` to see where this warning was generated.
 summary(fit_all)
+#> 
+#> Call:
+#> stats::glm(formula = formula, family = poisson(link = link), 
+#>     data = data)
+#> 
+#> Deviance Residuals: 
+#>     Min       1Q   Median       3Q      Max  
+#> -1.2575  -0.6870  -0.4147   0.2260   1.7546  
+#> 
+#> Coefficients:
+#>                Estimate Std. Error z value Pr(>|z|)    
+#> (Intercept)     0.08600    0.03871   2.222 0.026292 *  
+#> stageStage II   0.14998    0.06474   2.317 0.020519 *  
+#> stageStage III  0.56505    0.16482   3.428 0.000607 ***
+#> receptorLow     0.13965    0.09602   1.454 0.145866    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for poisson family taken to be 1)
+#> 
+#>     Null deviance: 137.00  on 191  degrees of freedom
+#> Residual deviance: 110.57  on 188  degrees of freedom
+#> AIC: 226.57
+#> 
+#> Number of Fisher Scoring iterations: 5
 ```
 
   
@@ -302,6 +423,13 @@ that converged:
 
 ``` r
 tidy(fit_all)
+#> # A tibble: 4 x 5
+#>   term           estimate std.error statistic  p.value
+#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 (Intercept)      0.0860    0.0387      2.22 0.0263  
+#> 2 stageStage II    0.150     0.0647      2.32 0.0205  
+#> 3 stageStage III   0.565     0.165       3.43 0.000607
+#> 4 receptorLow      0.140     0.0960      1.45 0.146
 ```
 
 ## Prediction
