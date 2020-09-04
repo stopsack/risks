@@ -34,7 +34,7 @@ Currently, you can install the development version from [GitHub](https://github.
 
 ``` r
 # install.packages("devtools")  # The devtools package needs to be installed
-library(devtolls)
+library(devtools)
 devtools::install_github("stopsack/risks")
 ```
 # Summary
