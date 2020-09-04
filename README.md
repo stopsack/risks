@@ -10,28 +10,27 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 [![Travis build
 status](https://img.shields.io/travis/tgerke/risks/master?logo=travis&style=flat&label=Linux)](https://travis-ci.com/tgerke/risks)
 [![Codecov test
-coverage](https://codecov.io/gh/tgerke/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/tgerke/risks?branch=master)
+coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
 [![R CMD Check
-Windows/MacOS/Ubuntu](https://github.com/tgerke/risks/workflows/R%20CMD%20Check%20Windows/MacOS/Ubuntu/badge.svg)](https://github.com/tgerke/risks/actions?query=workflow%3A%22R+CMD+Check+Windows%2FMacOS%2FUbuntu%22)
+Windows/MacOS/Ubuntu](https://github.com/stopsack/risks/workflows/R%20CMD%20Check%20Windows/MacOS/Ubuntu/badge.svg)](https://github.com/stopsack/risks/actions?query=workflow%3A%22R+CMD+Check+Windows%2FMacOS%2FUbuntu%22)
 <!-- badges: end -->
-
-The goal of risks is to … Further details are available at
-[tgerke.github.io/risks/](https://tgerke.github.io/risks/).
 
 ## Installation
 
-You can install the released version of risks from
-[CRAN](https://CRAN.R-project.org) with:
+Once released on [CRAN](https://CRAN.R-project.org), installation will
+be possible with:
 
 ``` r
 install.packages("risks")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+Currently, you can install the development version from
+[GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("tgerke/risks")
+# install.packages("devtools")  # The devtools package needs to be installed
+library(devtolls)
+devtools::install_github("stopsack/risks")
 ```
 
 # Summary
