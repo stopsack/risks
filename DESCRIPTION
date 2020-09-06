@@ -25,6 +25,7 @@ Suggests:
     testthat
 Imports: 
     addreg,
+    broom,
     dplyr,
     lifecycle,
     logbin,

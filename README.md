@@ -286,6 +286,7 @@ Selecting a binomial model with starting values from the Poisson model:
 ``` r
 estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
 #> 
+#> Risk ratio model
 #> Call:  stats::glm(formula = formula, family = binomial(link = link), 
 #>     data = data, start = start)
 #> 

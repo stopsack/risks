@@ -77,6 +77,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' to parameters for all models at once, in one tibble. The last
 #' column of the tibble includes the name of the model. See examples.
 #'
+#' @import broom
+#'
 #' @param x Model
 #' @param conf.int Show confidence intervals?
 #' @param conf.level Confidence level
@@ -89,16 +91,29 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' @export
 #'
 #' @examples
-#' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
-#' #tidy(fit_rr)
+#' # Define example data
+#' library(tibble)  # for tibble() function
+#' library(broom)   # required for tidy.risks()
+#' dat <- tibble(
+#'   id = 1:192,
+#'   death = c(rep(1, 54), rep(0, 138)),
+#'   stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+#'             rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+#'   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+#'                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+#'                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+#' # Fit and tidy the model
+#' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+#' tidy(fit_rr)
 #'
-#' # Increase number of bootstrap repeats:
-#' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "margstd")
-#' #tidy(fit_rr, bootrepeats = 1000)
+#' # Marginal standardization,
+#' # increase number of bootstrap repeats:
+#' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "margstd")
+#' tidy(fit_rr, bootrepeats = 150)
 #'
 #' # Multiple types of models fitted:
-#' #' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "all")
-#' #tidy(fit_rr)
+#' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "all")
+#' tidy(fit_rr)
 tidy.risks <- function(
   x,
   conf.int     = TRUE,
