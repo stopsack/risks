@@ -61,14 +61,51 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
   tibble::as_tibble(ret)
 }
 
-# tidy() for "risks"
+#' Tidy model summaries for risks models
+#'
+#' Obtain a tibble (data frame) with parameters,
+#' coefficients, standard errors, confidence limits,
+#' and p-values. Usual disclaimers about the use of the latter.
+#' A column with the type of model fitted is also being added.
+#'
+#' If running \code{tidy(...)} on a model using marginal
+#' standardization via \code{approach = "margstd"},
+#' by default, the number of bootstrap repeats is very low.
+#' It is strongly recommended to increase them to >1000. See examples.
+#'
+#' If multiple types of models are fitted, \code{tidy()} can be used
+#' to parameters for all models at once, in one tibble. The last
+#' column of the tibble includes the name of the model. See examples.
+#'
+#' @param x Model
+#' @param conf.int Show confidence intervals?
+#' @param conf.level Confidence level
+#' @param bootrepeats Bootstrap repeats. >1000 recommended
+#' @param exponentiate Exponentiate? For log links
+#' @param default Use normality-based confidence intervals?
+#' @param ... Passed on
+#'
+#' @return tibble
+#' @export
+#'
+#' @examples
+#' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+#' #tidy(fit_rr)
+#'
+#' # Increase number of bootstrap repeats:
+#' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "margstd")
+#' #tidy(fit_rr, bootrepeats = 1000)
+#'
+#' # Multiple types of models fitted:
+#' #' #fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "all")
+#' #tidy(fit_rr)
 tidy.risks <- function(
   x,
-  conf.int     = TRUE,  # show confidence intervals by default
+  conf.int     = TRUE,
   conf.level   = 0.95,
   bootrepeats  = 100,
   exponentiate = FALSE,
-  default      = TRUE,  # normality-based CIs from confint.default()
+  default      = TRUE,
   ...) {
   tidysummarylm <- get("tidy.summary.lm", envir = asNamespace("broom"), inherits = FALSE)
 
@@ -97,6 +134,12 @@ tidy.risks <- function(
   }
 }
 
+#' Print model
+#'
+#' @param x Fitted model
+#' @param ... Passed to print.glm()
+#'
+#' @export
 print.risks <- function(x, ...) {
   if(!is.null(x$estimate))
     estimate <- x$estimate
@@ -111,6 +154,15 @@ print.risks <- function(x, ...) {
   print_glm(x, ...)
 }
 
+#' Generate model summary
+#'
+#' Determine type of "risks" model fitted and
+#' generate appropriate summary.
+#'
+#' @param object Fitted model
+#' @param ... Passed on
+#'
+#' @export
 summary.risks <- function(object, ...) {
   # Exception: Multiple models were fitted (approach = "all") but the Poisson model failed
   # Retrieve the first converged model to make sure summary() does not fail
@@ -164,10 +216,27 @@ summary.risks <- function(object, ...) {
   return(mysummary)
 }
 
+#' Print "risks" model summary
+#'
+#' Print summaries for "risks" models. The printout is the same as
+#' for regular summaries of generalized linear models fit via
+#' \code{stats::glm()}, except that the type of "risks" model
+#' is printed first (e.g., "Poisson model with robust covariance")
+#' and confidence intervals for model parameters are printed at the end.
+#' By default, normality-based confidence intervals are calculated.
+#' By setting \code{default = FALSE}, profile likelihood-based
+#' confidence intervals can be calculated for binomial and Poisson models.
+#'
+#' @param x Model
+#' @param conf.int Add confidence intervals to printout?
+#' @param default Normal confidence intervals via confint.default()?
+#' @param ... Passed on
+#'
+#' @export
 print.summary.risks <- function(
   x,
-  conf.int = TRUE,  # add confidence intervals to printout?
-  default  = TRUE,  # normal confidence intervals via confint.default()?
+  conf.int = TRUE,
+  default  = TRUE,
   ...) {
 
   # If estimate_risk(approach = "all") was called:

@@ -3,7 +3,7 @@
 
 #' @import stats
 
-# (1) Poisson
+# estimate_poisson: internal, fitting the Poisson model
 estimate_poisson <- function(formula, data, link, ...) {
   fit <- stats::glm(formula = formula, family = poisson(link = link), data = data)
   class(fit) <- c("robpoisson", class(fit))
@@ -11,6 +11,16 @@ estimate_poisson <- function(formula, data, link, ...) {
   return(fit)
 }
 
+#' Robust confidence intervals for Poisson model
+#'
+#' Estimate confidence intervals for the Poisson model
+#' with robust/sandwich/empirical covariance structure.
+#'
+#' @param object Fitted model
+#' @param parm Not used
+#' @param level Confidence level, defaults to 0.95
+#' @param ... Additional arguments, not used
+#' @export
 confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
   # modified after stats:::confint.default()
   cf <- coef(object)
@@ -56,6 +66,19 @@ risks_meat <- function (x, type = "HC0", omega = NULL, ...) {
   return(rval)
 }
 
+#' Summary for Poisson model with robust covariance
+#'
+#' Summarize results from fitting a Poisson model with
+#' robust/empirical/sandwich covariance.
+#' The output is the same as for a regular summary(glm(...)),
+#' except for using robust standard errors.
+#'
+#' @param object Model
+#' @param dispersion Not used
+#' @param correlation Not used
+#' @param symbolic.cor Not used
+#' @param ... Other arguments, not used
+#' @export
 summary.robpoisson <- function (object, dispersion = NULL, correlation = FALSE,
                                 symbolic.cor = FALSE, ...) {
   # a modification of summary.glm(), calling risks_meat() to estimate covariance
