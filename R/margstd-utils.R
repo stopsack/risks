@@ -9,17 +9,17 @@
 # Helper function to obtain predicted values and their contrasts
 eststd <- function(x, data, predictor, levels) {
   tibble::tibble(term = levels) %>%
-    dplyr::mutate(data = purrr::map(.x = .data$term,
-                             .f = ~dplyr::mutate(.data = .data$data,
+    dplyr::mutate(data = purrr::map(.x = term,
+                             .f = ~dplyr::mutate(.data = data,
                                                  !!!predictor := .x)),
-           response = purrr::map(.x = .data$data,
+           response = purrr::map(.x = data,
                           .f = ~stats::predict(object = x, newdata = .x,
                                         type = "response"))) %>%
     dplyr::transmute(
-      term  = paste0(.data$predictor, .data$term),
-      means = purrr::map_dbl(.x = .data$response, .f = mean),
-      rd    = .data$means - .data$means[1],
-      rr    = .data$means / .data$means[1])
+      term  = paste0(predictor, term),
+      means = purrr::map_dbl(.x = response, .f = mean),
+      rd    = means - means[1],
+      rr    = means / means[1])
 }
 
 # Main function for marginal standardization
@@ -49,8 +49,8 @@ estimate_margstd <- function(
                     nlevels = purrr::map_int(.x = .data$vars,
                                              .f = ~length(unique(fit$model %>% dplyr::pull(.x))))) %>%
       dplyr::slice(-1) %>%
-      filter(.data$type %in% c("character", "factor", "logical") |
-               (.data$type == "numeric" & .$data$nlevels == 2)) %>%
+      dplyr::filter(type %in% c("character", "factor", "logical") |
+               (type == "numeric" & nlevels == 2)) %>%
       dplyr::slice(1)
 
     if(nrow(model_vars) > 0)
