@@ -77,6 +77,7 @@ must be supplied:
 fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
 summary(fit_rr)
 #> 
+#> Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_start).
 #> Call:
 #> stats::glm(formula = formula, family = binomial(link = link), 
 #>     data = data, start = start)
@@ -101,6 +102,13 @@ summary(fit_rr)
 #> AIC: 193.85
 #> 
 #> Number of Fisher Scoring iterations: 4
+#> 
+#> Confidence intervals for coefficients (normality-based):
+#>                      2.5 %     97.5 %
+#> (Intercept)    -3.05805977 -1.6461981
+#> stageStage II   0.16107688  1.7018004
+#> stageStage III  1.01475475  2.5242885
+#> receptorLow     0.05781282  0.8294095
 ```
 
   
@@ -111,6 +119,7 @@ risk differences, add the option `estimate = "rd"`:
 fit_rd <- estimate_risk(formula = death ~ stage + receptor, data = dat, estimate = "rd")
 summary(fit_rd)
 #> 
+#> Risk difference model, fitted as binomial model (glm).
 #> Call:
 #> stats::glm(formula = formula, family = binomial(link = link), 
 #>     data = data, start = start)
@@ -135,6 +144,13 @@ summary(fit_rd)
 #> AIC: 194.38
 #> 
 #> Number of Fisher Scoring iterations: 5
+#> 
+#> Confidence intervals for coefficients (normality-based):
+#>                     2.5 %    97.5 %
+#> (Intercept)    0.01260046 0.1550111
+#> stageStage II  0.03640945 0.2620070
+#> stageStage III 0.38663167 0.7579168
+#> receptorLow    0.01261165 0.3100162
 ```
 
 For example, the risk of death was 57 percentage points higher in women
@@ -159,13 +175,13 @@ default.
 
 ``` r
 tidy(fit_rd)
-#> # A tibble: 4 x 5
-#>   term           estimate std.error statistic       p.value
-#>   <chr>             <dbl>     <dbl>     <dbl>         <dbl>
-#> 1 (Intercept)      0.0838    0.0363      2.31 0.0211       
-#> 2 stageStage II    0.149     0.0576      2.59 0.00953      
-#> 3 stageStage III   0.572     0.0947      6.04 0.00000000152
-#> 4 receptorLow      0.161     0.0759      2.13 0.0335
+#> # A tibble: 4 x 8
+#>   term         estimate std.error statistic     p.value conf.low conf.high model
+#>   <chr>           <dbl>     <dbl>     <dbl>       <dbl>    <dbl>     <dbl> <chr>
+#> 1 (Intercept)    0.0838    0.0363      2.31     2.11e-2   0.0126     0.155 glm  
+#> 2 stageStage …   0.149     0.0576      2.59     9.53e-3   0.0364     0.262 glm  
+#> 3 stageStage …   0.572     0.0947      6.04     1.52e-9   0.387      0.758 glm  
+#> 4 receptorLow    0.161     0.0759      2.13     3.35e-2   0.0126     0.310 glm
 ```
 
   
@@ -176,13 +192,13 @@ TRUE)`:
 
 ``` r
 tidy(fit_rr, exponentiate = TRUE)
-#> # A tibble: 4 x 5
-#>   term           estimate std.error statistic  p.value
-#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)      0.0952     0.360     -6.53 6.55e-11
-#> 2 stageStage II    2.54       0.393      2.37 1.78e- 2
-#> 3 stageStage III   5.87       0.385      4.60 4.33e- 6
-#> 4 receptorLow      1.56       0.197      2.25 2.42e- 2
+#> # A tibble: 4 x 8
+#>   term         estimate std.error statistic  p.value conf.low conf.high model   
+#>   <chr>           <dbl>     <dbl>     <dbl>    <dbl>    <dbl>     <dbl> <chr>   
+#> 1 (Intercept)    0.0952     0.360     -6.53 6.55e-11   0.0470     0.193 glm_sta…
+#> 2 stageStage …   2.54       0.393      2.37 1.78e- 2   1.17       5.48  glm_sta…
+#> 3 stageStage …   5.87       0.385      4.60 4.33e- 6   2.76      12.5   glm_sta…
+#> 4 receptorLow    1.56       0.197      2.25 2.42e- 2   1.06       2.29  glm_sta…
 ```
 
 For example, the risk of death was 5.87 times higher in women with stage
@@ -328,6 +344,37 @@ We fit the same risk difference model as in section 2:
 fit_margstd <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd")
 summary(fit_margstd, bootrepeats = 500)
+#> 
+#> Risk difference model, fitted via marginal standardization of a logistic model (margstd).
+#> Call:
+#> stats::glm(formula = formula, family = binomial(link = "logit"), 
+#>     data = data)
+#> 
+#> Deviance Residuals: 
+#>    Min      1Q  Median      3Q     Max  
+#>                                         
+#> 
+#> Coefficients: (3 not defined because of singularities)
+#>                Estimate Std. Error z value Pr(>|z|)    
+#> stageStage I    0.00000    0.00000      NA       NA    
+#> stageStage II   0.16303    0.06177   2.639  0.00831 ** 
+#> stageStage III  0.57097    0.10135   5.633 1.77e-08 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 228.15  on 191  degrees of freedom
+#> Residual deviance: 185.88  on 188  degrees of freedom
+#> AIC: 193.88
+#> 
+#> Number of Fisher Scoring iterations: 4
+#> 
+#> Confidence intervals for coefficients (bootstrap-based):
+#>                      2.5%     97.5%
+#> stageStage I   0.00000000 0.0000000
+#> stageStage II  0.04950919 0.2809398
+#> stageStage III 0.34676281 0.7578268
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -345,6 +392,35 @@ Requesting a different exposure variable:
 fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
+#> 
+#> Risk difference model, fitted via marginal standardization of a logistic model (margstd).
+#> Call:
+#> stats::glm(formula = formula, family = binomial(link = "logit"), 
+#>     data = data)
+#> 
+#> Deviance Residuals: 
+#>    Min      1Q  Median      3Q     Max  
+#>                                         
+#> 
+#> Coefficients: (3 not defined because of singularities)
+#>              Estimate Std. Error z value Pr(>|z|)  
+#> receptorHigh  0.00000    0.00000      NA       NA  
+#> receptorLow   0.16163    0.07566   2.136   0.0327 *
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> (Dispersion parameter for binomial family taken to be 1)
+#> 
+#>     Null deviance: 228.15  on 191  degrees of freedom
+#> Residual deviance: 185.88  on 188  degrees of freedom
+#> AIC: 193.88
+#> 
+#> Number of Fisher Scoring iterations: 4
+#> 
+#> Confidence intervals for coefficients (bootstrap-based):
+#>                    2.5%     97.5%
+#> receptorHigh 0.00000000 0.0000000
+#> receptorLow  0.01533299 0.3059931
 ```
 
 ## Model comparisons
@@ -379,16 +455,19 @@ fit_all <- estimate_risk(formula = death ~ stage + receptor, data = dat,
 #> The following objects are masked from 'package:numDeriv':
 #> 
 #>     grad, hessian
-#> Warning in data.matrix(data): NAs introduced by coercion
-
-#> Warning in data.matrix(data): NAs introduced by coercion
-#> Warning: Unknown or uninitialised column: `data`.
-#> Warning: `slice_()` is deprecated as of dplyr 0.7.0.
-#> Please use `slice()` instead.
-#> This warning is displayed once every 8 hours.
-#> Call `lifecycle::last_warnings()` to see where this warning was generated.
 summary(fit_all)
 #> 
+#> All fitted models:
+#>        Model Converged Max.prob.
+#> 1 robpoisson      TRUE 0.7907040
+#> 2        glm      TRUE 0.8173940
+#> 3  glm_start      TRUE 0.8173882
+#> 4     addreg     FALSE        NA
+#> 5     addreg     FALSE        NA
+#> 6    margstd      TRUE 0.8158560
+#> Access these models via 'x$all_models'.
+#> 
+#> Risk difference model, fitted as Poisson model with robust covariance (robpoisson).
 #> Call:
 #> stats::glm(formula = formula, family = poisson(link = link), 
 #>     data = data)
@@ -413,6 +492,13 @@ summary(fit_all)
 #> AIC: 226.57
 #> 
 #> Number of Fisher Scoring iterations: 5
+#> 
+#> Confidence intervals for coefficients (normality-based):
+#>                      2.5 %    97.5 %
+#> (Intercept)     0.01013792 0.1618699
+#> stageStage II   0.02309478 0.2768559
+#> stageStage III  0.24200852 0.8880958
+#> receptorLow    -0.04855731 0.3278532
 ```
 
   
@@ -423,13 +509,24 @@ that converged:
 
 ``` r
 tidy(fit_all)
-#> # A tibble: 4 x 5
-#>   term           estimate std.error statistic  p.value
-#>   <chr>             <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 (Intercept)      0.0860    0.0387      2.22 0.0263  
-#> 2 stageStage II    0.150     0.0647      2.32 0.0205  
-#> 3 stageStage III   0.565     0.165       3.43 0.000607
-#> 4 receptorLow      0.140     0.0960      1.45 0.146
+#> # A tibble: 15 x 8
+#>    term       estimate std.error statistic    p.value conf.low conf.high model  
+#>    <chr>         <dbl>     <dbl>     <dbl>      <dbl>    <dbl>     <dbl> <chr>  
+#>  1 (Intercep…   0.0860    0.0387      2.22   2.63e- 2  0.0122      0.160 robpoi…
+#>  2 stageStag…   0.150     0.0647      2.32   2.05e- 2  0.0366      0.263 robpoi…
+#>  3 stageStag…   0.565     0.165       3.43   6.07e- 4  0.377       0.753 robpoi…
+#>  4 receptorL…   0.140     0.0960      1.45   1.46e- 1 -0.00878     0.288 robpoi…
+#>  5 (Intercep…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 glm    
+#>  6 stageStag…   0.149     0.0576      2.59   9.53e- 3  0.0364      0.262 glm    
+#>  7 stageStag…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 glm    
+#>  8 receptorL…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 glm    
+#>  9 (Intercep…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 glm_st…
+#> 10 stageStag…   0.149     0.0576      2.59   9.52e- 3  0.0364      0.262 glm_st…
+#> 11 stageStag…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 glm_st…
+#> 12 receptorL…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 glm_st…
+#> 13 stageStag…   0         0         NaN    NaN         0           0     margstd
+#> 14 stageStag…   0.163     0.0566      2.88   3.95e- 3  0.0551      0.265 margstd
+#> 15 stageStag…   0.571     0.0919      6.21   5.27e-10  0.361       0.726 margstd
 ```
 
 ## Prediction

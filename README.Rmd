@@ -19,13 +19,13 @@ knitr::opts_chunk$set(
 
 Once released on [CRAN](https://CRAN.R-project.org), installation will be possible with:
 
-``` r
+```r
 install.packages("risks")
 ```
 
 Currently, you can install the development version from [GitHub](https://github.com/) with:
 
-``` r
+```r
 # install.packages("devtools")  # The devtools package needs to be installed
 library(devtools)
 devtools::install_github("stopsack/risks")
@@ -169,7 +169,7 @@ Marginal standardization, `approach = "margstd"`, makes use of the good converge
 
 We fit the same risk difference model as in section 2:
 
-```{r margstd, eval = FALSE}
+```{r margstd}
 fit_margstd <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd")
 summary(fit_margstd, bootrepeats = 500)
@@ -181,7 +181,7 @@ Note that coefficients and standard errors are only estimated for the exposure v
 
 Requesting a different exposure variable:
 
-```{r margstd2, eval = FALSE}
+```{r margstd2}
 fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
                              estimate = "rd", approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
