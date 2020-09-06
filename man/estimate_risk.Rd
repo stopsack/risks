@@ -40,10 +40,19 @@ and \code{numeric} (only if no more than 2 levels for the latter);
 otherwise levels must be supplied via \code{at =}.}
 
 \item{at}{Optional: Levels of variable \code{variable} for marginal
-standardization. See details.}
+standardization. For binary variables (logical or character/factor/numeric
+with only two levels), \code{at =} is not needed. Otherwise,
+\code{at =} determines the levels at which contrasts of the exposure
+are to be assessed. Levels must exist in the data for character or
+factor variables. For numeric variables, levels that do not exist in the data
+can be interpolations or extrapolations; if levels exceed the
+extremes of the data (extrapolation), a warning will be displayed.}
 
 \item{...}{further arguments passed to fitting functions (\code{glm},
 \code{logbin}, or \code{addreg})}
+}
+\value{
+model
 }
 \description{
 \code{estimate_risk} Fits risk ratio and risk difference models.
@@ -55,6 +64,21 @@ binomial models aided in convergence by starting values obtained
 through Poisson models, binomial models fitted via
 combinatorial expectation maximization, and estimates
 obtained via regression standardization.
+}
+\examples{
+# Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
+library(tibble)
+dat <- tibble(
+  id = 1:192,
+  death = c(rep(1, 54), rep(0, 138)),
+  stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+            rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+fit_rr
+summary(fit_rr)
 }
 \references{
 Wacholder S. Binomial regression in GLIM: Estimating risk ratios
