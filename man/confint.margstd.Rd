@@ -21,5 +21,5 @@
 Matrix: First column, lower bound; second column, upper bound.
 }
 \description{
-For models fit using marginal standardization
+Confidence intervals for models fit using marginal standardization.
 }

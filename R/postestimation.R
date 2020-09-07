@@ -65,13 +65,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' Obtain a tibble (data frame) with parameters,
 #' coefficients, standard errors, confidence limits,
-#' and p-values. Usual disclaimers about the use of the latter.
-#' A column with the type of model fitted is also being added.
-#'
-#' If running \code{tidy(...)} on a model using marginal
-#' standardization via \code{approach = "margstd"},
-#' by default, the number of bootstrap repeats is very low.
-#' It is strongly recommended to increase them to >1000. See examples.
+#' and p-values. A column with the type of model fitted is added.
 #'
 #' If multiple types of models are fitted, \code{tidy()} can be used
 #' to parameters for all models at once, in one tibble. The last
@@ -81,10 +75,17 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' @param x Model
 #' @param conf.int Show confidence intervals?
-#' @param conf.level Confidence level
-#' @param bootrepeats Bootstrap repeats. For marginal standardized models. >1000 recommended.
-#' @param exponentiate Exponentiate? For log links
-#' @param default Use normality-based confidence intervals?
+#' @param conf.level Optional: Confidence level. Defaults to 0.95.
+#' @param bootrepeats Optional: Number of bootstrap repeats.
+#' Applicable to models fitted via marginal standardization (\code{approach = "margstd"}).
+#' Defaults to 200, a very low number of repeats.
+#' It is strongly recommended to increase repeats to >1000.
+#' @param exponentiate Exponentiate coefficients and confidence limits? Defaults to FALSE.
+#' Setting \code{exponentiate = TRUE} is useful for relative risk models (log links).
+#' @param default Use normality-based confidence intervals? Defaults to TRUE.
+#' With \code{default = FALSE}, profile likelihood-based confidence intervals
+#' can be calculated for binomial models.
+
 #' @param ... Passed on
 #'
 #' @return tibble
@@ -247,10 +248,10 @@ summary.risks <- function(object, ...) {
 #' and confidence intervals for model parameters are printed at the end.
 #'
 #' @param x Model
-#' @param conf.int Add confidence intervals to printout?
-#' @param default Normal confidence intervals via confint.default()?
+#' @param conf.int Add confidence intervals to printout? Defaults to TRUE.
+#' @param default Normal confidence intervals via confint.default()? Default to TRUE.
 #'   By setting \code{default = FALSE}, profile likelihood-based
-#'   confidence intervals can be calculated for binomial and Poisson models.
+#'   confidence intervals can be calculated for binomial models.
 #' @param ... Passed on
 #'
 #' @export

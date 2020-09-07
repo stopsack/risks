@@ -10,14 +10,14 @@
 eststd <- function(x, data, predictor, levels, estimate) {
   mdl <- glm(formula = x$formula, family = binomial(link = "logit"), data = data)
   results <- tibble::tibble(term = levels) %>%
-    dplyr::mutate(data = purrr::map(.x = term,
+    dplyr::mutate(data = purrr::map(.x = .data$term,
                                     .f = ~dplyr::mutate(.data = data,
                                                         !!!predictor := .x)),
                   response = purrr::map(.x = data,
                                         .f = ~stats::predict(object = mdl,
                                                              newdata = .x,
                                                              type = "response")),
-                  means = purrr::map_dbl(.x = response, .f = mean))
+                  means = purrr::map_dbl(.x = .data$response, .f = mean))
   if(estimate == "rr")
     res <- log(results$means / results$means[1])
   if(estimate == "rd")
@@ -141,7 +141,7 @@ bcaci <- function(boot.out, conf, parameters) {
 
 #' Bias-corrected/accelerated bootstrap confidence intervals
 #'
-#' For models fit using marginal standardization
+#' Confidence intervals for models fit using marginal standardization.
 #'
 #' @param object Model fitted through marginal standardization
 #' @param parm Not used, for compatibility

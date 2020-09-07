@@ -26,6 +26,6 @@
 \description{
 Summarize results from fitting a Poisson model with
 robust/empirical/sandwich covariance.
-The output is the same as for a regular summary(glm(...)),
+The output is the same as for a regular \code{summary(glm(...))},
 except for using robust standard errors.
 }

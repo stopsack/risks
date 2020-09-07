@@ -9,11 +9,11 @@
 \arguments{
 \item{x}{Model}
 
-\item{conf.int}{Add confidence intervals to printout?}
+\item{conf.int}{Add confidence intervals to printout? Defaults to TRUE.}
 
-\item{default}{Normal confidence intervals via confint.default()?
+\item{default}{Normal confidence intervals via confint.default()? Default to TRUE.
 By setting \code{default = FALSE}, profile likelihood-based
-confidence intervals can be calculated for binomial and Poisson models.}
+confidence intervals can be calculated for binomial models.}
 
 \item{...}{Passed on}
 }

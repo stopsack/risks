@@ -19,13 +19,19 @@
 
 \item{conf.int}{Show confidence intervals?}
 
-\item{conf.level}{Confidence level}
+\item{conf.level}{Optional: Confidence level. Defaults to 0.95.}
 
-\item{bootrepeats}{Bootstrap repeats. For marginal standardized models. >1000 recommended.}
+\item{bootrepeats}{Optional: Number of bootstrap repeats.
+Applicable to models fitted via marginal standardization (\code{approach = "margstd"}).
+Defaults to 200, a very low number of repeats.
+It is strongly recommended to increase repeats to >1000.}
 
-\item{exponentiate}{Exponentiate? For log links}
+\item{exponentiate}{Exponentiate coefficients and confidence limits? Defaults to FALSE.
+Setting \code{exponentiate = TRUE} is useful for relative risk models (log links).}
 
-\item{default}{Use normality-based confidence intervals?}
+\item{default}{Use normality-based confidence intervals? Defaults to TRUE.
+With \code{default = FALSE}, profile likelihood-based confidence intervals
+can be calculated for binomial models.}
 
 \item{...}{Passed on}
 }
@@ -35,15 +41,9 @@ tibble
 \description{
 Obtain a tibble (data frame) with parameters,
 coefficients, standard errors, confidence limits,
-and p-values. Usual disclaimers about the use of the latter.
-A column with the type of model fitted is also being added.
+and p-values. A column with the type of model fitted is also being added.
 }
 \details{
-If running \code{tidy(...)} on a model using marginal
-standardization via \code{approach = "margstd"},
-by default, the number of bootstrap repeats is very low.
-It is strongly recommended to increase them to >1000. See examples.
-
 If multiple types of models are fitted, \code{tidy()} can be used
 to parameters for all models at once, in one tibble. The last
 column of the tibble includes the name of the model. See examples.
