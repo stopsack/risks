@@ -2,7 +2,7 @@
 # fitting a logistic regression model
 
 #' @import stats tidyverse boot
-#' @importFrom magrittr %>%
+#' @importFrom purrr %>%
 #' @importFrom rlang .data
 
 
@@ -53,8 +53,8 @@ estimate_margstd <- function(
                     nlevels = purrr::map_int(.x = .data$vars,
                                              .f = ~length(unique(fit$model %>% dplyr::pull(.x))))) %>%
       dplyr::slice(-1) %>%
-      dplyr::filter(type %in% c("character", "factor", "logical") |
-               (type == "numeric" & nlevels == 2)) %>%
+      dplyr::filter(.data$type %in% c("character", "factor", "logical") |
+               (.data$type == "numeric" & nlevels == 2)) %>%
       dplyr::slice(1)
 
     if(nrow(model_vars) > 0)

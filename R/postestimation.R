@@ -12,7 +12,7 @@ norowname <- function(x) {
 
 # Helper function for tidy.risks()
 risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
-                             bootreps = 100,
+                             bootreps = 200,
                              exponentiate = FALSE,
                              default = TRUE, ...) {
   # This is broom:::process_lm(), but defaults to calling confint.default(),
@@ -82,7 +82,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' @param x Model
 #' @param conf.int Show confidence intervals?
 #' @param conf.level Confidence level
-#' @param bootrepeats Bootstrap repeats. >1000 recommended
+#' @param bootrepeats Bootstrap repeats. For marginal standardized models. >1000 recommended.
 #' @param exponentiate Exponentiate? For log links
 #' @param default Use normality-based confidence intervals?
 #' @param ... Passed on
@@ -118,7 +118,7 @@ tidy.risks <- function(
   x,
   conf.int     = TRUE,
   conf.level   = 0.95,
-  bootrepeats  = 100,
+  bootrepeats  = 200,
   exponentiate = FALSE,
   default      = TRUE,
   ...) {
@@ -183,7 +183,7 @@ print.risks <- function(x, ...) {
 #'
 #' @param object Fitted model
 #' @param ... Passed on
-#' @value Model summary (list)
+#' @return Model summary (list)
 #' @export
 summary.risks <- function(object, ...) {
   # Exception: Multiple models were fitted but the Poisson model failed
@@ -299,14 +299,20 @@ print.summary.risks <- function(
     print(confint(x$object, ...))
   }
   if(conf.int == TRUE & "margstd" %in% class(x$object)) {
+    # retrieve CIs that were generated when bootstrapping SEs for model summary
     cat("Confidence intervals for coefficients (bootstrap-based):\n")
     ci <- x$conf.int %>%
       dplyr::select(.data$conf.low, .data$conf.high) %>%
       as.matrix()
-    a <- (1 - x$level)/2
+    a <- (1 - x$level) / 2
     a <- c(a, 1 - a)
-    colnames(ci) <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
-    rownames(ci) <- x$conf.int %>% dplyr::pull("term")
+    ci <- array(NA, dim = c(length(x$object$margstd_levels), 2L),
+                dimnames = list(paste0(x$object$margstd_predictor, x$object$margstd_levels),
+                                paste0(format(100 * a, trim = TRUE,
+                                              scientific = FALSE, digits = 3), "%")))
+    ci[] <- x$conf.int %>%
+      dplyr::select(.data$conf.low, .data$conf.high) %>%
+      as.matrix()
     print(ci)
   }
 }

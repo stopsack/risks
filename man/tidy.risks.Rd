@@ -8,7 +8,7 @@
   x,
   conf.int = TRUE,
   conf.level = 0.95,
-  bootrepeats = 100,
+  bootrepeats = 200,
   exponentiate = FALSE,
   default = TRUE,
   ...
@@ -21,7 +21,7 @@
 
 \item{conf.level}{Confidence level}
 
-\item{bootrepeats}{Bootstrap repeats. >1000 recommended}
+\item{bootrepeats}{Bootstrap repeats. For marginal standardized models. >1000 recommended.}
 
 \item{exponentiate}{Exponentiate? For log links}
 

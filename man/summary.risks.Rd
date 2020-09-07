@@ -11,6 +11,9 @@
 
 \item{...}{Passed on}
 }
+\value{
+Model summary (list)
+}
 \description{
 Determine type of risks model fitted and
 generate appropriate summary.
