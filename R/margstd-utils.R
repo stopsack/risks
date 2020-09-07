@@ -145,11 +145,11 @@ bcaci <- function(boot.out, conf, parameters) {
 #'
 #' @param object Model fitted through marginal standardization
 #' @param parm Not used, for compatibility
-#' @param level Confidence level, defaults to 95%
+#' @param level Confidence level, defaults to 0.95.
 #' @param bootrepeats Bootstrap repeats. Defaults to 200. Strongly recommend >1000.
 #' @param ... Not used
 #'
-#' @return Matrix
+#' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
 confint.margstd <- function(object, parm = NULL,
                             level = 0.95,

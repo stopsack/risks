@@ -151,6 +151,9 @@ tidy.risks <- function(
 
 #' Print model
 #'
+#' Print fitted risks model. The only change, compared to \code{print.glm()},
+#' is the addition of the main type of model: relative risk or risk difference.
+#'
 #' @param x Fitted model
 #' @param ... Passed to print.glm()
 #'
@@ -171,15 +174,19 @@ print.risks <- function(x, ...) {
 
 #' Generate model summary
 #'
-#' Determine type of "risks" model fitted and
+#' Determine type of risks model fitted and
 #' generate appropriate summary.
+#'
+#' If multiple models were fitted (\code{approach = "all"}), then
+#' the first converged model is displayed. Other models can be accessed
+#' via the returned list \code{$all_models}.
 #'
 #' @param object Fitted model
 #' @param ... Passed on
-#'
+#' @value Model summary (list)
 #' @export
 summary.risks <- function(object, ...) {
-  # Exception: Multiple models were fitted (approach = "all") but the Poisson model failed
+  # Exception: Multiple models were fitted but the Poisson model failed
   # Retrieve the first converged model to make sure summary() does not fail
   if(object$converged == FALSE & !is.null(object$all_models)) {
     all_models <- object$all_models
@@ -231,20 +238,19 @@ summary.risks <- function(object, ...) {
   return(mysummary)
 }
 
-#' Print "risks" model summary
+#' Print model summary
 #'
 #' Print summaries for "risks" models. The printout is the same as
 #' for regular summaries of generalized linear models fit via
 #' \code{stats::glm()}, except that the type of "risks" model
 #' is printed first (e.g., "Poisson model with robust covariance")
 #' and confidence intervals for model parameters are printed at the end.
-#' By default, normality-based confidence intervals are calculated.
-#' By setting \code{default = FALSE}, profile likelihood-based
-#' confidence intervals can be calculated for binomial and Poisson models.
 #'
 #' @param x Model
 #' @param conf.int Add confidence intervals to printout?
 #' @param default Normal confidence intervals via confint.default()?
+#'   By setting \code{default = FALSE}, profile likelihood-based
+#'   confidence intervals can be calculated for binomial and Poisson models.
 #' @param ... Passed on
 #'
 #' @export

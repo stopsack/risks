@@ -20,6 +20,7 @@ estimate_poisson <- function(formula, data, link, ...) {
 #' @param parm Not used
 #' @param level Confidence level, defaults to 0.95
 #' @param ... Additional arguments, not used
+#' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
 confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
   # modified after stats:::confint.default()

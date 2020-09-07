@@ -11,14 +11,14 @@
 
 \item{parm}{Not used, for compatibility}
 
-\item{level}{Confidence level, defaults to 95\%}
+\item{level}{Confidence level, defaults to 0.95.}
 
 \item{bootrepeats}{Bootstrap repeats. Defaults to 200. Strongly recommend >1000.}
 
 \item{...}{Not used}
 }
 \value{
-Matrix
+Matrix: First column, lower bound; second column, upper bound.
 }
 \description{
 For models fit using marginal standardization

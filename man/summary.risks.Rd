@@ -12,6 +12,11 @@
 \item{...}{Passed on}
 }
 \description{
-Determine type of "risks" model fitted and
+Determine type of risks model fitted and
 generate appropriate summary.
+}
+\details{
+If multiple models were fitted (\code{approach = "all"}), then
+the first converged model is displayed. Other models can be accessed
+via the returned list \code{$all_models}.
 }

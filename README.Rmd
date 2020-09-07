@@ -54,7 +54,6 @@ library(broom)  # tidy() for model summaries
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
-  id = 1:192,
   death = c(rep(1, 54), rep(0, 138)),
   stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
             rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
@@ -165,7 +164,7 @@ Marginal standardization, `approach = "margstd"`, makes use of the good converge
 * By default, the first categorical right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, and `character` are taken to represent categorical variables, as are variables of the type `numeric` with only two levels (e.g., `0` and `1`).
 * Using `variable =`, the user can specify a different variable.
 * Using `at =`, levels for contrasts and the order of levels can be specified. The first level is used as the reference with a risk ratio of 1 or a risk difference of 0. The option `at =` is required for continuous variables or `numeric` variables with more than two levels. A warning will be shown for continuous values if the requested levels exceed the range of data (extrapolation).
-* For models fitted via `approach = "margstd"`, standard errors/confidence intervals are obtained via bootstrapping. The default are 100 bootstrap repeats. This number should be increased to >500 for more precise estimates. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`.
+* For models fitted via `approach = "margstd"`, standard errors/confidence intervals are obtained via bootstrapping. The default are 200 bootstrap repeats to reduce initial computation time. For final, precise estimates, the number of repeats should be increased to >1000. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`.
 
 We fit the same risk difference model as in section 2:
 

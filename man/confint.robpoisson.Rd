@@ -15,6 +15,9 @@
 
 \item{...}{Additional arguments, not used}
 }
+\value{
+Matrix: First column, lower bound; second column, upper bound.
+}
 \description{
 Estimate confidence intervals for the Poisson model
 with robust/sandwich/empirical covariance structure.

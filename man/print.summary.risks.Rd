@@ -2,7 +2,7 @@
 % Please edit documentation in R/postestimation.R
 \name{print.summary.risks}
 \alias{print.summary.risks}
-\title{Print "risks" model summary}
+\title{Print model summary}
 \usage{
 \method{print}{summary.risks}(x, conf.int = TRUE, default = TRUE, ...)
 }
@@ -11,7 +11,9 @@
 
 \item{conf.int}{Add confidence intervals to printout?}
 
-\item{default}{Normal confidence intervals via confint.default()?}
+\item{default}{Normal confidence intervals via confint.default()?
+By setting \code{default = FALSE}, profile likelihood-based
+confidence intervals can be calculated for binomial and Poisson models.}
 
 \item{...}{Passed on}
 }
@@ -21,7 +23,4 @@ for regular summaries of generalized linear models fit via
 \code{stats::glm()}, except that the type of "risks" model
 is printed first (e.g., "Poisson model with robust covariance")
 and confidence intervals for model parameters are printed at the end.
-By default, normality-based confidence intervals are calculated.
-By setting \code{default = FALSE}, profile likelihood-based
-confidence intervals can be calculated for binomial and Poisson models.
 }
