@@ -30,7 +30,6 @@ Imports:
     dplyr,
     lifecycle,
     logbin,
-    magrittr,
     purrr,
     rlang,
     sandwich,

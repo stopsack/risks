@@ -50,7 +50,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r load, results = "hide", message = FALSE}
 library(risks)
 library(tidyverse)
-library(broom)  # tidy() for model summaries
+library(broom)
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
