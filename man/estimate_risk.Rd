@@ -40,11 +40,10 @@ and \code{numeric} (only if no more than 2 levels for the latter);
 otherwise levels must be supplied via \code{at =}.}
 
 \item{at}{Optional: Levels of variable \code{variable} for marginal
-standardization. For binary variables (logical or character/factor/numeric
-with only two levels), \code{at =} is not needed. Otherwise,
-\code{at =} determines the levels at which contrasts of the exposure
-are to be assessed. Levels must exist in the data for character or
-factor variables. For numeric variables, levels that do not exist in the data
+standardization. \code{at =} determines the levels at which contrasts of the exposure
+are to be assessed. The level listed first is used as the reference.
+Levels must exist in the data for character or factor variables.
+For numeric variables, levels that do not exist in the data
 can be interpolations or extrapolations; if levels exceed the
 extremes of the data (extrapolation), a warning will be displayed.}
 
@@ -52,7 +51,7 @@ extremes of the data (extrapolation), a warning will be displayed.}
 \code{logbin}, or \code{addreg})}
 }
 \value{
-model
+Fitted model
 }
 \description{
 \code{estimate_risk} Fits risk ratio and risk difference models.

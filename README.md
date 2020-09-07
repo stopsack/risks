@@ -358,8 +358,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.06028   2.705  0.00684 ** 
-#> stageStage III  0.57097    0.09734   5.865 4.48e-09 ***
+#> stageStage II   0.16303    0.06218   2.622  0.00875 ** 
+#> stageStage III  0.57097    0.10063   5.674  1.4e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -374,8 +374,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Confidence intervals for coefficients (bootstrap-based):
 #>                      2.5%     97.5%
 #> stageStage I           NA        NA
-#> stageStage II  0.03575436 0.2876725
-#> stageStage III 0.33386907 0.7498954
+#> stageStage II  0.02515081 0.2705034
+#> stageStage III 0.32647205 0.7382744
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -391,7 +391,7 @@ Requesting a different exposure variable:
 
 ``` r
 fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                             estimate = "rd", approach = "margstd", variable = "receptor")
+                              estimate = "rd", approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
 #> 
 #> Risk difference model, fitted via marginal standardization of a logistic model (margstd).
@@ -405,8 +405,8 @@ summary(fit_margstd2, bootrepeats = 500)
 #> 
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
-#> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07484    2.16   0.0308 *
+#> receptorHigh   0.0000     0.0000      NA       NA  
+#> receptorLow    0.1616     0.0747   2.164   0.0305 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -419,9 +419,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients (bootstrap-based):
-#>                     2.5%     97.5%
-#> receptorHigh          NA        NA
-#> receptorLow  0.005615862 0.3035348
+#>                   2.5%     97.5%
+#> receptorHigh        NA        NA
+#> receptorLow  0.0460708 0.3531176
 ```
 
 ## Model comparisons
@@ -526,8 +526,8 @@ tidy(fit_all)
 #> 11 stageStage…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm_st…
 #> 12 receptorLow   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm_st…
 #> 13 stageStage…   0         0         NaN    NaN       NA          NA     margstd
-#> 14 stageStage…   0.163     0.0576      2.83   4.67e-3  0.0292      0.283 margstd
-#> 15 stageStage…   0.571     0.108       5.28   1.27e-7  0.334       0.761 margstd
+#> 14 stageStage…   0.163     0.0626      2.60   9.23e-3  0.0428      0.285 margstd
+#> 15 stageStage…   0.571     0.112       5.12   3.11e-7  0.363       0.768 margstd
 ```
 
 ## Prediction
