@@ -25,6 +25,7 @@ Suggests:
     testthat
 Imports: 
     addreg,
+    boot,
     broom,
     dplyr,
     lifecycle,
@@ -32,7 +33,6 @@ Imports:
     magrittr,
     purrr,
     rlang,
-    rsample,
     sandwich,
     stats,
     tibble,

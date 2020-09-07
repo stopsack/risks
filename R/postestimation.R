@@ -2,7 +2,7 @@
 #
 # print(), summary(), summary.print(), and tidy()
 
-#' @import stats tidyverse rsample
+#' @import stats tidyverse
 #' @importFrom rlang .data
 
 norowname <- function(x) {
@@ -109,7 +109,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' # Marginal standardization,
 #' # increase number of bootstrap repeats:
 #' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "margstd")
-#' tidy(fit_rr, bootrepeats = 150)
+#' tidy(fit_rr, bootrepeats = 250)
 #'
 #' # Multiple types of models fitted:
 #' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "all")

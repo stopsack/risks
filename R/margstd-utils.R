@@ -1,25 +1,29 @@
 # Helper functions for marginal standardization after
 # fitting a logistic regression model
 
-#' @import stats tidyverse rsample
+#' @import stats tidyverse boot
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 
 
-# Helper function to obtain predicted values and their contrasts
-eststd <- function(x, data, predictor, levels) {
-  tibble::tibble(term = levels) %>%
+# Fit logistic model, obtained marginal predictions, generate contrasts
+eststd <- function(x, data, predictor, levels, estimate) {
+  mdl <- glm(formula = x$formula, family = binomial(link = "logit"), data = data)
+  results <- tibble::tibble(term = levels) %>%
     dplyr::mutate(data = purrr::map(.x = term,
-                             .f = ~dplyr::mutate(.data = data,
-                                                 !!!predictor := .x)),
-           response = purrr::map(.x = data,
-                          .f = ~stats::predict(object = x, newdata = .x,
-                                        type = "response"))) %>%
-    dplyr::transmute(
-      term  = paste0(predictor, term),
-      means = purrr::map_dbl(.x = response, .f = mean),
-      rd    = means - means[1],
-      rr    = means / means[1])
+                                    .f = ~dplyr::mutate(.data = data,
+                                                        !!!predictor := .x)),
+                  response = purrr::map(.x = data,
+                                        .f = ~stats::predict(object = mdl,
+                                                             newdata = .x,
+                                                             type = "response")),
+                  means = purrr::map_dbl(.x = response, .f = mean))
+  if(estimate == "rr")
+    res <- log(results$means / results$means[1])
+  if(estimate == "rd")
+    res <- results$means - results$means[1]
+  names(res) <- paste0(predictor, results$term)
+  return(res)
 }
 
 # Main function for marginal standardization
@@ -86,19 +90,14 @@ estimate_margstd <- function(
         levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
-  eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels)
+  eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels,
+                   estimate = estimate[1])
 
-  if(estimate[1] == "rr")
-    coefs <- log(eststd$rr)
-  else
-    coefs <- eststd$rd
-  names(coefs) <- eststd$term
-
-  newfit <- list(coefficients = coefs,
+  newfit <- list(coefficients      = eststd,
                  estimate          = estimate[1],
                  margstd_predictor = predictor,
                  margstd_levels    = levels,
-                 rank = 1)
+                 rank              = 1)
   newfit <- append(newfit, fit[c("residuals", "fitted.values",
                                  "family", "deviance", "aic", "null.deviance",
                                  "iter", "df.residual", "df.null", "y", "converged",
@@ -109,43 +108,52 @@ estimate_margstd <- function(
   return(newfit)
 }
 
-# Bootstrap the standardization procedure
-eststd_boot <- function(x, reps, failsafe = TRUE) {
-  set.seed(123)
-  if(failsafe == TRUE) {
-    res <- bootstraps(data = x$data, times = reps) %>%
-      dplyr::mutate(res = purrr::map(.x = .data$splits,
-                       .f = ~{
-                         tryCatch({stats::glm(formula = x$formula,
-                                       family  = binomial(link = "logit"),
-                                       data    = analysis(.x)) %>%
-                             eststd(data      = analysis(.x),
-                                    predictor = x$margstd_predictor,
-                                    levels    = x$margstd_levels)},
-                             error = function(x) { tibble() })
-                       }))
-  } else {
-    res <- bootstraps(data = x$data, times = reps) %>%
-      dplyr::mutate(res = purrr::map(.x = .data$splits,
-                       .f = ~{
-                         stats::glm(formula = x$formula,
-                             family  = binomial(link = "logit"),
-                             data    = analysis(.x)) %>%
-                           eststd(data      = analysis(.x),
-                                  predictor = x$margstd_predictor,
-                                  levels    = x$margstd_levels)
-                       }))
+# Bootstrap model fitting
+boot_eststd <- function(object, bootrepeats) {
+  bootfn <- function(data, index, fit, ...) {
+    eststd(x = fit, data = data[index, ], ...)
   }
-  res %>%
-    dplyr::select(-.data$splits) %>%
-    tidyr::unnest(col = res) %>%
-    dplyr::group_by(.data$term)
+
+  boot::boot(data = object$data,
+             statistic = bootfn,
+             R = bootrepeats,
+             fit = glm(formula = object$formula, family = binomial(link = "logit"),
+                       data = object$data),
+             predictor = object$margstd_predictor,
+             levels = object$margstd_levels,
+             estimate = object$estimate[1])
 }
 
-# Bootstrapped CIs
-confint.margstd <- function(object, parm = NULL, level = 0.95,
-                            bootrepeats = 100, na.rm = TRUE, ...) {
-  # modified after stats:::confint.default()
+# Helper function for BCa bootstrap confidence intervals
+bcaci <- function(boot.out, conf, parameters) {
+  getbcaci <- function(boot.out, index, conf) {
+    mybca <- boot::boot.ci(boot.out = boot.out, index = index, type = "bca", conf = conf)$bca
+    res <- as.numeric(mybca[1, 4:5])
+    names(res) <- c("conf.low", "conf.high")
+    return(res)
+  }
+
+  dplyr::bind_rows(
+    c(conf.low = NA, conf.high = NA),
+    purrr::map_dfr(.x = 2:parameters,
+                   .f = getbcaci, boot.out = boot.out, conf = conf))
+}
+
+#' Bias-corrected/accelerated bootstrap confidence intervals
+#'
+#' For models fit using marginal standardization
+#'
+#' @param object Model fitted through marginal standardization
+#' @param parm Not used, for compatibility
+#' @param level Confidence level, defaults to 95%
+#' @param bootrepeats Bootstrap repeats. Defaults to 200. Strongly recommend >1000.
+#' @param ... Not used
+#'
+#' @return Matrix
+#' @export
+confint.margstd <- function(object, parm = NULL,
+                            level = 0.95,
+                            bootrepeats = 200, ...) {
   cf <- coef(object)
   pnames <- names(cf)
   a <- (1 - level)/2
@@ -153,20 +161,9 @@ confint.margstd <- function(object, parm = NULL, level = 0.95,
   pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
   ci <- array(NA, dim = c(length(pnames), 2L), dimnames = list(pnames, pct))
 
-  boots <- eststd_boot(x = object, reps = bootrepeats, failsafe = na.rm)
+  myboot <- boot_eststd(object = object, bootrepeats = bootrepeats)
 
-  res <- if(object$estimate == "rr") {
-    boots %>%
-      dplyr::summarize(log(quantile(.data$rr, probs = a[1], na.rm = na.rm)),
-                       log(quantile(.data$rr, probs = a[2], na.rm = na.rm)))
-  } else {
-    boots %>%
-      dplyr::summarize(quantile(.data$rd, probs = a[1]),
-                       quantile(.data$rd, probs = a[2]))
-  }
-  ci[] <- res %>%
-    dplyr::ungroup() %>%
-    dplyr::select(-.data$term) %>%
+  ci[] <- bcaci(boot.out = myboot, conf = level, parameters = length(pnames)) %>%
     as.matrix()
 
   return(ci)
@@ -174,28 +171,29 @@ confint.margstd <- function(object, parm = NULL, level = 0.95,
 
 # Bootstrapped standard errors, required by summary.margstd()
 margstd_stderror <- function(object, level = 0.95, bootreps, ...) {
-  a <- (1 - level)/2
-  a <- c(a, 1 - a)
-  boots <- eststd_boot(x = object, reps = bootreps)
+  myboot <- boot_eststd(object = object, bootrepeats = bootreps)
 
-  if(object$estimate == "rr") {
-    boots %>%
-      dplyr::summarize(estimate  = mean(log(.data$rr)),
-                       conf.low  = log(quantile(.data$rr, probs = a[1])),
-                       conf.high = log(quantile(.data$rr, probs = a[2])),
-                       std.error = sqrt(var(log(.data$rr))))
-  } else {
-    boots %>%
-      dplyr::summarize(estimate  = mean(.data$rd),
-                       conf.low  = quantile(.data$rd, probs = a[1]),
-                       conf.high = quantile(.data$rd, probs = a[2]),
-                       std.error = sqrt(var(.data$rd)))
-  }
+  tibble::tibble(estimate = coef(object),
+                 std.error = base::apply(myboot$t, MARGIN = 2, FUN = sd)) %>%
+    dplyr::bind_cols(bcaci(boot.out = myboot, conf = level, parameters = length(coef(object))))
 }
 
+#' Summary for models using marginal standardization
+#'
+#' @param object Model
+#' @param dispersion Not used
+#' @param correlation Not used
+#' @param symbolic.cor Not used
+#' @param level Confidence level, defaults to 95%
+#' @param bootrepeats Bootstrap repeats for standard errors. Defaults to 200. Strongly recommend >1000.
+#' @param ... Not used
+#'
+#' @return Model summary (list)
+#' @return
+#' @export
 summary.margstd <- function(object, dispersion = NULL,
                             correlation = FALSE, symbolic.cor = FALSE,
-                            level = 0.95, bootrepeats = 100, ...) {
+                            level = 0.95, bootrepeats = 200, ...) {
   est.disp <- FALSE
   df.r <- object$df.residual
   if (is.null(dispersion))

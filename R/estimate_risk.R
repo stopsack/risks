@@ -12,7 +12,7 @@
 #' combinatorial expectation maximization, and estimates
 #' obtained via regression standardization.
 #'
-#' @import stats tidyverse rsample
+#' @import stats tidyverse
 #' @importFrom addreg addreg
 #' @importFrom logbin logbin
 #'
