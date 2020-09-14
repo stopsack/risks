@@ -40,27 +40,28 @@ estimate_margstd <- function(
   if(!is.null(variable)) {
     if(!(variable %in% names(fit$model)[2:length(names(fit$model))]))
       stop(paste0("Variable '", variable, "' is not part of the model."))
-    if(!(class(fit$model[[variable]]) %in% c("character", "factor", "logical")))
+    if(!(class(fit$model[[variable]])[1] %in%
+         c("character", "factor", "ordered", "logical")))
       if(length(unique(fit$model[[variable]])) > 2 & is.null(at))
-        stop(paste0("Variable '", variable, "' is not a factor, logical, character, ",
-                    "or numeric with 2 levels, ",
+        stop(paste0("Variable '", variable, "' is not a factor, ordered factor, logical, character, ",
+                    "or a numeric with 2 levels, ",
                     "and no values to standardize at are given via 'at ='."))
     predictor <- variable
   } else {
     model_vars <- tibble::tibble(vars = names(fit$model)) %>%
       dplyr::mutate(type    = purrr::map_chr(.x = .data$vars,
-                                             .f = ~class(fit$model %>% dplyr::pull(.x))),
+                                             .f = ~class(fit$model %>% dplyr::pull(.x))[1]),
                     nlevels = purrr::map_int(.x = .data$vars,
                                              .f = ~length(unique(fit$model %>% dplyr::pull(.x))))) %>%
       dplyr::slice(-1) %>%
-      dplyr::filter(.data$type %in% c("character", "factor", "logical") |
+      dplyr::filter(.data$type %in% c("character", "factor", "logical", "ordered") |
                (.data$type == "numeric" & nlevels == 2)) %>%
       dplyr::slice(1)
 
     if(nrow(model_vars) > 0)
       predictor <- model_vars$vars
     else
-      stop(paste("No exposure variable identified that is a factor, logical, character,",
+      stop(paste("No exposure variable identified that is a factor, ordered factor, logical, character,",
                  "or numeric with 2 levels."))
   }
 
@@ -68,7 +69,8 @@ estimate_margstd <- function(
   if(!is.null(at)) {
     if(length(at) < 2)
       stop("Because 'at' has less than 2 levels, contrasts cannot be estimated.")
-    if(class(fit$model %>% dplyr::pull(predictor)) %in% c("character", "factor", "logical") &
+    if(class(fit$model %>% dplyr::pull(predictor)) %in%
+       c("character", "factor", "ordered", "logical") &
        sum(at %in% unique(fit$model %>% dplyr::pull(predictor))) != length(at))
       stop(paste0("Some of the levels, specificied via 'at =', ",
                   "of the non-numeric variable '",
