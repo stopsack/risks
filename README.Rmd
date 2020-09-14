@@ -200,7 +200,8 @@ summary(fit_all)
 Individual models can be accessed as `fit$all_models[[1]]` through `fit$all_models[[6]]` (or `[[7]]` if fitting a risk ratio model). `tidy()` shows coefficients and confidence intervals from all models that converged:
 
 ```{r allmodels2}
-tidy(fit_all)
+tidy(fit_all) %>%
+  print(n = 25)
 ```
 
 

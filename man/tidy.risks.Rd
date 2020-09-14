@@ -41,7 +41,7 @@ tibble
 \description{
 Obtain a tibble (data frame) with parameters,
 coefficients, standard errors, confidence limits,
-and p-values. A column with the type of model fitted is also being added.
+and p-values. A column with the type of model fitted is added.
 }
 \details{
 If multiple types of models are fitted, \code{tidy()} can be used

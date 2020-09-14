@@ -358,8 +358,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.06119   2.665  0.00771 ** 
-#> stageStage III  0.57097    0.09982   5.720 1.07e-08 ***
+#> stageStage II   0.16303    0.06013   2.711   0.0067 ** 
+#> stageStage III  0.57097    0.10465   5.456 4.87e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -374,8 +374,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Confidence intervals for coefficients (bootstrap-based):
 #>                      2.5%     97.5%
 #> stageStage I           NA        NA
-#> stageStage II  0.03842027 0.2832442
-#> stageStage III 0.35149091 0.7452713
+#> stageStage II  0.04235352 0.2755368
+#> stageStage III 0.32227801 0.7431031
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -406,7 +406,7 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
 #> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07324   2.207   0.0273 *
+#> receptorLow   0.16163    0.07331   2.205   0.0275 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -419,9 +419,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients (bootstrap-based):
-#>                    2.5%   97.5%
-#> receptorHigh         NA      NA
-#> receptorLow  0.02634241 0.31112
+#>                   2.5%     97.5%
+#> receptorHigh        NA        NA
+#> receptorLow  0.0294773 0.3163962
 ```
 
 ## Model comparisons
@@ -459,13 +459,13 @@ fit_all <- estimate_risk(formula = death ~ stage + receptor, data = dat,
 summary(fit_all)
 #> 
 #> All fitted models:
-#>        Model Converged Max.prob.
-#> 1 robpoisson      TRUE 0.7907040
-#> 2        glm      TRUE 0.8173940
-#> 3  glm_start      TRUE 0.8173882
-#> 4     addreg     FALSE        NA
-#> 5     addreg     FALSE        NA
-#> 6    margstd      TRUE 0.8158560
+#>          Model Converged Max.prob.
+#> 1   robpoisson      TRUE 0.7907040
+#> 2          glm      TRUE 0.8173940
+#> 3    glm_start      TRUE 0.8173882
+#> 4       addreg      TRUE 0.8173957
+#> 5 addreg_start      TRUE 0.8173957
+#> 6      margstd      TRUE 0.8158560
 #> Access these models via 'x$all_models'.
 #> 
 #> Risk difference model, fitted as Poisson model with robust covariance (robpoisson).
@@ -509,25 +509,34 @@ Individual models can be accessed as `fit$all_models[[1]]` through
 that converged:
 
 ``` r
-tidy(fit_all)
-#> # A tibble: 15 x 8
-#>    term        estimate std.error statistic   p.value conf.low conf.high model  
-#>    <chr>          <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl> <chr>  
-#>  1 (Intercept)   0.0860    0.0387      2.22   2.63e-2  0.0122      0.160 robpoi…
-#>  2 stageStage…   0.150     0.0647      2.32   2.05e-2  0.0366      0.263 robpoi…
-#>  3 stageStage…   0.565     0.165       3.43   6.07e-4  0.377       0.753 robpoi…
-#>  4 receptorLow   0.140     0.0960      1.45   1.46e-1 -0.00878     0.288 robpoi…
-#>  5 (Intercept)   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm    
-#>  6 stageStage…   0.149     0.0576      2.59   9.53e-3  0.0364      0.262 glm    
-#>  7 stageStage…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm    
-#>  8 receptorLow   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm    
-#>  9 (Intercept)   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm_st…
-#> 10 stageStage…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 glm_st…
-#> 11 stageStage…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm_st…
-#> 12 receptorLow   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm_st…
-#> 13 stageStage…   0         0         NaN    NaN       NA          NA     margstd
-#> 14 stageStage…   0.163     0.0634      2.57   1.01e-2  0.0248      0.272 margstd
-#> 15 stageStage…   0.571     0.0938      6.08   1.17e-9  0.363       0.771 margstd
+tidy(fit_all) %>%
+  print(n = 25)
+#> # A tibble: 23 x 8
+#>    term       estimate std.error statistic   p.value conf.low conf.high model   
+#>    <chr>         <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl> <chr>   
+#>  1 (Intercep…   0.0860    0.0387      2.22   2.63e-2  0.0122      0.160 robpois…
+#>  2 stageStag…   0.150     0.0647      2.32   2.05e-2  0.0366      0.263 robpois…
+#>  3 stageStag…   0.565     0.165       3.43   6.07e-4  0.377       0.753 robpois…
+#>  4 receptorL…   0.140     0.0960      1.45   1.46e-1 -0.00878     0.288 robpois…
+#>  5 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm     
+#>  6 stageStag…   0.149     0.0576      2.59   9.53e-3  0.0364      0.262 glm     
+#>  7 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm     
+#>  8 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm     
+#>  9 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm_sta…
+#> 10 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 glm_sta…
+#> 11 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm_sta…
+#> 12 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm_sta…
+#> 13 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 addreg  
+#> 14 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 addreg  
+#> 15 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 addreg  
+#> 16 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 addreg  
+#> 17 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 addreg_…
+#> 18 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 addreg_…
+#> 19 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 addreg_…
+#> 20 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 addreg_…
+#> 21 stageStag…   0         0         NaN    NaN       NA          NA     margstd 
+#> 22 stageStag…   0.163     0.0630      2.59   9.63e-3  0.0759      0.314 margstd 
+#> 23 stageStag…   0.571     0.106       5.40   6.61e-8  0.349       0.798 margstd
 ```
 
 ## Prediction
