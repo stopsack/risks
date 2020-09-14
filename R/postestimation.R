@@ -123,11 +123,17 @@ tidy.risks <- function(
   exponentiate = FALSE,
   default      = TRUE,
   ...) {
-  tidysummarylm <- get("tidy.summary.lm", envir = asNamespace("broom"), inherits = FALSE)
+
+  getmodel <- function(x) {
+    # new as of broom 0.7.0 with the removal of broom:::tidy.summary.lm():
+    ret <- tibble::as_tibble(summary(x)$coefficients, rownames = "term")
+    colnames(ret) <- c("term", "estimate", "std.error", "statistic", "p.value")
+    coefs <- tibble::enframe(stats::coef(x), name = "term", value = "estimate")
+    dplyr::left_join(coefs, ret, by = c("term", "estimate"))
+  }
 
   if(is.null(purrr::pluck(x, "all_models"))) {
-    #ret <- broom:::tidy.summary.lm(summary(x))
-    ret <- tidysummarylm(summary(x))
+    ret <- getmodel(x)
     risks_process_lm(ret, x, conf.int = conf.int, conf.level = conf.level,
                      bootreps = bootrepeats,
                      exponentiate = exponentiate, default = default, ...) %>%
@@ -138,7 +144,7 @@ tidy.risks <- function(
       .f = ~{
         if((purrr::pluck(.x, "converged") == TRUE) & (purrr::pluck(.x, "boundary") == FALSE)) {
           tryCatch({
-            ret <- tidysummarylm(summary(.x))
+            ret <- getmodel(.x)
             risks_process_lm(ret, .x, conf.int = conf.int, conf.level = conf.level,
                              bootreps = bootrepeats,
                              exponentiate = exponentiate, default = default, ...) %>%
