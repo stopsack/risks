@@ -4,7 +4,7 @@
 # via logit link--the logistic model just for comparison
 
 #' @import stats
-#' @importFrom addreg addreg
+#' @import addreg
 #' @importFrom logbin logbin
 
 
