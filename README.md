@@ -5,20 +5,20 @@
 
 ## Installation
 
-Once released on [CRAN](https://CRAN.R-project.org), installation will
-be possible with:
-
-``` r
-install.packages("risks")
-```
-
-Currently, you can install the development version from
-[GitHub](https://github.com/) with:
+Currently, the development version of `risks` can be installed from
+[GitHub](https://github.com/) using:
 
 ``` r
 # install.packages("devtools")  # The devtools package needs to be installed
 library(devtools)
 devtools::install_github("stopsack/risks")
+```
+
+Once released on [CRAN](https://CRAN.R-project.org), installation will
+be possible with:
+
+``` r
+install.packages("risks")
 ```
 
 # Summary
@@ -58,9 +58,9 @@ library(broom)
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
-  death = c(rep(1, 54), rep(0, 138)),
-  stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-            rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+  death    = c(rep(1, 54), rep(0, 138)),
+  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
@@ -73,13 +73,13 @@ models in R. No options for model `family` or `link` function can or
 must be supplied:
 
 ``` r
-fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
 summary(fit_rr)
 #> 
 #> Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_start).
 #> Call:
-#> stats::glm(formula = formula, family = binomial(link = link), 
-#>     data = data, start = start)
+#> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), 
+#>     data = data, start = "(from Poisson model)")
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -111,17 +111,16 @@ summary(fit_rr)
 ```
 
   
-By default, `risks` fits models for relative risk (`"rr"`). To obtain
-risk differences, add the option `estimate = "rd"`:
+To obtain risk differences, use `riskdiff`, which has the same syntax:
 
 ``` r
-fit_rd <- estimate_risk(formula = death ~ stage + receptor, data = dat, estimate = "rd")
+fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
 summary(fit_rd)
 #> 
 #> Risk difference model, fitted as binomial model (glm).
 #> Call:
-#> stats::glm(formula = formula, family = binomial(link = link), 
-#>     data = data, start = start)
+#> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), 
+#>     data = data, start = "(no starting values)")
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -201,7 +200,7 @@ tidy(fit_rr, exponentiate = TRUE)
 ```
 
 For example, the risk of death was 5.87 times higher in women with stage
-III breast cancer compared to stage II (95% confidence interval, 2.76 to
+III breast cancer compared to stage I (95% confidence interval, 2.76 to
 12.48 times), adjusting for hormone receptor status.
 
   
@@ -283,11 +282,11 @@ not converge.
 Selecting a binomial model with starting values from the Poisson model:
 
 ``` r
-estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
+riskratio(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
 #> 
 #> Risk ratio model
-#> Call:  stats::glm(formula = formula, family = binomial(link = link), 
-#>     data = data, start = start)
+#> Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), 
+#>     data = data, start = "(from Poisson model)")
 #> 
 #> Coefficients:
 #>    (Intercept)   stageStage II  stageStage III     receptorLow  
@@ -302,7 +301,7 @@ estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm_st
 However, the binomial model without starting values does not converge:
 
 ``` r
-estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm")
+riskratio(formula = death ~ stage + receptor, data = dat, approach = "glm")
 #> Error: no valid set of coefficients has been found: please supply starting values
 ```
 
@@ -342,14 +341,14 @@ continuous exposures are evaluated at discrete levels.
 We fit the same risk difference model as in section 2:
 
 ``` r
-fit_margstd <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                             estimate = "rd", approach = "margstd")
+fit_margstd <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                        approach = "margstd")
 summary(fit_margstd, bootrepeats = 500)
 #> 
 #> Risk difference model, fitted via marginal standardization of a logistic model (margstd).
 #> Call:
-#> stats::glm(formula = formula, family = binomial(link = "logit"), 
-#>     data = data)
+#> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), 
+#>     data = data, start = "(no starting values)")
 #> 
 #> Deviance Residuals: 
 #>    Min      1Q  Median      3Q     Max  
@@ -358,8 +357,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.06013   2.711   0.0067 ** 
-#> stageStage III  0.57097    0.10465   5.456 4.87e-08 ***
+#> stageStage II   0.16303    0.05798   2.812  0.00492 ** 
+#> stageStage III  0.57097    0.09968   5.728 1.02e-08 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -374,8 +373,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Confidence intervals for coefficients (bootstrap-based):
 #>                      2.5%     97.5%
 #> stageStage I           NA        NA
-#> stageStage II  0.04235352 0.2755368
-#> stageStage III 0.32227801 0.7431031
+#> stageStage II  0.04883175 0.2779093
+#> stageStage III 0.35457038 0.7547630
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -390,14 +389,14 @@ directly from the underlying logistic model.
 Requesting a different exposure variable:
 
 ``` r
-fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                              estimate = "rd", approach = "margstd", variable = "receptor")
+fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                         approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
 #> 
 #> Risk difference model, fitted via marginal standardization of a logistic model (margstd).
 #> Call:
-#> stats::glm(formula = formula, family = binomial(link = "logit"), 
-#>     data = data)
+#> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), 
+#>     data = data, start = "(no starting values)")
 #> 
 #> Deviance Residuals: 
 #>    Min      1Q  Median      3Q     Max  
@@ -406,7 +405,7 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
 #> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07331   2.205   0.0275 *
+#> receptorLow   0.16163    0.07201   2.245   0.0248 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -419,9 +418,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients (bootstrap-based):
-#>                   2.5%     97.5%
-#> receptorHigh        NA        NA
-#> receptorLow  0.0294773 0.3163962
+#>                    2.5%     97.5%
+#> receptorHigh         NA        NA
+#> receptorLow  0.03524539 0.3287343
 ```
 
 ## Model comparisons
@@ -432,8 +431,8 @@ models. A summary of the convergence status of all models is displayed
 at the beginning of `summary(fit)`:
 
 ``` r
-fit_all <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                         estimate = "rd", approach = "all")
+fit_all <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                    approach = "all")
 #> Loading required package: doParallel
 #> Loading required package: foreach
 #> 
@@ -470,8 +469,8 @@ summary(fit_all)
 #> 
 #> Risk difference model, fitted as Poisson model with robust covariance (robpoisson).
 #> Call:
-#> stats::glm(formula = formula, family = poisson(link = link), 
-#>     data = data)
+#> stats::glm(formula = death ~ stage + receptor, family = poisson(link = "identity"), 
+#>     data = data, start = "(no starting values)")
 #> 
 #> Deviance Residuals: 
 #>     Min       1Q   Median       3Q      Max  
@@ -535,8 +534,8 @@ tidy(fit_all) %>%
 #> 19 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 addreg_…
 #> 20 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 addreg_…
 #> 21 stageStag…   0         0         NaN    NaN       NA          NA     margstd 
-#> 22 stageStag…   0.163     0.0630      2.59   9.63e-3  0.0759      0.314 margstd 
-#> 23 stageStag…   0.571     0.106       5.40   6.61e-8  0.349       0.798 margstd
+#> 22 stageStag…   0.163     0.0608      2.68   7.36e-3  0.0183      0.265 margstd 
+#> 23 stageStag…   0.571     0.0964      5.93   3.12e-9  0.324       0.737 margstd
 ```
 
 ## Prediction

@@ -17,19 +17,20 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-Once released on [CRAN](https://CRAN.R-project.org), installation will be possible with:
-
-```r
-install.packages("risks")
-```
-
-Currently, you can install the development version from [GitHub](https://github.com/) with:
+Currently, the development version of `risks` can be installed from [GitHub](https://github.com/) using:
 
 ```r
 # install.packages("devtools")  # The devtools package needs to be installed
 library(devtools)
 devtools::install_github("stopsack/risks")
 ```
+
+Once released on [CRAN](https://CRAN.R-project.org), installation will be possible with:
+
+```r
+install.packages("risks")
+```
+
 # Summary
 
 The `risks` packages provides a flexible interface to fitting regression models for risk ratios and risk differences, as well as prevalence ratios and prevalence differences. (For brevity, the vignette describes "risk," but "prevalence" can be substituted throughout.) 
@@ -54,9 +55,9 @@ library(broom)
 
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
-  death = c(rep(1, 54), rep(0, 138)),
-  stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-            rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+  death    = c(rep(1, 54), rep(0, 138)),
+  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
@@ -66,15 +67,15 @@ dat <- tibble(
 Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` function can or must be supplied:
 
 ```{r basic}
-fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
 summary(fit_rr)
 ```
   
 \
-By default, `risks` fits models for relative risk (`"rr"`). To obtain risk differences, add the option `estimate = "rd"`:
+To obtain risk differences, use `riskdiff`, which has the same syntax:
 
 ```{r basic2}
-fit_rd <- estimate_risk(formula = death ~ stage + receptor, data = dat, estimate = "rd")
+fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
 summary(fit_rd)
 ```
 
@@ -99,7 +100,7 @@ In accordance with R standards, coefficients for relative risks are shown on the
 tidy(fit_rr, exponentiate = TRUE)
 ```
 
-For example, the risk of death was 5.87 times higher in women with stage III breast cancer compared to stage II (95% confidence interval, 2.76 to 12.48 times), adjusting for hormone receptor status.
+For example, the risk of death was 5.87 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.76 to 12.48 times), adjusting for hormone receptor status.
 
 \
 Typical R functions that build on regression models can further process fitted `risks` models. Examples:
@@ -147,14 +148,14 @@ By default, automatic model fitting according to the priority listed in the tabl
 Selecting a binomial model with starting values from the Poisson model:
 
 ```{r selectapproach}
-estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
+riskratio(formula = death ~ stage + receptor, data = dat, approach = "glm_start")
 ```
 
 \
 However, the binomial model without starting values does not converge:
 
 ```{r selectapproach2, error = TRUE}
-estimate_risk(formula = death ~ stage + receptor, data = dat, approach = "glm")
+riskratio(formula = death ~ stage + receptor, data = dat, approach = "glm")
 ```
 
 ## Marginal standardization
@@ -169,8 +170,8 @@ Marginal standardization, `approach = "margstd"`, makes use of the good converge
 We fit the same risk difference model as in section 2:
 
 ```{r margstd}
-fit_margstd <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                             estimate = "rd", approach = "margstd")
+fit_margstd <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                        approach = "margstd")
 summary(fit_margstd, bootrepeats = 500)
 ```
 
@@ -181,8 +182,8 @@ Note that coefficients and standard errors are only estimated for the exposure v
 Requesting a different exposure variable:
 
 ```{r margstd2}
-fit_margstd2 <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                              estimate = "rd", approach = "margstd", variable = "receptor")
+fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                         approach = "margstd", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
 ```
 
@@ -191,8 +192,8 @@ summary(fit_margstd2, bootrepeats = 500)
 With `approach = "all"`, all model types listed in the tables are fitted. The fitted object, *e.g.*, `fit`, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of `summary(fit)`:
 
 ```{r allmodels}
-fit_all <- estimate_risk(formula = death ~ stage + receptor, data = dat, 
-                         estimate = "rd", approach = "all")
+fit_all <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                    approach = "all")
 summary(fit_all)
 ```
 
