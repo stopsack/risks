@@ -106,7 +106,7 @@ estimate_margstd <- function(
                                  "boundary", "model", "call", "formula", "terms",
                                  "data", "offset", "control", "method", "xlevels", "qr")])
   class(newfit) <- c("margstd", "glm", "lm")
-  newfit <- estimate_maxprob(newfit)
+  newfit <- estimate_maxprob(fit = newfit, formula = formula, data = data, link = "logit")
   return(newfit)
 }
 

@@ -7,7 +7,7 @@
 estimate_poisson <- function(formula, data, link, ...) {
   fit <- stats::glm(formula = formula, family = poisson(link = link), data = data)
   class(fit) <- c("robpoisson", class(fit))
-  fit <- estimate_maxprob(fit)
+  fit <- estimate_maxprob(fit = fit, formula = formula, data = data, link = link)
   return(fit)
 }
 

@@ -13,7 +13,8 @@ estimate_glm <- function(formula, data, link, start = NULL, ...) {
   fit <- stats::glm(formula, data = data, family = binomial(link = link), start = start, ...)
   if(!is.null(start))
     class(fit) <- c("glm_start", class(fit))
-  fit <- estimate_maxprob(fit)
+  fit <- estimate_maxprob(fit = fit, formula = formula, data = data,
+                          link = link, start = start)
   return(fit)
 }
 
@@ -21,7 +22,8 @@ estimate_glm <- function(formula, data, link, start = NULL, ...) {
 estimate_logbin <- function(formula, data, start = NULL, method = "cem", ...) {
   fit <- logbin::logbin(formula = formula, data = data,
                         method = method, start = start, ...)
-  return(estimate_maxprob(fit, start = start))
+  return(estimate_maxprob(fit = fit, formula = formula, data = data, link = "log",
+                          start = start))
 }
 
 # (3d) Additive binomial via addreg::
@@ -29,13 +31,14 @@ estimate_addreg <- function(formula, data, start = NULL, method = "cem", ...) {
   fit <- addreg::addreg(formula = formula, data = data,
                         family = stats::binomial(link = "identity"),
                         method = method, start = start, ...)
-  return(estimate_maxprob(fit, start = start))
+  return(estimate_maxprob(fit, formula = formula, data = data, link = "identity",
+                          start = start))
 }
 
 # (5) Logistic model, for comparison only
 estimate_logistic <- function(formula, data, ...) {
   fit <- stats::glm(formula, data = data, family = stats::binomial(link = "logit"), ...)
   class(fit) <- c("logistic", class(fit))
-  fit <- estimate_maxprob(fit)
+  fit <- estimate_maxprob(fit = fit, formula = formula, data = data, link = "logit")
   return(fit)
 }
