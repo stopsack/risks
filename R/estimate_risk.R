@@ -2,32 +2,48 @@
 #'
 #' @description
 #'
-#' \code{estimate_risk} Fits risk ratio and risk difference models.
-#'
-#' \code{estimate_risk} provides a flexible interface to fitting
+#' \code{riskratio} and \code{riskdiff} provide a flexible interface to fitting
 #' risk ratio and risk difference models.
+#'
+#' In cohort studies with a binary outcome, risk ratios and risk differences
+#' are typically more appropriate to report than odds ratios from logistic regression,
+#' yet such models have historically been difficult to implement in standard software.
+#'
+#' The risks package selects an efficient way to fit risk ratio or
+#' risk difference models successfully, which will converge whenever logistic models converge.
+#' Optionally, a specific approach to model fitting can also be requested.
 #' Implemented are Poisson models with robust covariance, binomial models,
 #' binomial models aided in convergence by starting values obtained
 #' through Poisson models, binomial models fitted via
-#' combinatorial expectation maximization, and estimates
-#' obtained via regression standardization.
+#' combinatorial expectation maximization (optionally also with Poisson starting values),
+#' and estimates obtained via marginal standardization after logistic regression.
+#'
+#' Adjusting for covariates (e.g., confounders) the model specification (\code{formula =}) is possible.
 #'
 #' @import stats tidyverse
 #' @importFrom addreg addreg
 #' @importFrom logbin logbin
 #'
-#' @param formula A formula object of the form 'response ~ predictors'
-#' @param data A \code{tibble} or \code{data.frame} object
-#' @param estimate Optional: the type of estimate to report: risk ratio
-#' (\code{"rr"}, default) or risk difference (\code{"rd"})
+#' @param formula A formula object of the form 'response ~ predictors'.
+#' @param data A \code{tibble} or \code{data.frame} object.
 #' @param approach Optional: Method for model fitting.
-#' \code{"auto"} (default) is recommended; it selects the most efficient
-#'   approach that converges and ensures that predicted probabilities are
-#'   within range (< 1; see Details). \code{"all"} will attempt to fit
-#'   the model via all implemented approaches to allow for comparisons.
+#'   * \code{"auto"} (default) is recommended; it selects the most efficient
+#'     approach that converges and ensures that predicted probabilities are
+#'     within range (< 1; see Details).
+#'   * \code{"all"} will attempt to fit
+#'     the model via all implemented approaches to allow for comparisons.
+#'
 #'   The other options allow for directly selecting a fitting approach,
-#'   which may not converge or yield out-of-range  predicted probabilities.
-#' @param variable Optional: variable use for marginal standardization.
+#'   some of which may not converge or yield out-of-range predicted probabilities.
+#'   See full documentation (currently at \url{https://github.com/stopsack/risks}) for details.
+#'
+#'   * \code{"glm"} Binomial model.
+#'   * \code{"glm_start"} Binomial model with starting values from Poisson model.
+#'   * \code{"robpoisson"} Poisson model with robust covariance.
+#'   * \code{"glm_cem"} Binomial model fitted with combinatorial expectation maximization.
+#'   * \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
+#'   * \code{"margstd"} Marginal standardization after logistic model.
+#' @param variable Optional: variable to use for marginal standardization.
 #'   If \code{variable} is not provided and marginal standardization is
 #'   attempted, then the first binary or categorical variable in the model
 #'   is used as the exposure. Levels are determined automatically for
@@ -37,12 +53,12 @@
 #' @param at Optional: Levels of variable \code{variable} for marginal
 #'   standardization. \code{at =} determines the levels at which contrasts of the exposure
 #'   are to be assessed. The level listed first is used as the reference.
-#'   Levels must exist in the data for character or factor variables.
+#'   Levels must exist in the data for character, factor or ordered factor variables.
 #'   For numeric variables, levels that do not exist in the data
 #'   can be interpolations or extrapolations; if levels exceed the
 #'   extremes of the data (extrapolation), a warning will be displayed.
-#' @param ... further arguments passed to fitting functions (\code{glm},
-#'   \code{logbin}, or \code{addreg})
+#' @param ... Optional: Further arguments passed to fitting functions (\code{glm},
+#'   \code{logbin}, or \code{addreg}).
 #'
 #' @references Wacholder S. Binomial regression in GLIM: Estimating risk ratios
 #'   and risk differences. Am J Epidemiol 1986;123:174-184.
@@ -67,28 +83,53 @@
 #' @references Localio AR, Margolis DJ, Berlin JA.
 #'   Relative risks and confidence intervals were easily computed
 #'   indirectly from multivariable logistic regression.
-#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after
-#'   logistic model; approach = "margstd)
+#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
+#'   logistic model; approach = "margstd")
 #'
 #' @export
-#' @return Fitted model
+#' @return Fitted model. Pass this object to \code{\link{summary.risks}} to obtain
+#'   an overview of results; to \code{\link{tidy.risks}} to obtain a tibble of
+#'   coefficients and confidence intervals; or to \code{\link{predict.glm}(type = "response")}
+#'   to obtain fitted values (predictions).
+#' @describeIn riskratio Fit risk ratio models
 #'
 #' @examples
 #' # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
-#' library(tibble)
+#' library(tibble)  # used to set up example data
 #' dat <- tibble(
-#'   id = 1:192,
-#'   death = c(rep(1, 54), rep(0, 138)),
-#'   stage = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-#'             rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+#'   death    = c(rep(1, 54), rep(0, 138)),
+#'   stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+#'                rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
 #'   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
 #'                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
 #'                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
-#' fit_rr <- estimate_risk(formula = death ~ stage + receptor, data = dat)
+#'
+#' # Risk ratio model
+#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
 #' fit_rr
 #' summary(fit_rr)
+#'
+#' # Risk difference model
+#' fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
+#' fit_rd
+#' summary(fit_rd)
+riskratio <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
+                                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                      variable = NULL, at = NULL, ...) {
+  estimate_risk(formula = formula, data = data, estimate = "rr",
+                approach = approach, variable = variable, at = at, ...)
+}
 
+#' @describeIn riskratio Fit risk difference models
+#' @export
+riskdiff <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
+                                                 "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                     variable = NULL, at = NULL, ...) {
+  estimate_risk(formula = formula, data = data, estimate = "rd",
+                approach = approach, variable = variable, at = at, ...)
+}
 
+# Workhorse for riskratio and riskdiff
 estimate_risk <- function(formula, data,
                           estimate = c("rr", "rd"),
                           approach = c("auto", "all", "robpoisson", "glm", "glm_start",

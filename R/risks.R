@@ -5,7 +5,9 @@
 #'
 #' @section risks functions:
 #'
-#' \code{\link{estimate_risk}}: Fit risk ratio or risk difference models.
+#' \code{\link{riskratio}}: Fit risk ratio models.
+#'
+#' \code{\link{riskdiff}}: Fit risk difference models.
 #'
 #' \code{\link{summary.risks}}: Summarize fitted model.
 #'
