@@ -33,26 +33,25 @@ install.packages("risks")
 
 # Summary
 
-The `risks` packages provides a flexible interface to fitting regression models for risk ratios and risk differences, as well as prevalence ratios and prevalence differences. (For brevity, the vignette describes "risk," but "prevalence" can be substituted throughout.) 
+The `risks` package fits regression models for risk ratios (RR) and risk differences (RD). For brevity, the package refers to "risk," but "prevalence" can be substituted throughout.
 
-Emphasis is on a user-friendly approach that does not require advanced programming or biostatistics skills while still providing users with options for customization of model use and reporting as well as comparisons between different approaches.
+What is the association between an exposure (men/women, age in years, or underweight/lean/overweight/obese) and the risk of a binary outcome (dead/alive, disease/healthy), perhaps adjusting for confounders (smoker/nonsmoker, years of education)? For such binary outcomes, many studies default to reporting odds ratios (OR). Yet outside of case-control studies, odds ratios are unnecessary to report. Risk ratios and risk differences have much more intuitive interpretations. Additionally, when the outcome is not rare, odds ratios are significant overestimates for risk ratios. Despite these drawbacks, odds ratios are often simply reported because they are easily obtained from logistic regression models. Obtaining risk ratios or risk differences, especially after adjusting for covariates (*e.g.,* confounders) has been quite challenging and often required more advanced biostatistics and programming skills, including in R. 
 
-Implemented are Poisson models with robust covariance, binomial models, binomial models aided in convergence by starting values obtained through Poisson models, binomial models fitted via combinatorial expectation maximization (optionally also with Poisson starting values), and estimates obtained via marginal standardization after fitting logistic models.
+The `risks` package fills this gap by providing a user-friendly approach that makes obtaining adjusted risk ratios and risk differences as simple as fitting a logistic regression model. No advanced programming or biostatistics skills are required. Build-in routines automatically switch to more computationally demanding model fitting approaches if simple binomial models have convergence issues, making `risks` return valid estimates whenever the data would allow for fitting a logistic model. At the same time, several options for customization of model fitting and reporting as well as comparisons between different approaches are provided.
+
+Implemented are binomial models, Poisson models with robust covariance, binomial models aided in convergence by starting values obtained through Poisson models, binomial models fitted via combinatorial expectation maximization instead of Fisher scoring (optionally also with Poisson starting values), and marginal standardization after fitting logistic models.
 
 
 # Basic usage
 
-We define a cohort of women with breast cancer, used by Spiegelman and Hertzmark (Am J Epidemiol 2005) and Greenland (Am J Epidemiol 2004). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
+We define a cohort of women with breast cancer, as used by Spiegelman and Hertzmark ([Am J Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland ([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
 
-```{r}
-knitr::opts_chunk$set(echo = TRUE)
-```
+```{r load, message = FALSE}
+library(risks)      # provides riskratio(), riskdiff(), and postestimation functions as below
+library(tidyverse)  # For data handling
+library(broom)      # For tidy() model summaries
 
-```{r load, results = "hide", message = FALSE}
-library(risks)
-library(tidyverse)
-library(broom)
-
+# Sample data originally from:
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
   death    = c(rep(1, 54), rep(0, 138)),
@@ -61,10 +60,15 @@ dat <- tibble(
   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+
+# Display the sample data
+dat %>% 
+  group_by(receptor, stage) %>% 
+  summarize(deaths = sum(death), total = n(), risk = deaths/total)
 ```
 
 \
-Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` function can or must be supplied:
+The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` need to be supplied:
 
 ```{r basic}
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
@@ -87,46 +91,46 @@ The model summary in `risks` includes to two additions compared to a regular `gl
 *  At the end of the output, confidence intervals for the model coefficients are printed.
 
 \
-`risks` provides an interface to `tidy()`, which returns a data frame (or tibble) of all coefficients (risk differences), their standard errors, and confidence intervals. Confidence intervals are included by default.
+`risks` provides an interface to `tidy()`, which returns a data frame of all coefficients (risk differences in this example), their standard errors, and confidence intervals.
 
 ```{r basic3}
 tidy(fit_rd)
 ```
 
 \
-In accordance with R standards, coefficients for relative risks are shown on the $log_e(RR)$ scale. Exponentiated coefficients (risk ratios, $RR$) are easily obtained via `tidy(..., exponentiate = TRUE)`:
+In accordance with R standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients (risk ratios) are easily obtained via `tidy(..., exponentiate = TRUE)`:
 
 ```{r basic4}
 tidy(fit_rr, exponentiate = TRUE)
 ```
 
-For example, the risk of death was 5.87 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.76 to 12.48 times), adjusting for hormone receptor status.
+For example, the risk of death was 5.9 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.8 to 12 times), adjusting for hormone receptor status.
 
 \
 Typical R functions that build on regression models can further process fitted `risks` models. Examples:
 
-*  `coef(fit)` returns model coefficients (*i.e.*, $log(RR)$s or RDs) as a numeric vector
+*  `coef(fit)` returns model coefficients (*i.e.*, log(RR) or RDs) as a numeric vector
 *  `confint(fit, level = 0.9)` returns *90%* confidence intervals.
 *  `predict(fit, type = "response")` returns predicted probabilities of the binary outcome.
 
 
-# Models
+# Advanced usage
 
-What is the association between an exposure (perhaps men/women, age in years, or underweight/lean/overweight/obese) and the risk of a binary outcome (yes/no, dead/alive, disease/healthy), perhaps adjusting for confounders (smoker/nonsmoker, years of completed education)? In a cohort study, this association is best expressed as a risk ratio (RR) or as a risk difference (RD). It is is well-recognized theoretically that is it unneccessary to report an odds ratio (OR) in cohort studies, because their interpretation differs from risk ratios and numerically diverges the stronger the association is. Many regression models have been proposed to directly estimate risk ratios and risk differences. However, implementing them in standard software, including R, has typically required more advanced programming skills. 
+# Implemented regression models for risk ratios and risk differences
 
-`risks` implements all major regression models that have been proposed for relative risks and risk differences. By default (`approach = "auto"`), `risks` estimates the most efficient valid model that converges; in more numerically challenging cases, it defaults to computationally less efficient models while ensuring that the user receives a valid result. Whenever data are sufficient to obtain odds ratios from logistic models, `risks` is designed to successfully return risk ratios and risk differences.
+`risks` implements all major regression models that have been proposed for relative risks and risk differences. By default (`approach = "auto"`), `riskratio` and `riskdiff` estimate the most efficient valid model that converges; in more numerically challenging cases, they default to computationally less efficient models while ensuring that a valid result is returned.
 
 The following models are implemented in `risks`:
 
 #^1^ | `approach =`| RR  | RD  | Model                       | Reference
 --|-------------|-----|-----|-----------------------------|----------------------------------
-1 | `glm`       | Yes | Yes | Binomial model with a log or identity link | Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. [Am J Epidemiol 1986;123:174-184](https://www.ncbi.nlm.nih.gov/pubmed/3509965).
-2 | `glm_start` | Yes | Yes | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).
-3 | `glm_cem`   | Yes | --- | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).
-3 | `glm_cem`   | --- | Yes | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
-4 | `margstd`   | Yes | Yes | Marginally standardized estimates using binomial model with a logit link (logistic model) | Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803).
---| `robpoisson` | Yes | Yes | Log-linear (Poisson) model with robust/sandwich/empirical standard errors | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)
---| `logistic`   | No  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
+1 | `glm`       | `riskratio` | `riskdiff` | Binomial model with a log or identity link | Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. [Am J Epidemiol 1986;123:174-184](https://www.ncbi.nlm.nih.gov/pubmed/3509965).
+2 | `glm_start` | `riskratio` | `riskdiff` | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).
+3 | `glm_cem`   | `riskratio` | --- | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).
+3 | `glm_cem`   | --- | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
+4 | `margstd`   | `riskratio` | `riskdiff` | Marginally standardized estimates using binomial model with a logit link (logistic model) | Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803).
+--| `robpoisson` | `riskratio` | `riskdiff` | Log-linear (Poisson) model with robust/sandwich/empirical standard errors | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)
+--| `logistic`   | (only comparison)  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
 ^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting.
 
 \
@@ -136,10 +140,8 @@ Which model was fitted is always indicated in the first line of the output of `s
 
 For example:
 
-> Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the `risks` R package (reference).
+> Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the `risks` R package (https://github.com/stopsack/risks).
 
-
-# Advanced usage
 
 ## Model choice
 

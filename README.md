@@ -23,39 +23,58 @@ install.packages("risks")
 
 # Summary
 
-The `risks` packages provides a flexible interface to fitting regression
-models for risk ratios and risk differences, as well as prevalence
-ratios and prevalence differences. (For brevity, the vignette describes
-“risk,” but “prevalence” can be substituted throughout.)
+The `risks` package fits regression models for risk ratios (RR) and risk
+differences (RD). For brevity, the package refers to “risk,” but
+“prevalence” can be substituted throughout.
 
-Emphasis is on a user-friendly approach that does not require advanced
-programming or biostatistics skills while still providing users with
-options for customization of model use and reporting as well as
-comparisons between different approaches.
+What is the association between an exposure (men/women, age in years, or
+underweight/lean/overweight/obese) and the risk of a binary outcome
+(dead/alive, disease/healthy), perhaps adjusting for confounders
+(smoker/nonsmoker, years of education)? For such binary outcomes, many
+studies default to reporting odds ratios (OR). Yet outside of
+case-control studies, odds ratios are unnecessary to report. Risk ratios
+and risk differences have much more intuitive interpretations.
+Additionally, when the outcome is not rare, odds ratios are significant
+overestimates for risk ratios. Despite these drawbacks, odds ratios are
+often simply reported because they are easily obtained from logistic
+regression models. Obtaining risk ratios or risk differences, especially
+after adjusting for covariates (*e.g.,* confounders) has been quite
+challenging and often required more advanced biostatistics and
+programming skills, including in R.
 
-Implemented are Poisson models with robust covariance, binomial models,
+The `risks` package fills this gap by providing a user-friendly approach
+that makes obtaining adjusted risk ratios and risk differences as simple
+as fitting a logistic regression model. No advanced programming or
+biostatistics skills are required. Build-in routines automatically
+switch to more computationally demanding model fitting approaches if
+simple binomial models have convergence issues, making `risks` return
+valid estimates whenever the data would allow for fitting a logistic
+model. At the same time, several options for customization of model
+fitting and reporting as well as comparisons between different
+approaches are provided.
+
+Implemented are binomial models, Poisson models with robust covariance,
 binomial models aided in convergence by starting values obtained through
 Poisson models, binomial models fitted via combinatorial expectation
-maximization (optionally also with Poisson starting values), and
-estimates obtained via marginal standardization after fitting logistic
+maximization instead of Fisher scoring (optionally also with Poisson
+starting values), and marginal standardization after fitting logistic
 models.
 
 # Basic usage
 
-We define a cohort of women with breast cancer, used by Spiegelman and
-Hertzmark (Am J Epidemiol 2005) and Greenland (Am J Epidemiol 2004). The
+We define a cohort of women with breast cancer, as used by Spiegelman
+and Hertzmark ([Am J
+Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland
+([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The
 the categorical exposure is `stage`, the binary outcome is `death`, and
 the binary confounder is `receptor`.
 
 ``` r
-knitr::opts_chunk$set(echo = TRUE)
-```
+library(risks)      # provides riskratio(), riskdiff(), and postestimation functions as below
+library(tidyverse)  # For data handling
+library(broom)      # For tidy() model summaries
 
-``` r
-library(risks)
-library(tidyverse)
-library(broom)
-
+# Sample data originally from:
 # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
 dat <- tibble(
   death    = c(rep(1, 54), rep(0, 138)),
@@ -64,13 +83,29 @@ dat <- tibble(
   receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+
+# Display the sample data
+dat %>% 
+  group_by(receptor, stage) %>% 
+  summarize(deaths = sum(death), total = n(), risk = deaths/total)
+#> # A tibble: 6 x 5
+#> # Groups:   receptor [2]
+#>   receptor stage     deaths total   risk
+#>   <chr>    <chr>      <dbl> <int>  <dbl>
+#> 1 High     Stage I        5    55 0.0909
+#> 2 High     Stage II      17    74 0.230 
+#> 3 High     Stage III      9    15 0.6   
+#> 4 Low      Stage I        2    12 0.167 
+#> 5 Low      Stage II       9    22 0.409 
+#> 6 Low      Stage III     12    14 0.857
 ```
 
   
-Using `risks` models to obtain (possibly multivariable-adjusted) risk
-ratios or risk differences is similar to the standard code for logistic
-models in R. No options for model `family` or `link` function can or
-must be supplied:
+The risk of death is higher among women with higher-stage and hormone
+receptor-low cancers, which also tend to be of higher stage. Using
+`risks` models to obtain (possibly multivariable-adjusted) risk ratios
+or risk differences is similar to the standard code for logistic models
+in R. No options for model `family` or `link` need to be supplied:
 
 ``` r
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
@@ -166,10 +201,9 @@ regular `glm` model:
     coefficients are printed.
 
   
-`risks` provides an interface to `tidy()`, which returns a data frame
-(or tibble) of all coefficients (risk differences), their standard
-errors, and confidence intervals. Confidence intervals are included by
-default.
+`risks` provides an interface to `tidy()`, which returns a data frame of
+all coefficients (risk differences in this example), their standard
+errors, and confidence intervals.
 
 ``` r
 tidy(fit_rd)
@@ -184,9 +218,8 @@ tidy(fit_rd)
 
   
 In accordance with R standards, coefficients for relative risks are
-shown on the \(log_e(RR)\) scale. Exponentiated coefficients (risk
-ratios, \(RR\)) are easily obtained via `tidy(..., exponentiate =
-TRUE)`:
+shown on the logarithmic scale. Exponentiated coefficients (risk ratios)
+are easily obtained via `tidy(..., exponentiate = TRUE)`:
 
 ``` r
 tidy(fit_rr, exponentiate = TRUE)
@@ -199,55 +232,42 @@ tidy(fit_rr, exponentiate = TRUE)
 #> 4 receptorLow    1.56       0.197      2.25 2.42e- 2   1.06       2.29  glm_sta…
 ```
 
-For example, the risk of death was 5.87 times higher in women with stage
-III breast cancer compared to stage I (95% confidence interval, 2.76 to
-12.48 times), adjusting for hormone receptor status.
+For example, the risk of death was 5.9 times higher in women with stage
+III breast cancer compared to stage I (95% confidence interval, 2.8 to
+12 times), adjusting for hormone receptor status.
 
   
 Typical R functions that build on regression models can further process
 fitted `risks` models. Examples:
 
-  - `coef(fit)` returns model coefficients (*i.e.*, \(log(RR)\)s or RDs)
-    as a numeric vector
+  - `coef(fit)` returns model coefficients (*i.e.*, log(RR) or RDs) as a
+    numeric vector
   - `confint(fit, level = 0.9)` returns *90%* confidence intervals.
   - `predict(fit, type = "response")` returns predicted probabilities of
     the binary outcome.
 
-# Models
+# Advanced usage
 
-What is the association between an exposure (perhaps men/women, age in
-years, or underweight/lean/overweight/obese) and the risk of a binary
-outcome (yes/no, dead/alive, disease/healthy), perhaps adjusting for
-confounders (smoker/nonsmoker, years of completed education)? In a
-cohort study, this association is best expressed as a risk ratio (RR) or
-as a risk difference (RD). It is is well-recognized theoretically that
-is it unneccessary to report an odds ratio (OR) in cohort studies,
-because their interpretation differs from risk ratios and numerically
-diverges the stronger the association is. Many regression models have
-been proposed to directly estimate risk ratios and risk differences.
-However, implementing them in standard software, including R, has
-typically required more advanced programming skills.
+# Implemented regression models for risk ratios and risk differences
 
 `risks` implements all major regression models that have been proposed
 for relative risks and risk differences. By default (`approach =
-"auto"`), `risks` estimates the most efficient valid model that
-converges; in more numerically challenging cases, it defaults to
-computationally less efficient models while ensuring that the user
-receives a valid result. Whenever data are sufficient to obtain odds
-ratios from logistic models, `risks` is designed to successfully return
-risk ratios and risk differences.
+"auto"`), `riskratio` and `riskdiff` estimate the most efficient valid
+model that converges; in more numerically challenging cases, they
+default to computationally less efficient models while ensuring that a
+valid result is returned.
 
 The following models are implemented in `risks`:
 
-| \#<sup>1</sup> | `approach =` | RR  | RD  | Model                                                                                                               | Reference                                                                                                                                                                                                                               |
-| -------------- | ------------ | --- | --- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1              | `glm`        | Yes | Yes | Binomial model with a log or identity link                                                                          | Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. [Am J Epidemiol 1986;123:174-184](https://www.ncbi.nlm.nih.gov/pubmed/3509965).                                                                  |
-| 2              | `glm_start`  | Yes | Yes | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model              | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).                                                        |
-| 3              | `glm_cem`    | Yes | —   | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring            | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).                                                          |
-| 3              | `glm_cem`    | —   | Yes | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).                 |
-| 4              | `margstd`    | Yes | Yes | Marginally standardized estimates using binomial model with a logit link (logistic model)                           | Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803). |
-| –              | `robpoisson` | Yes | Yes | Log-linear (Poisson) model with robust/sandwich/empirical standard errors                                           | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)                                                                 |
-| –              | `logistic`   | No  | —   | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios                                  | Included for comparison purposes only.                                                                                                                                                                                                  |
+| \#<sup>1</sup> | `approach =` | RR                | RD         | Model                                                                                                               | Reference                                                                                                                                                                                                                               |
+| -------------- | ------------ | ----------------- | ---------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1              | `glm`        | `riskratio`       | `riskdiff` | Binomial model with a log or identity link                                                                          | Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. [Am J Epidemiol 1986;123:174-184](https://www.ncbi.nlm.nih.gov/pubmed/3509965).                                                                  |
+| 2              | `glm_start`  | `riskratio`       | `riskdiff` | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model              | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).                                                        |
+| 3              | `glm_cem`    | `riskratio`       | —          | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring            | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).                                                          |
+| 3              | `glm_cem`    | —                 | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).                 |
+| 4              | `margstd`    | `riskratio`       | `riskdiff` | Marginally standardized estimates using binomial model with a logit link (logistic model)                           | Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803). |
+| –              | `robpoisson` | `riskratio`       | `riskdiff` | Log-linear (Poisson) model with robust/sandwich/empirical standard errors                                           | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)                                                                 |
+| –              | `logistic`   | (only comparison) | —          | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios                                  | Included for comparison purposes only.                                                                                                                                                                                                  |
 
 <sup>1</sup> Indicates the priority with which the default modelling
 strategy (`approach = "auto"`) attempts model fitting.
@@ -267,9 +287,8 @@ For example:
 
 > Risk ratios were obtained from binomial models with a log link,
 > convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark,
-> AJE 2005), using the `risks` R package (reference).
-
-# Advanced usage
+> AJE 2005), using the `risks` R package
+> (<https://github.com/stopsack/risks>).
 
 ## Model choice
 
@@ -357,8 +376,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.05798   2.812  0.00492 ** 
-#> stageStage III  0.57097    0.09968   5.728 1.02e-08 ***
+#> stageStage II   0.16303    0.05881   2.772  0.00557 ** 
+#> stageStage III  0.57097    0.09631   5.928 3.06e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -373,8 +392,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Confidence intervals for coefficients (bootstrap-based):
 #>                      2.5%     97.5%
 #> stageStage I           NA        NA
-#> stageStage II  0.04883175 0.2779093
-#> stageStage III 0.35457038 0.7547630
+#> stageStage II  0.03161866 0.2670610
+#> stageStage III 0.34684786 0.7395444
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -405,7 +424,7 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
 #> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07201   2.245   0.0248 *
+#> receptorLow   0.16163    0.07658   2.111   0.0348 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -418,9 +437,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients (bootstrap-based):
-#>                    2.5%     97.5%
-#> receptorHigh         NA        NA
-#> receptorLow  0.03524539 0.3287343
+#>                     2.5%     97.5%
+#> receptorHigh          NA        NA
+#> receptorLow  0.000612633 0.3046141
 ```
 
 ## Model comparisons
@@ -511,31 +530,31 @@ that converged:
 tidy(fit_all) %>%
   print(n = 25)
 #> # A tibble: 23 x 8
-#>    term       estimate std.error statistic   p.value conf.low conf.high model   
-#>    <chr>         <dbl>     <dbl>     <dbl>     <dbl>    <dbl>     <dbl> <chr>   
-#>  1 (Intercep…   0.0860    0.0387      2.22   2.63e-2  0.0122      0.160 robpois…
-#>  2 stageStag…   0.150     0.0647      2.32   2.05e-2  0.0366      0.263 robpois…
-#>  3 stageStag…   0.565     0.165       3.43   6.07e-4  0.377       0.753 robpois…
-#>  4 receptorL…   0.140     0.0960      1.45   1.46e-1 -0.00878     0.288 robpois…
-#>  5 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm     
-#>  6 stageStag…   0.149     0.0576      2.59   9.53e-3  0.0364      0.262 glm     
-#>  7 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm     
-#>  8 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm     
-#>  9 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 glm_sta…
-#> 10 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 glm_sta…
-#> 11 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 glm_sta…
-#> 12 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 glm_sta…
-#> 13 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 addreg  
-#> 14 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 addreg  
-#> 15 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 addreg  
-#> 16 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 addreg  
-#> 17 (Intercep…   0.0838    0.0363      2.31   2.11e-2  0.0126      0.155 addreg_…
-#> 18 stageStag…   0.149     0.0576      2.59   9.52e-3  0.0364      0.262 addreg_…
-#> 19 stageStag…   0.572     0.0947      6.04   1.52e-9  0.387       0.758 addreg_…
-#> 20 receptorL…   0.161     0.0759      2.13   3.35e-2  0.0126      0.310 addreg_…
-#> 21 stageStag…   0         0         NaN    NaN       NA          NA     margstd 
-#> 22 stageStag…   0.163     0.0608      2.68   7.36e-3  0.0183      0.265 margstd 
-#> 23 stageStag…   0.571     0.0964      5.93   3.12e-9  0.324       0.737 margstd
+#>    term      estimate std.error statistic    p.value conf.low conf.high model   
+#>    <chr>        <dbl>     <dbl>     <dbl>      <dbl>    <dbl>     <dbl> <chr>   
+#>  1 (Interce…   0.0860    0.0387      2.22   2.63e- 2  0.0122      0.160 robpois…
+#>  2 stageSta…   0.150     0.0647      2.32   2.05e- 2  0.0366      0.263 robpois…
+#>  3 stageSta…   0.565     0.165       3.43   6.07e- 4  0.377       0.753 robpois…
+#>  4 receptor…   0.140     0.0960      1.45   1.46e- 1 -0.00878     0.288 robpois…
+#>  5 (Interce…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 glm     
+#>  6 stageSta…   0.149     0.0576      2.59   9.53e- 3  0.0364      0.262 glm     
+#>  7 stageSta…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 glm     
+#>  8 receptor…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 glm     
+#>  9 (Interce…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 glm_sta…
+#> 10 stageSta…   0.149     0.0576      2.59   9.52e- 3  0.0364      0.262 glm_sta…
+#> 11 stageSta…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 glm_sta…
+#> 12 receptor…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 glm_sta…
+#> 13 (Interce…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 addreg  
+#> 14 stageSta…   0.149     0.0576      2.59   9.52e- 3  0.0364      0.262 addreg  
+#> 15 stageSta…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 addreg  
+#> 16 receptor…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 addreg  
+#> 17 (Interce…   0.0838    0.0363      2.31   2.11e- 2  0.0126      0.155 addreg_…
+#> 18 stageSta…   0.149     0.0576      2.59   9.52e- 3  0.0364      0.262 addreg_…
+#> 19 stageSta…   0.572     0.0947      6.04   1.52e- 9  0.387       0.758 addreg_…
+#> 20 receptor…   0.161     0.0759      2.13   3.35e- 2  0.0126      0.310 addreg_…
+#> 21 stageSta…   0         0         NaN    NaN        NA          NA     margstd 
+#> 22 stageSta…   0.163     0.0578      2.82   4.81e- 3  0.0629      0.284 margstd 
+#> 23 stageSta…   0.571     0.0889      6.42   1.32e-10  0.386       0.770 margstd
 ```
 
 ## Prediction

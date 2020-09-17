@@ -1,5 +1,5 @@
 Package: risks
-Title: Estimate relative risks and risk differences using regression
+Title: Estimate risk ratios and risk differences using regression
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Konrad",
