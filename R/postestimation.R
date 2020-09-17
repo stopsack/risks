@@ -246,6 +246,8 @@ summary.risks <- function(object, ...) {
 
 #' Print model summary
 #'
+#' @description
+#'
 #' Print summaries for "risks" models. The printout is the same as
 #' for regular summaries of generalized linear models fit via
 #' \code{stats::glm()}, except that the type of "risks" model
@@ -276,7 +278,6 @@ print.summary.risks <- function(
         `Max.prob.` = purrr::pluck(.x, "maxprob"))) %>%
       as.data.frame()
     print(toprint)
-    cat(paste0("Access these models via '", deparse(substitute(x)), "$all_models'.\n"))
   }
 
   # Print type of final model
@@ -295,18 +296,20 @@ print.summary.risks <- function(
   if(conf.int == TRUE &   # addreg and logbin use standard CIs
      (default == TRUE | "addreg" %in% class(x$object) | "logbin" %in% class(x$object)) &
      !("margstd" %in% class(x$object))) {
-    cat("Confidence intervals for coefficients (normality-based):\n")
+    cat("Confidence intervals for coefficients: (normality-based)\n")
     print(confint.default(x$object, ...))
   }
   if(conf.int == TRUE &
      default == FALSE &
      sum(c("margstd", "addreg", "logbin") %in% class(x$object)) == 0) {
-    cat("Confidence intervals for coefficients (profiling-based):\n")
+    cat("Confidence intervals for coefficients: (profiling-based)\n")
     print(confint(x$object, ...))
   }
   if(conf.int == TRUE & "margstd" %in% class(x$object)) {
     # retrieve CIs that were generated when bootstrapping SEs for model summary
-    cat("Confidence intervals for coefficients (bootstrap-based):\n")
+    cat(paste("Confidence intervals for coefficients: (based on",
+              x$margstd.bootrepeats,
+              "bootstrap repeats)\n"))
     ci <- x$conf.int %>%
       dplyr::select(.data$conf.low, .data$conf.high) %>%
       as.matrix()
