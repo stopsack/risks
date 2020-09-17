@@ -71,10 +71,16 @@ extremes of the data (extrapolation), a warning will be displayed.}
 \code{logbin}, or \code{addreg}).}
 }
 \value{
-Fitted model. Pass this object to \code{\link{summary.risks}} to obtain
+Fitted model.
+Pass this object to \code{\link{summary.risks}} to obtain
 an overview of results; to \code{\link{tidy.risks}} to obtain a tibble of
 coefficients and confidence intervals; or to \code{\link{predict.glm}(type = "response")}
 to obtain fitted values (predictions).
+
+If all model fitting using all possible approaches was requested via
+\code{approach = "all"}, then their results can be retrieved from the
+list \code{all_models} in the returned object (e.g., \code{fit$all_models[[1]]},
+\code{fit$all_models[[2]]}, etc.).
 }
 \description{
 \code{riskratio} and \code{riskdiff} provide a flexible interface to fitting
@@ -141,13 +147,13 @@ approach = "robpoisson")
 Donoghoe MW, Marschner IC. logbin: An R Package for
 Relative Risk Regression Using the Log-Binomial Model.
 J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
-expectation maximization; estimate = "rr", approach = "glm_cem")
+expectation maximization; riskratio(approach = "glm_cem")
 
 Donoghoe MW, Marschner IC. Stable computational methods
 for additive binomial models with application to adjusted risk differences.
 Comput Stat Data Anal 2014;80:184-96. (Additive binomial models
 fitted via combinatorial expectation maximization;
-estimate = "rd", approach = "glm_cem")
+riskdiff(approach = "glm_cem"))
 
 Localio AR, Margolis DJ, Berlin JA.
 Relative risks and confidence intervals were easily computed
