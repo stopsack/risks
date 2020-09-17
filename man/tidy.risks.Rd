@@ -66,7 +66,7 @@ tidy(fit_rr)
 # Marginal standardization,
 # increase number of bootstrap repeats:
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "margstd")
-tidy(fit_rr, bootrepeats = 250)
+tidy(fit_rr, bootrepeats = 1000)
 
 # Multiple types of models fitted:
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "all")
