@@ -126,10 +126,26 @@ boot_eststd <- function(object, bootrepeats) {
              estimate = object$estimate[1])
 }
 
-# Helper function for BCa bootstrap confidence intervals
+# Helper for BCa bootstrap CIs with meaningful error message
+bcaci_catch <- function(boot.out, index, conf) {
+  tryCatch(expr = boot::boot.ci(boot.out = boot.out, index = index, type = "bca", conf = conf),
+           error = function(cond)
+             stop(paste("The logistic model converged, but estimation of bias-corrected",
+                        "accelerated bootstrap confidence intervals for marginally",
+                        "standardized estimates failed. The most likely reason is that",
+                        "the number of bootstrap repeats was too low.",
+                        "Recommend increasing  bootstrap repeats substantially",
+                        "with 'bootrepeats = 2000' or even higher counts.\n",
+                        "The original error message from boot::boot.ci(type = 'bca') was:\n", cond)),
+           warning = function(cond)
+             message(paste("boot::boot.ci(type = 'bca') return a warning message:\n", cond)))
+}
+
+# Obtain BCa bootstrap confidence intervals after bootstrapping
 bcaci <- function(boot.out, conf, parameters) {
   getbcaci <- function(boot.out, index, conf) {
-    mybca <- boot::boot.ci(boot.out = boot.out, index = index, type = "bca", conf = conf)$bca
+    mybca <- bcaci_catch(boot.out = boot.out, index = index, conf = conf)$bca
+      #boot::boot.ci(boot.out = boot.out, index = index, type = "bca", conf = conf)$bca
     res <- as.numeric(mybca[1, 4:5])
     names(res) <- c("conf.low", "conf.high")
     return(res)
@@ -255,7 +271,7 @@ summary.margstd <- function(object, dispersion = NULL,
            list(#deviance.resid = residuals(object, type = "deviance"),
              coefficients = coef.table, aliased = aliased,
              dispersion = dispersion, df = c(object$rank, df.r, df.f),
-             conf.int = stderror, level = level))
+             conf.int = stderror, level = level, margstd.bootrepeats = bootrepeats))
   class(ans) <- "summary.glm"
   return(ans)
 }
