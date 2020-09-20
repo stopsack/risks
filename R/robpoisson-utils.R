@@ -4,8 +4,9 @@
 #' @import stats
 
 # estimate_poisson: internal, fitting the Poisson model
-estimate_poisson <- function(formula, data, link, ...) {
-  fit <- stats::glm(formula = formula, family = poisson(link = link), data = data)
+estimate_poisson <- function(formula, data, link, weights = NULL, ...) {
+  fit <- eval(substitute(stats::glm(formula = formula, family = poisson(link = link),
+                                    data = data, weights = weights)))
   class(fit) <- c("robpoisson", class(fit))
   fit <- estimate_maxprob(fit = fit, formula = formula, data = data, link = link)
   return(fit)

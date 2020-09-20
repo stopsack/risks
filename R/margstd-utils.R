@@ -1,14 +1,20 @@
 # Helper functions for marginal standardization after
 # fitting a logistic regression model
 
-#' @import stats tidyverse boot
+#' @import stats
 #' @importFrom purrr %>%
 #' @importFrom rlang .data
 
 
 # Fit logistic model, obtained marginal predictions, generate contrasts
-eststd <- function(x, data, predictor, levels, estimate) {
-  mdl <- glm(formula = x$formula, family = binomial(link = "logit"), data = data)
+eststd <- function(x, data, predictor, levels, estimate, weights = NULL, substitution = TRUE) {
+  .weight <- NULL
+  if(substitution == TRUE)
+    mdl <- eval(substitute(stats::glm(formula = x$formula, family = binomial(link = "logit"),
+                                      data = data, weights = weights)))
+  else
+    mdl <- stats::glm(formula = x$formula, family = binomial(link = "logit"),
+                      data = data, weights = .weight)
   results <- tibble::tibble(term = levels) %>%
     dplyr::mutate(data = purrr::map(.x = .data$term,
                                     .f = ~dplyr::mutate(.data = data,
@@ -33,8 +39,10 @@ estimate_margstd <- function(
   estimate   = c("rr", "rd"),
   variable   = NULL,    # where to standardize;
   # default: 1st binary var/categorical var/numeric var w/2 levels
-  at         = NULL) {  # level of variable to standardize at)
-  fit <- stats::glm(formula = formula, family = binomial(link = "logit"), data = data)
+  at         = NULL,    # level of variable to standardize at)
+  weights    = NULL) {  # weights for GLM model
+  fit <- eval(substitute(stats::glm(formula = formula, family = binomial(link = "logit"),
+                                    data = data, weights = weights)))
 
   # find variable to standardize over
   if(!is.null(variable)) {
@@ -92,15 +100,15 @@ estimate_margstd <- function(
         levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
-  eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels,
-                   estimate = estimate[1])
+  eststd <- eval(substitute(eststd(x = fit, data = data, predictor = predictor, levels = levels,
+                                   estimate = estimate[1], weights = weights)))
 
   newfit <- list(coefficients      = eststd,
                  estimate          = estimate[1],
                  margstd_predictor = predictor,
                  margstd_levels    = levels,
                  rank              = 1)
-  newfit <- append(newfit, fit[c("residuals", "fitted.values",
+  newfit <- append(newfit, fit[c("residuals", "fitted.values", "weights", "prior.weights",
                                  "family", "deviance", "aic", "null.deviance",
                                  "iter", "df.residual", "df.null", "y", "converged",
                                  "boundary", "model", "call", "formula", "terms",
@@ -112,15 +120,18 @@ estimate_margstd <- function(
 
 # Bootstrap model fitting
 boot_eststd <- function(object, bootrepeats) {
+  object$data$.weight <- object$prior.weights
+
   bootfn <- function(data, index, fit, ...) {
-    eststd(x = fit, data = data[index, ], ...)
+    eststd(x = fit, data = data[index, ],
+           substitution = FALSE, ...)
   }
 
   boot::boot(data = object$data,
              statistic = bootfn,
              R = bootrepeats,
-             fit = glm(formula = object$formula, family = binomial(link = "logit"),
-                       data = object$data),
+             fit = stats::glm(formula = object$formula, family = binomial(link = "logit"),
+                              data = object$data),
              predictor = object$margstd_predictor,
              levels = object$margstd_levels,
              estimate = object$estimate[1])
@@ -138,7 +149,7 @@ bcaci_catch <- function(boot.out, index, conf) {
                         "with 'bootrepeats = 2000' or even higher counts.\n",
                         "The original error message from boot::boot.ci(type = 'bca') was:\n", cond)),
            warning = function(cond)
-             message(paste("boot::boot.ci(type = 'bca') return a warning message:\n", cond)))
+             message(paste("boot::boot.ci(type = 'bca') returned a warning message:\n", cond)))
 }
 
 # Obtain BCa bootstrap confidence intervals after bootstrapping
@@ -164,7 +175,7 @@ bcaci <- function(boot.out, conf, parameters) {
 #' @param object Model fitted through marginal standardization
 #' @param parm Not used, for compatibility
 #' @param level Confidence level, defaults to 0.95.
-#' @param bootrepeats Bootstrap repeats. Defaults to 200. Strongly recommend >1000.
+#' @param bootrepeats Bootstrap repeats. Defaults to 200. Strongly recommend >>1000.
 #' @param ... Not used
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
@@ -233,7 +244,8 @@ summary.margstd <- function(object, dispersion = NULL,
     p1 <- 1L:p
     Qr <- object$qr
     if(is.null(Qr))
-      stop("lm object does not have a proper 'qr' component.\n Rank zero or should not have used lm(.., qr=FALSE).")
+      stop(paste("lm object does not have a proper 'qr' component.\n",
+                 "Rank zero or should not have used lm(.., qr=FALSE)."))
     #coef.p <- object$coefficients[Qr$pivot[p1]]
     coef.p <- object$coefficients
     stderror <- margstd_stderror(object = object, level = level,
@@ -259,8 +271,7 @@ summary.margstd <- function(object, dispersion = NULL,
   }
   else {
     coef.table <- matrix(, 0L, 4L)
-    dimnames(coef.table) <- list(NULL, c("Estimate", "Std. Error",
-                                         "t value", "Pr(>|t|)"))
+    dimnames(coef.table) <- list(NULL, c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
     covmat.unscaled <- covmat <- matrix(, 0L, 0L)
     df.f <- length(aliased)
   }
