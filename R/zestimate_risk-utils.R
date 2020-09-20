@@ -1,14 +1,14 @@
 # Helper functions for estimate_risk()
-#' @import stats tidyverse
 
 # Fitting functions for individual models
 # Estimate maximum predicted probability, ensure later it is < 1
 estimate_maxprob <- function(fit, formula, data, link, start = NULL) {
-  implausible <- 0.99999  # logbin and addreg predicted probablities do not exact reach 1
-                          # in case they converge on implausible values
+  implausible <- 0.99999
+  # logbin and addreg predicted probablities do not exactly reach 1
+  # in case they converge on implausible values
   fit$maxprob <- maxprob <- max(predict(fit, type = "response"))
   if(maxprob > implausible)
-    message(paste("Implausible predicted probability >", implausible, "occurred:", maxprob))
+    message(paste0("Implausible predicted probability >", implausible, " occurred: ", maxprob))
   if(!is.null(start) & fit$method != "glm.fit")
     fit$risks_start <- "_start"
   else
@@ -23,33 +23,58 @@ estimate_maxprob <- function(fit, formula, data, link, start = NULL) {
   return(fit)
 }
 
+# Extended purrr::possibly() that allows 'otherwise =' to be a function
+# based on https://github.com/tidyverse/purrr/issues/640
+ext_possibly <- function(.f, otherwise, quiet = TRUE) {
+  .f <- purrr::as_mapper(.f)
+  force(otherwise)
+  function(...) {
+    tryCatch(.f(...), error = function(e) {
+      if (!quiet)
+        message("Error: ", e$message)
+      otherwise
+    }, interrupt = function(e) {
+      stop("Terminated by user", call. = FALSE)
+    })
+  }
+}
+
+# Return values if model fitting failed.
+# Still assign the class/type of the model that was meant to be fitted.
+return_failure <- function(family, classname) {
+  ret <- list(family = family,
+              converged = FALSE, boundary = FALSE, maxprob = NA_real_)
+  class(ret) <- c("risks", classname, "glm", "lm")
+  return(ret)
+}
+
 # Exception handlers
-possibly_estimate_poisson <- purrr::possibly(
+possibly_estimate_poisson <- ext_possibly(
   .f = estimate_poisson,
-  otherwise = list(family = list(family = "poisson"),
-                   converged = FALSE, boundary = FALSE, maxprob  = NA_real_))
+  otherwise = return_failure(family = list(family = "poisson"),
+                             classname = "robpoisson"))
 
-possibly_estimate_glm <- purrr::possibly(
+possibly_estimate_glm <- ext_possibly(
   .f = estimate_glm,
-  otherwise = list(family = list(family = "binomial"),
-                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+  otherwise = return_failure(family = list(family = "binomial"),
+                             classname = NULL))
 
-possibly_estimate_logbin <- purrr::possibly(
+possibly_estimate_logbin <- ext_possibly(
   .f = estimate_logbin,
-  otherwise = list(family = list(family = "binomial", link = "log"),
-                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+  otherwise = return_failure(family = list(family = "binomial", link = "log"),
+                             classname = "logbin"))
 
-possibly_estimate_addreg <- purrr::possibly(
+possibly_estimate_addreg <- ext_possibly(
   .f = estimate_addreg,
-  otherwise = list(family = list(family = "binomial", link = "identity"),
-                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+  otherwise = return_failure(family = list(family = "binomial", link = "identity"),
+                             classname = "addreg"))
 
-possibly_estimate_logistic <- purrr::possibly(
+possibly_estimate_logistic <- ext_possibly(
   .f = estimate_logistic,
-  otherwise = list(family = list(family = "binomial", link = "logit"),
-                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+  otherwise = return_failure(family = list(family = "binomial", link = "logit"),
+                             classname = "logistic"))
 
-possibly_estimate_margstd <- purrr::possibly(
+possibly_estimate_margstd <- ext_possibly(
   .f = estimate_margstd,
-  otherwise = list(family = list(family = "binomial", link = "logit"),
-                   converged = FALSE, boundary = FALSE, maxprob = NA_real_))
+  otherwise = return_failure(family = list(family = "binomial", link = "logit"),
+                             classname = "margstd"))
