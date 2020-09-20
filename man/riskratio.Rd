@@ -12,6 +12,7 @@ riskratio(
     "glm_cem_start", "margstd", "logistic"),
   variable = NULL,
   at = NULL,
+  weights = NULL,
   ...
 )
 
@@ -22,6 +23,7 @@ riskdiff(
     "glm_cem_start", "margstd", "logistic"),
   variable = NULL,
   at = NULL,
+  weights = NULL,
   ...
 )
 }
@@ -49,9 +51,10 @@ See full documentation (currently at \url{https://github.com/stopsack/risks}) fo
 \item \code{"glm_cem"} Binomial model fitted with combinatorial expectation maximization.
 \item \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
 \item \code{"margstd"} Marginal standardization after logistic model.
+\item \code{"logistic"} For comparison only: the logistic model. Only available in \code{riskratio()}.
 }}
 
-\item{variable}{Optional: variable to use for marginal standardization.
+\item{variable}{Optional: exposure variable to use for marginal standardization.
 If \code{variable} is not provided and marginal standardization is
 attempted, then the first binary or categorical variable in the model
 is used as the exposure. Levels are determined automatically for
@@ -59,13 +62,19 @@ variables types \code{logical}, \code{character}, \code{factor},
 and \code{numeric} (only if no more than 2 levels for the latter);
 otherwise levels must be supplied via \code{at =}.}
 
-\item{at}{Optional: Levels of variable \code{variable} for marginal
+\item{at}{Optional: Levels of exposure variable \code{variable} for marginal
 standardization. \code{at =} determines the levels at which contrasts of the exposure
 are to be assessed. The level listed first is used as the reference.
 Levels must exist in the data for character, factor or ordered factor variables.
 For numeric variables, levels that do not exist in the data
 can be interpolations or extrapolations; if levels exceed the
 extremes of the data (extrapolation), a warning will be displayed.}
+
+\item{weights}{Precision weights for individual observations (integers).
+See help for \code{\link[stats]{glm}}.
+Precision weights are not supported by approaches \code{"glm_cem"} and \code{"glm_cem_start"}.
+Not to be confused with frequency or sampling weights;
+use \code{\link[survey]{svyglm}} if such weights are needed.}
 
 \item{...}{Optional: Further arguments passed to fitting functions (\code{glm},
 \code{logbin}, or \code{addreg}).}
@@ -77,7 +86,7 @@ an overview of results; to \code{\link{tidy.risks}} to obtain a tibble of
 coefficients and confidence intervals; or to \code{\link{predict.glm}(type = "response")}
 to obtain fitted values (predictions).
 
-If all model fitting using all possible approaches was requested via
+If model fitting using all possible approaches was requested via
 \code{approach = "all"}, then their results can be retrieved from the
 list \code{all_models} in the returned object (e.g., \code{fit$all_models[[1]]},
 \code{fit$all_models[[2]]}, etc.).
@@ -132,32 +141,32 @@ summary(fit_rd)
 \references{
 Wacholder S. Binomial regression in GLIM: Estimating risk ratios
 and risk differences. Am J Epidemiol 1986;123:174-184.
-(Binomial regression models; approach = "glm")
+(Binomial regression models; \code{approach = "glm"})
 
 Spiegelman D, Hertzmark E. Easy SAS Calculations for Risk or
 Prevalence Ratios and Differences. Am J Epidemiol 2005;162:199-200.
 (Binomial models fitted used starting values from Poisson models;
-approach = "glm_start")
+\code{approach = "glm_start"})
 
 Zou G. A modified Poisson regression approach to prospective
 studies with binary data. Am J Epidemiol 2004;159:702-706.
 (Poisson model with robust/sandwich standard errors;
-approach = "robpoisson")
+\code{approach = "robpoisson"})
 
 Donoghoe MW, Marschner IC. logbin: An R Package for
 Relative Risk Regression Using the Log-Binomial Model.
 J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
-expectation maximization; riskratio(approach = "glm_cem")
+expectation maximization; \code{riskratio(approach = "glm_cem")}
 
 Donoghoe MW, Marschner IC. Stable computational methods
 for additive binomial models with application to adjusted risk differences.
 Comput Stat Data Anal 2014;80:184-96. (Additive binomial models
 fitted via combinatorial expectation maximization;
-riskdiff(approach = "glm_cem"))
+\code{riskdiff(approach = "glm_cem")})
 
 Localio AR, Margolis DJ, Berlin JA.
 Relative risks and confidence intervals were easily computed
 indirectly from multivariable logistic regression.
 J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
-logistic model; approach = "margstd")
+logistic model; \code{approach = "margstd"})
 }

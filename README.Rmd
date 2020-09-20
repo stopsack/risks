@@ -98,7 +98,7 @@ tidy(fit_rd)
 ```
 
 \
-In accordance with R standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients (risk ratios) are easily obtained via `tidy(..., exponentiate = TRUE)`:
+In accordance with `glm` standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients for risk ratios are easily obtained via `tidy(..., exponentiate = TRUE)`:
 
 ```{r basic4}
 tidy(fit_rr, exponentiate = TRUE)
@@ -109,14 +109,14 @@ For example, the risk of death was 5.9 times higher in women with stage III brea
 \
 Typical R functions that build on regression models can further process fitted `risks` models. Examples:
 
-*  `coef(fit)` returns model coefficients (*i.e.*, log(RR) or RDs) as a numeric vector
+*  `coef(fit)` or `coefficients(fit)` return model coefficients (*i.e.*, log(RR) or RDs) as a numeric vector
 *  `confint(fit, level = 0.9)` returns *90%* confidence intervals.
-*  `predict(fit, type = "response")` returns predicted probabilities of the binary outcome.
-
+*  `predict(fit, type = "response")` or `fitted.values(fit)` return predicted probabilities of the binary outcome.
+*  `residuals(fit)` returns model residuals.
 
 # Advanced usage
 
-# Implemented regression models for risk ratios and risk differences
+# Implemented model types
 
 `risks` implements all major regression models that have been proposed for relative risks and risk differences. By default (`approach = "auto"`), `riskratio` and `riskdiff` estimate the most efficient valid model that converges; in more numerically challenging cases, they default to computationally less efficient models while ensuring that a valid result is returned.
 
@@ -130,7 +130,7 @@ The following models are implemented in `risks`:
 3 | `glm_cem`   | --- | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
 4 | `margstd`   | `riskratio` | `riskdiff` | Marginally standardized estimates using binomial model with a logit link (logistic model) | Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803).
 --| `robpoisson` | `riskratio` | `riskdiff` | Log-linear (Poisson) model with robust/sandwich/empirical standard errors | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)
---| `logistic`   | (only comparison)  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
+--| `logistic`   | `riskratio`, for comparison only  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
 ^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting.
 
 \
@@ -162,12 +162,12 @@ riskratio(formula = death ~ stage + receptor, data = dat, approach = "glm")
 
 ## Marginal standardization
 
-Marginal standardization, `approach = "margstd"`, makes use of the good convergence properties of the logit link, which is also guaranteed to result in probabilities within (0; 1). After fitting a logistic models, predicted probabilities for each observation are obtained for the levels of the exposure variable. Risk ratios and risk differences are calculated by contrasting the predicted probabilities as ratios or differences. Standard errors and confidence intervals are obtained via bootstrapping the entire procedure. Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model. In addition, in order to derive contrasts, continuous exposures are evaluated at discrete levels.
+Marginal standardization, `approach = "margstd"`, makes use of the good convergence properties of the logit link, which is also guaranteed to result in probabilities within (0; 1). After fitting a logistic model, predicted probabilities for each observation are obtained for the levels of the exposure variable. Risk ratios and risk differences are calculated by contrasting the predicted probabilities as ratios or differences. Standard errors and confidence intervals are obtained via bootstrapping the entire procedure. Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model. In addition, in order to derive contrasts, continuous exposures have to be evaluated at discrete levels.
 
-* By default, the first categorical right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, and `character` are taken to represent categorical variables, as are variables of the type `numeric` with only two levels (e.g., `0` and `1`).
-* Using `variable =`, the user can specify a different variable.
+* By default, the first categorical right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, `ordered`, and `character` are taken to represent categorical variables, as are variables of the type `numeric` with only two levels (e.g., `0` and `1`).
+* Using `variable =`, a different variable can be specified.
 * Using `at =`, levels for contrasts and the order of levels can be specified. The first level is used as the reference with a risk ratio of 1 or a risk difference of 0. The option `at =` is required for continuous variables or `numeric` variables with more than two levels. A warning will be shown for continuous values if the requested levels exceed the range of data (extrapolation).
-* For models fitted via `approach = "margstd"`, standard errors/confidence intervals are obtained via bootstrapping. The default are 200 bootstrap repeats to reduce initial computation time. For final, precise estimates, the number of repeats should be increased to >1000. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`.
+* For models fitted via `approach = "margstd"`, standard errors/confidence intervals are obtained via bootstrapping. The default are (currently) 200 bootstrap repeats to reduce initial computation time. For final, precise estimates, the number of repeats should be increased to >>1000. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`.
 
 We fit the same risk difference model as in section 2:
 
@@ -204,14 +204,29 @@ Individual models can be accessed as `fit$all_models[[1]]` through `fit$all_mode
 
 ```{r allmodels2}
 tidy(fit_all) %>%
+  select(-statistic) %>%
   print(n = 25)
 ```
 
 
-## Prediction
+## Precision weights
 
-* Checking maximum predicted probabilities (may be out-of-range for Poisson)
+At this point, integer *precision* weights are supported, as in `glm`, but not frequency weights or sampling weights, such as for inverse-probability weighting. The latter can be handled, *e.g.*, via `survey::svyglm()`.  Binomial models fitted via combinatorial expectation maximization do not support precision weights. 
 
-## Weights---TBD
+```{r allmodels_weights}
+dat <- dat %>%  # generate some non-random weights
+  mutate(myweight = round((row_number() + 20) / 20))
 
-## Clustered observations---TBD
+fit_all <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                    approach = "all", weights = myweight)
+summary(fit_all)
+```
+
+\
+In this example, the Poisson model and models using its coeffients as starting values do not converge. Overview of the converged models using weights with `tidy()` (`glm`'s warnings are suppressed):
+
+```{r allmodels2_weights, warning = FALSE}
+tidy(fit_all) %>%
+  select(-statistic) %>%
+  print(n = 25)
+```

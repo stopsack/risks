@@ -13,7 +13,7 @@
 
 \item{level}{Confidence level, defaults to 0.95.}
 
-\item{bootrepeats}{Bootstrap repeats. Defaults to 200. Strongly recommend >1000.}
+\item{bootrepeats}{Bootstrap repeats. Defaults to 200. Strongly recommend >>1000.}
 
 \item{...}{Not used}
 }

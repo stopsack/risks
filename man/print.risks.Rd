@@ -14,4 +14,6 @@
 \description{
 Print fitted risks model. The only change, compared to \code{print.glm()},
 is the addition of the main type of model: relative risk or risk difference.
+If multiple models were fitted via \code{approach = "all"}, then the
+first converged model will be printed.
 }
