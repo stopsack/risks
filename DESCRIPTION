@@ -12,7 +12,7 @@ Authors@R:
            role = c("aut"),
            email = "travis.gerke@moffitt.org",
            comment = c(ORCID = "0000-0002-9500-8907")))
-Description: Offers several methods for estimating convergent regression models for relative risks (risk ratios) and risk differences.
+Description: The risks package allows for fitting risk ratio and risk difference models using regression.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -34,8 +34,7 @@ Imports:
     sandwich,
     stats,
     tibble,
-    tidyr,
-    tidyverse
+    tidyr
 Depends:
     logbin
 RdMacros: lifecycle
