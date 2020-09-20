@@ -2,7 +2,7 @@
 #
 # print(), summary(), summary.print(), and tidy()
 
-#' @import stats tidyverse
+#' @import stats
 #' @importFrom rlang .data
 
 norowname <- function(x) {
@@ -159,12 +159,21 @@ tidy.risks <- function(
 #'
 #' Print fitted risks model. The only change, compared to \code{print.glm()},
 #' is the addition of the main type of model: relative risk or risk difference.
+#' If multiple models were fitted via \code{approach = "all"}, then the
+#' first converged model will be printed.
 #'
 #' @param x Fitted model
 #' @param ... Passed to print.glm()
 #'
 #' @export
 print.risks <- function(x, ...) {
+  if(x$converged == FALSE & !is.null(x$all_models)) {
+    converged <- min(which(purrr::map(x$all_models, .f = ~purrr::pluck(.x, "converged")) == TRUE))
+    if(is.null(converged))
+      stop("No model converged")
+    x <- x$all_models[[converged]]
+  }
+
   if(!is.null(x$estimate))
     estimate <- x$estimate
   else
@@ -272,7 +281,7 @@ print.summary.risks <- function(
   if(!is.null(purrr::pluck(x, "all_models"))) {
     cat("\nAll fitted models:\n")
     toprint <- purrr::pluck(x, "all_models") %>%
-      purrr::map_dfr(.f = ~tibble(
+      purrr::map_dfr(.f = ~tibble::tibble(
         Model       = paste0(class(.x)[2], purrr::pluck(.x, "risks_start")),
         Converged   = purrr::pluck(.x, "converged"),
         `Max.prob.` = purrr::pluck(.x, "maxprob"))) %>%
