@@ -80,11 +80,21 @@ use \code{\link[survey]{svyglm}} if such weights are needed.}
 \code{logbin}, or \code{addreg}).}
 }
 \value{
-Fitted model.
-Pass this object to \code{\link[risks]{summary.risks}} to obtain
-an overview of results; to \code{\link[risks]{tidy.risks}} to obtain a tibble of
-coefficients and confidence intervals; or to \code{\link[stats]{predict.glm}(type = "response")}
-to obtain fitted values (predictions).
+Fitted model. This object can be passed on to post-processing functions:
+\itemize{
+\item \code{\link[risks]{summary.risks}}: an overview of results (risks-specific S3 methods:
+\code{\link[risks]{summary.robpoisson}}, \code{\link[risks]{summary.margstd}}).
+\item \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence intervals.
+}
+
+Standard post-processing functions can also be used:
+\itemize{
+\item \code{\link[stats]{coef}}: a vector of coefficients.
+\item \code{\link[stats]{confint}}: a matrix of confidence intervals (risks-specific S3 methods:
+\code{\link[risks]{confint.robpoisson}}, \code{\link[risks]{confint.margstd}}).
+\item \code{\link[stats]{predict.glm}(type = "response")}: fitted values (predictions).
+\item \code{\link[stats]{residuals}}: residuals.
+}
 
 If model fitting using all possible approaches was requested via
 \code{approach = "all"}, then their results can be retrieved from the
@@ -108,7 +118,7 @@ through Poisson models, binomial models fitted via
 combinatorial expectation maximization (optionally also with Poisson starting values),
 and estimates obtained via marginal standardization after logistic regression.
 
-Adjusting for covariates (e.g., confounders) the model specification (\code{formula =}) is possible.
+Adjusting for covariates (e.g., confounders) in the model specification (\code{formula =}) is possible.
 }
 \section{Functions}{
 \itemize{
