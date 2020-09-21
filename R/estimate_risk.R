@@ -94,9 +94,9 @@
 #'
 #' @export
 #' @return Fitted model.
-#'   Pass this object to \code{\link{summary.risks}} to obtain
-#'   an overview of results; to \code{\link{tidy.risks}} to obtain a tibble of
-#'   coefficients and confidence intervals; or to \code{\link{predict.glm}(type = "response")}
+#'   Pass this object to \code{\link[risks]{summary.risks}} to obtain
+#'   an overview of results; to \code{\link[risks]{tidy.risks}} to obtain a tibble of
+#'   coefficients and confidence intervals; or to \code{\link[stats]{predict.glm}(type = "response")}
 #'   to obtain fitted values (predictions).
 #'
 #'   If model fitting using all possible approaches was requested via
@@ -142,6 +142,10 @@ riskratio <- function(formula, data, approach = c("auto", "all", "robpoisson", "
 riskdiff <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
                                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
                      variable = NULL, at = NULL, weights = NULL, ...) {
+  if(deparse(substitute(weights)) == "NULL")
+    estimate_risk(formula = formula, data = data, estimate = "rd",
+                  approach = approach, variable = variable, at = at, ...)
+  else
   eval(substitute(estimate_risk(formula = formula, data = data, estimate = "rd",
                 approach = approach, variable = variable, at = at, weights = weights, ...)))
 }

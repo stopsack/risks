@@ -5,15 +5,15 @@
 #'
 #' @section risks functions:
 #'
-#' \code{\link{riskratio}}: Fit risk ratio models.
+#' \code{\link[risks]{riskratio}}: Fit risk ratio models.
 #'
-#' \code{\link{riskdiff}}: Fit risk difference models.
+#' \code{\link[risks]{riskdiff}}: Fit risk difference models.
 #'
-#' \code{\link{summary.risks}}: Summarize fitted model.
+#' \code{\link[risks]{summary.risks}}: Summarize fitted model.
 #'
-#' \code{\link{tidy.risks}}: Tibble (data frame) of parameters, coefficients, standard errors, confidence intervals.
+#' \code{\link[risks]{tidy.risks}}: Tibble (data frame) of parameters, coefficients, standard errors, confidence intervals.
 #'
-#' \code{\link{confint.robpoisson}}, \code{\link{confint.margstd}}: Confidence intervals. (Standard confidence intervals for generalized linear models are used for other models.)
+#' \code{\link[risks]{confint.robpoisson}}, \code{\link[risks]{confint.margstd}}: Confidence intervals. (Standard confidence intervals for generalized linear models are used for other models.)
 #'
 #' @docType package
 #' @name risks
