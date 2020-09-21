@@ -9,9 +9,9 @@ Currently, the development version of `risks` can be installed from
 [GitHub](https://github.com/) using:
 
 ``` r
-# install.packages("devtools")  # The devtools package needs to be installed
-library(devtools)
-devtools::install_github("stopsack/risks")
+# install.packages("remotes")  # The "remotes" package needs to be installed
+library(remotes)
+remotes::install_github("stopsack/risks")
 ```
 
 Once released on [CRAN](https://CRAN.R-project.org), installation will
@@ -243,9 +243,9 @@ fitted `risks` models. Examples:
   - `coef(fit)` or `coefficients(fit)` return model coefficients
     (*i.e.*, log(RR) or RDs) as a numeric vector
   - `confint(fit, level = 0.9)` returns *90%* confidence intervals.
-  - `predict(fit, type = "response")` or *`fitted.values(fit)`* return
+  - `predict(fit, type = "response")` or `fitted.values(fit)` return
     predicted probabilities of the binary outcome.
-  - *`residuals(fit)` results residuals.*
+  - `residuals(fit)` returns model residuals.
 
 # Advanced usage
 
@@ -377,8 +377,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.06032   2.703  0.00688 ** 
-#> stageStage III  0.57097    0.09828   5.809 6.27e-09 ***
+#> stageStage II   0.16303    0.06225   2.619  0.00882 ** 
+#> stageStage III  0.57097    0.09688   5.893 3.78e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -391,10 +391,10 @@ summary(fit_margstd, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients: (based on 500 bootstrap repeats)
-#>                      2.5%     97.5%
-#> stageStage I           NA        NA
-#> stageStage II  0.01986293 0.2719250
-#> stageStage III 0.34355828 0.7546017
+#>                     2.5%     97.5%
+#> stageStage I          NA        NA
+#> stageStage II  0.0254270 0.2832588
+#> stageStage III 0.3531658 0.7411828
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -425,7 +425,7 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
 #> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07123   2.269   0.0233 *
+#> receptorLow   0.16163    0.07302   2.214   0.0269 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -438,9 +438,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients: (based on 500 bootstrap repeats)
-#>                    2.5%     97.5%
-#> receptorHigh         NA        NA
-#> receptorLow  0.02254986 0.2918382
+#>                   2.5%     97.5%
+#> receptorHigh        NA        NA
+#> receptorLow  0.0347821 0.3342538
 ```
 
 ## Model comparisons
@@ -554,15 +554,15 @@ tidy(fit_all) %>%
 #> 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start
 #> 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start
 #> 21 stageStage I     0         0      NaN       NA          NA     margstd     
-#> 22 stageStage II    0.163     0.0637   1.05e-2  0.0352      0.259 margstd     
-#> 23 stageStage III   0.571     0.109    1.52e-7  0.384       0.778 margstd
+#> 22 stageStage II    0.163     0.0597   6.30e-3  0.0383      0.264 margstd     
+#> 23 stageStage III   0.571     0.0993   9.05e-9  0.325       0.770 margstd
 ```
 
 ## Precision weights
 
 At this point, integer *precision* weights are supported, as in `glm`,
 but not frequency weights or sampling weights, such as for
-inverse-probability weights. The latter can be handled, *e.g.*, via
+inverse-probability weighting. The latter can be handled, *e.g.*, via
 `survey::svyglm()`. Binomial models fitted via combinatorial expectation
 maximization do not support precision weights.
 
@@ -635,6 +635,6 @@ tidy(fit_all) %>%
 #> 3 stageStage III   0.403    0.0422    1.49e-21  0.320      0.486  glm    
 #> 4 receptorLow      0.0877   0.0275    1.42e- 3  0.0338     0.142  glm    
 #> 5 stageStage I     0        0       NaN        NA         NA      margstd
-#> 6 stageStage II    0.0648   0.0220    3.16e- 3  0.0307     0.116  margstd
-#> 7 stageStage III   0.397    0.101     9.30e- 5  0.230      0.599  margstd
+#> 6 stageStage II    0.0648   0.0235    5.73e- 3  0.0277     0.111  margstd
+#> 7 stageStage III   0.397    0.112     3.95e- 4  0.208      0.639  margstd
 ```
