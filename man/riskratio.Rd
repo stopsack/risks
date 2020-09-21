@@ -81,9 +81,9 @@ use \code{\link[survey]{svyglm}} if such weights are needed.}
 }
 \value{
 Fitted model.
-Pass this object to \code{\link{summary.risks}} to obtain
-an overview of results; to \code{\link{tidy.risks}} to obtain a tibble of
-coefficients and confidence intervals; or to \code{\link{predict.glm}(type = "response")}
+Pass this object to \code{\link[risks]{summary.risks}} to obtain
+an overview of results; to \code{\link[risks]{tidy.risks}} to obtain a tibble of
+coefficients and confidence intervals; or to \code{\link[stats]{predict.glm}(type = "response")}
 to obtain fitted values (predictions).
 
 If model fitting using all possible approaches was requested via
