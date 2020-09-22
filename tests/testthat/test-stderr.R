@@ -17,7 +17,7 @@ test_that("Standard errors for RR(receptorLow) are the same", {
   rd_margstd    <- riskratio(formula = death ~ receptor, data = dat, approach = "margstd")
 
   se_glm <- summary(rd_glm)$coefficients["receptorLow", "Std. Error"]
-  tol <- 0.0001
+  tol <- 0.01
 
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
@@ -25,7 +25,7 @@ test_that("Standard errors for RR(receptorLow) are the same", {
   expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_margstd, bootrepeats = 500)$coefficients["receptorLow", "Std. Error"],
-               tolerance = 0.01)
+               tolerance = 0.03)
 })
 
 test_that("Standard errors for RD(receptorLow) are the same", {
@@ -45,7 +45,7 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   rd_margstd    <- riskdiff(formula = death ~ receptor, data = dat, approach = "margstd")
 
   se_glm <- summary(rd_glm)$coefficients["receptorLow", "Std. Error"]
-  tol <- 0.0001
+  tol <- 0.01
 
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
@@ -53,5 +53,5 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_margstd, bootrepeats = 500)$coefficients["receptorLow", "Std. Error"],
-               tolerance = 0.01)
+               tolerance = 0.03)
 })

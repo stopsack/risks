@@ -16,7 +16,7 @@ test_that("RD coefficients for receptorLow are the same", {
   rd_cem_start  <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem_start"))
   rd_margstd    <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "margstd"))
 
-  tol <- 0.00000001
+  tol <- 0.000001
 
   expect_equal((23/48) - (31/144), as.numeric(rd_glm["receptorLow"]),        tolerance = tol)
   expect_equal((23/48) - (31/144), as.numeric(rd_glm_start["receptorLow"]),  tolerance = tol)
@@ -29,7 +29,7 @@ test_that("RD coefficients for receptorLow are the same", {
   expect_equal(rd_glm, rd_cem, tolerance = 0.01)
   expect_equal(rd_glm, rd_cem_start, tolerance = 0.01)
   expect_equal(rd_glm[c("stageStage II", "stageStage III")],
-               rd_margstd[c("stageStage II", "stageStage III")], tolerance = 0.02)
+               rd_margstd[c("stageStage II", "stageStage III")], tolerance = 0.03)
 })
 
 test_that("RR coefficients for receptorLow are the same", {
@@ -61,5 +61,5 @@ test_that("RR coefficients for receptorLow are the same", {
   expect_equal(rd_glm, rd_cem, tolerance = 0.01)
   expect_equal(rd_glm, rd_cem_start, tolerance = 0.01)
   expect_equal(rd_glm[c("stageStage II", "stageStage III")],
-               rd_margstd[c("stageStage II", "stageStage III")], tolerance = 0.02)
+               rd_margstd[c("stageStage II", "stageStage III")], tolerance = 0.03)
 })
