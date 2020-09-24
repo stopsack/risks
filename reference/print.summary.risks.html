@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • risks</title>
+<title>Print model summary — print.summary.risks • risks</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,12 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Print model summary — print.summary.risks" />
+<meta property="og:description" content="Print summaries for &quot;risks&quot; models. The printout is the same as
+for regular summaries of generalized linear models fit via
+stats::glm(), except that the type of &quot;risks&quot; model
+is printed first (e.g., &quot;Poisson model with robust covariance&quot;)
+and confidence intervals for model parameters are printed at the end." />
 
 
 
@@ -58,7 +63,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -105,96 +110,49 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Print model summary</h1>
+    <small class="dont-index">Source: <a href='https://github.com/stopsack/risks/blob/master/R/postestimation.R'><code>R/postestimation.R</code></a></small>
+    <div class="hidden name"><code>print.summary.risks.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Print summaries for "risks" models. The printout is the same as
+for regular summaries of generalized linear models fit via
+<code><a href='https://rdrr.io/r/stats/glm.html'>stats::glm()</a></code>, except that the type of "risks" model
+is printed first (e.g., "Poisson model with robust covariance")
+and confidence intervals for model parameters are printed at the end.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='co'># S3 method for summary.risks</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='kw'>x</span>, conf.int = <span class='fl'>TRUE</span>, default = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="confint.margstd.html">confint(<i>&lt;margstd&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Bias-corrected/accelerated bootstrap confidence intervals</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="confint.robpoisson.html">confint(<i>&lt;robpoisson&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Robust confidence intervals for Poisson model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.risks.html">print(<i>&lt;risks&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.summary.risks.html">print(<i>&lt;summary.risks&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print model summary</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="riskratio.html">riskratio()</a></code> <code><a href="riskratio.html">riskdiff()</a></code> </p>
-        </td>
-        <td><p>Fit risk ratio and risk difference models</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="risks.html">risks</a></code> </p>
-        </td>
-        <td><p>risks: Estimate risk ratios and risk differences using regression</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.margstd.html">summary(<i>&lt;margstd&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summary for models using marginal standardization</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.risks.html">summary(<i>&lt;risks&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Generate model summary</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.robpoisson.html">summary(<i>&lt;robpoisson&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summary for Poisson model with robust covariance</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="tidy.risks.html">tidy(<i>&lt;risks&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Tidy model summaries for risks models</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>Model</p></td>
+    </tr>
+    <tr>
+      <th>conf.int</th>
+      <td><p>Add confidence intervals to printout? Defaults to TRUE.</p></td>
+    </tr>
+    <tr>
+      <th>default</th>
+      <td><p>Normal confidence intervals via confint.default()? Default to TRUE.
+By setting <code>default = FALSE</code>, profile likelihood-based
+confidence intervals can be calculated for binomial models.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Passed on</p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
