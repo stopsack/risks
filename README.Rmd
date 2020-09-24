@@ -133,14 +133,9 @@ The following models are implemented in `risks`:
 --| `logistic`   | `riskratio`, for comparison only  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
 ^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting.
 
-\
-Which model was fitted is always indicated in the first line of the output of `summary(...)` and in the `model` column of `tidy(...)`. In methods sections of manuscripts, the approach can be described in detail as follows:
+Which model was fitted is always indicated in the first line of the output of `summary(...)` and in the `model` column of `tidy(...)`. In methods sections of manuscripts, the approach can be described in detail as follows: "Risk ratios (or risk differences) were obtained via (method listed in the first line of model `summary.risks(...)`) using the `risks` R package (reference to this package and/or the article listed in the column 'reference')."
 
-> Risk ratios [or risk differences] were obtained via [method listed in the first line of `summary(...)`] using the `risks` R package (reference to this package and/or the article listed in the column "reference").
-
-For example:
-
-> Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the `risks` R package (https://github.com/stopsack/risks).
+For example: "Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the `risks` R package (https://github.com/stopsack/risks)."
 
 
 ## Model choice

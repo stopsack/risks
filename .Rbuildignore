@@ -10,3 +10,4 @@
 ^\.github$
 ^clang-.*
 ^tic\.R$
+^_pkgdown\.yml$

@@ -273,23 +273,18 @@ The following models are implemented in `risks`:
 <sup>1</sup> Indicates the priority with which the default modelling
 strategy (`approach = "auto"`) attempts model fitting.
 
-  
 Which model was fitted is always indicated in the first line of the
 output of `summary(...)` and in the `model` column of `tidy(...)`. In
 methods sections of manuscripts, the approach can be described in detail
-as follows:
+as follows: “Risk ratios (or risk differences) were obtained via (method
+listed in the first line of model `summary.risks(...)`) using the
+`risks` R package (reference to this package and/or the article listed
+in the column”reference“).”
 
-> Risk ratios \[or risk differences\] were obtained via \[method listed
-> in the first line of `summary(...)`\] using the `risks` R package
-> (reference to this package and/or the article listed in the column
-> “reference”).
-
-For example:
-
-> Risk ratios were obtained from binomial models with a log link,
-> convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark,
-> AJE 2005), using the `risks` R package
-> (<https://github.com/stopsack/risks>).
+For example: “Risk ratios were obtained from binomial models with a log
+link, convergence-assisted by Poisson models (ref. Spiegelman and
+Hertzmark, AJE 2005), using the `risks` R package
+(<https://github.com/stopsack/risks>).”
 
 ## Model choice
 
@@ -377,8 +372,8 @@ summary(fit_margstd, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>                Estimate Std. Error z value Pr(>|z|)    
 #> stageStage I    0.00000    0.00000      NA       NA    
-#> stageStage II   0.16303    0.06225   2.619  0.00882 ** 
-#> stageStage III  0.57097    0.09688   5.893 3.78e-09 ***
+#> stageStage II   0.16303    0.05819   2.802  0.00508 ** 
+#> stageStage III  0.57097    0.09495   6.013 1.82e-09 ***
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -391,10 +386,10 @@ summary(fit_margstd, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients: (based on 500 bootstrap repeats)
-#>                     2.5%     97.5%
-#> stageStage I          NA        NA
-#> stageStage II  0.0254270 0.2832588
-#> stageStage III 0.3531658 0.7411828
+#>                      2.5%     97.5%
+#> stageStage I           NA        NA
+#> stageStage II  0.04676527 0.2815745
+#> stageStage III 0.37834806 0.7524654
 ```
 
 Consistent with earlier results, we observed that women with stage III
@@ -425,7 +420,7 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Coefficients: (3 not defined because of singularities)
 #>              Estimate Std. Error z value Pr(>|z|)  
 #> receptorHigh  0.00000    0.00000      NA       NA  
-#> receptorLow   0.16163    0.07302   2.214   0.0269 *
+#> receptorLow   0.16163    0.07171   2.254   0.0242 *
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
@@ -438,9 +433,9 @@ summary(fit_margstd2, bootrepeats = 500)
 #> Number of Fisher Scoring iterations: 4
 #> 
 #> Confidence intervals for coefficients: (based on 500 bootstrap repeats)
-#>                   2.5%     97.5%
-#> receptorHigh        NA        NA
-#> receptorLow  0.0347821 0.3342538
+#>                    2.5%    97.5%
+#> receptorHigh         NA       NA
+#> receptorLow  0.03281886 0.335073
 ```
 
 ## Model comparisons
@@ -554,8 +549,8 @@ tidy(fit_all) %>%
 #> 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start
 #> 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start
 #> 21 stageStage I     0         0      NaN       NA          NA     margstd     
-#> 22 stageStage II    0.163     0.0597   6.30e-3  0.0383      0.264 margstd     
-#> 23 stageStage III   0.571     0.0993   9.05e-9  0.325       0.770 margstd
+#> 22 stageStage II    0.163     0.0615   7.98e-3  0.0525      0.305 margstd     
+#> 23 stageStage III   0.571     0.107    1.00e-7  0.314       0.741 margstd
 ```
 
 ## Precision weights
@@ -635,6 +630,6 @@ tidy(fit_all) %>%
 #> 3 stageStage III   0.403    0.0422    1.49e-21  0.320      0.486  glm    
 #> 4 receptorLow      0.0877   0.0275    1.42e- 3  0.0338     0.142  glm    
 #> 5 stageStage I     0        0       NaN        NA         NA      margstd
-#> 6 stageStage II    0.0648   0.0235    5.73e- 3  0.0277     0.111  margstd
-#> 7 stageStage III   0.397    0.112     3.95e- 4  0.208      0.639  margstd
+#> 6 stageStage II    0.0648   0.0226    4.13e- 3  0.0293     0.109  margstd
+#> 7 stageStage III   0.397    0.102     1.09e- 4  0.223      0.643  margstd
 ```
