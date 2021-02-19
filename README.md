@@ -1,7 +1,8 @@
 
 <!-- badges: start -->
   [![Codecov test coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
-  <!-- badges: end -->
+[![R-CMD-check](https://github.com/stopsack/risks/workflows/R-CMD-check/badge.svg)](https://github.com/stopsack/risks/actions)
+<!-- badges: end -->
   
 # risks
 
