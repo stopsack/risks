@@ -2,9 +2,16 @@
 % Please edit documentation in R/margstd-utils.R
 \name{confint.margstd}
 \alias{confint.margstd}
-\title{Bias-corrected/accelerated bootstrap confidence intervals}
+\title{Bootstrap confidence intervals}
 \usage{
-\method{confint}{margstd}(object, parm = NULL, level = 0.95, bootrepeats = 200, ...)
+\method{confint}{margstd}(
+  object,
+  parm = NULL,
+  level = 0.95,
+  bootrepeats = 200,
+  bootci = c("bca", "normal", "nonpar"),
+  ...
+)
 }
 \arguments{
 \item{object}{Model fitted through marginal standardization}
@@ -13,7 +20,20 @@
 
 \item{level}{Confidence level, defaults to 0.95.}
 
-\item{bootrepeats}{Bootstrap repeats. Defaults to 200. Strongly recommend >>1000.}
+\item{bootrepeats}{Bootstrap repeats. Defaults to 200.
+Strongly recommend >1000.}
+
+\item{bootci}{Type of bootstrap confidence interval:
+\itemize{
+\item \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
+confidence intervals.
+\item \code{"normal"} Parametric normality-based confidence intervals,
+which require lower repeat numbers but are less accurate and
+may result in invalid results for ratios.
+\item \code{"nonpar"} Non-parametric BCa confidence intervals,
+which should be used with caution because of the risk
+of sparse-data bias with non-parametric bootstrapping.
+}}
 
 \item{...}{Not used}
 }
@@ -21,5 +41,6 @@
 Matrix: First column, lower bound; second column, upper bound.
 }
 \description{
-Confidence intervals for models fit using marginal standardization.
+Confidence intervals for models fit using marginal standardization
+based on parametric bootstrapping.
 }

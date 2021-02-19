@@ -12,7 +12,6 @@ riskratio(
     "glm_cem_start", "margstd", "logistic"),
   variable = NULL,
   at = NULL,
-  weights = NULL,
   ...
 )
 
@@ -23,7 +22,6 @@ riskdiff(
     "glm_cem_start", "margstd", "logistic"),
   variable = NULL,
   at = NULL,
-  weights = NULL,
   ...
 )
 }
@@ -43,15 +41,18 @@ the model via all implemented approaches to allow for comparisons.
 
 The other options allow for directly selecting a fitting approach,
 some of which may not converge or yield out-of-range predicted probabilities.
-See full documentation (currently at \url{https://github.com/stopsack/risks}) for details.
+See full documentation (currently at
+\url{https://stopsack.github.io/risks}) for details.
 \itemize{
 \item \code{"glm"} Binomial model.
 \item \code{"glm_start"} Binomial model with starting values from Poisson model.
 \item \code{"robpoisson"} Poisson model with robust covariance.
-\item \code{"glm_cem"} Binomial model fitted with combinatorial expectation maximization.
+\item \code{"glm_cem"} Binomial model fitted with combinatorial expectation
+maximization.
 \item \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
 \item \code{"margstd"} Marginal standardization after logistic model.
-\item \code{"logistic"} For comparison only: the logistic model. Only available in \code{riskratio()}.
+\item \code{"logistic"} For comparison only: the logistic model. Only available
+in \code{riskratio()}.
 }}
 
 \item{variable}{Optional: exposure variable to use for marginal standardization.
@@ -65,19 +66,13 @@ otherwise levels must be supplied via \code{at =}.}
 \item{at}{Optional: Levels of exposure variable \code{variable} for marginal
 standardization. \code{at =} determines the levels at which contrasts of the exposure
 are to be assessed. The level listed first is used as the reference.
-Levels must exist in the data for character, factor or ordered factor variables.
-For numeric variables, levels that do not exist in the data
+Levels must exist in the data for character, factor or ordered factor
+variables. For numeric variables, levels that do not exist in the data
 can be interpolations or extrapolations; if levels exceed the
 extremes of the data (extrapolation), a warning will be displayed.}
 
-\item{weights}{Precision weights for individual observations (integers).
-See help for \code{\link[stats]{glm}}.
-Precision weights are not supported by approaches \code{"glm_cem"} and \code{"glm_cem_start"}.
-Not to be confused with frequency or sampling weights;
-use \code{\link[survey]{svyglm}} if such weights are needed.}
-
-\item{...}{Optional: Further arguments passed to fitting functions (\code{glm},
-\code{logbin}, or \code{addreg}).}
+\item{...}{Optional: Further arguments passed to fitting functions
+(\code{glm}, \code{logbin}, or \code{addreg}).}
 }
 \value{
 Fitted model. This object can be passed on to post-processing functions:

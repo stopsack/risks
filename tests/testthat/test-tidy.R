@@ -15,16 +15,3 @@ test_that("tidy(risk*(...), approach = 'all') returns 6 models", {
   expect_equal(length(unique(broom::tidy(fit_rr)$model)), 6)  # no glm
   expect_equal(length(unique(broom::tidy(fit_rd)$model)), 6)  # no logistic
 })
-
-test_that("tidy(risk*(..., weight = myweight), approach = 'all') returns 4 or 5 models", {
-  dat$myweight <- rep(1:10, times = 20)[1:192]
-
-  # weights: need to run via eval(substitute())
-  fit_rrw <- eval(substitute(riskratio(formula = death ~ stage + receptor, data = dat,
-                                       approach = "all", weights = myweight)))
-  fit_rdw <- eval(substitute(riskdiff(formula  = death ~ stage + receptor, data = dat,
-                                      approach = "all", weights = myweight)))
-
-  expect_equal(length(unique(broom::tidy(fit_rrw)$model)), 5)  # no cem*
-  expect_equal(length(unique(broom::tidy(fit_rdw)$model)), 4)  # no logistic, no cem*
-})

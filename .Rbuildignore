@@ -11,3 +11,5 @@
 ^clang-.*
 ^tic\.R$
 ^_pkgdown\.yml$
+^index\.md$
+^index\.Rmd$

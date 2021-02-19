@@ -11,6 +11,7 @@
   symbolic.cor = FALSE,
   level = 0.95,
   bootrepeats = 200,
+  bootci = c("bca", "normal", "nonpar"),
   ...
 )
 }
@@ -23,9 +24,22 @@
 
 \item{symbolic.cor}{Not used}
 
-\item{level}{Confidence level, defaults to 95\%}
+\item{level}{Confidence level, defaults to \code{0.95}.}
 
-\item{bootrepeats}{Bootstrap repeats for standard errors. Defaults to 200. Strongly recommend >1000.}
+\item{bootrepeats}{Bootstrap repeats for standard errors. Defaults to 200.
+Strongly recommend >1000.}
+
+\item{bootci}{Type of bootstrap confidence interval:
+\itemize{
+\item \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
+confidence intervals.
+\item \code{"normal"} Parametric normality-based confidence intervals,
+which require lower repeat numbers but are less accurate and
+may result in invalid results for ratios.
+\item \code{"nonpar"} Non-parametric BCa confidence intervals,
+which should be used with caution because of the risk
+of sparse-data bias with non-parametric bootstrapping.
+}}
 
 \item{...}{Not used}
 }

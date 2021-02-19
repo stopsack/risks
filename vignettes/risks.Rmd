@@ -1,0 +1,105 @@
+---
+title: "Introduction to the risks package: Get Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to the risks package: Get Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Installation
+
+Once risks is released on CRAN, `install.packages("risks")` will be available. Currently, the development version of `risks` can be installed from [GitHub](https://github.com/) using:
+
+```r
+# install.packages("remotes")  # The "remotes" package needs to be installed
+remotes::install_github("stopsack/risks")
+```
+
+# An example cohort study
+
+We define a cohort of women with breast cancer, as used by Spiegelman and Hertzmark ([Am J Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland ([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
+
+```{r load, message = FALSE}
+library(risks)      # provides riskratio(), riskdiff(), postestimation functions
+library(tidyverse)  # For data handling
+library(broom)      # For tidy() model summaries
+
+# Sample data originally from:
+# Newman SC. Biostatistical methods in epidemiology. 
+# New York, NY: Wiley, 2001, table 5.3
+dat <- tibble::tibble(
+  death    = c(rep(1, 54), rep(0, 138)),
+  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+
+# Display the sample data
+dat %>% 
+  group_by(receptor, stage) %>% 
+  summarize(deaths = sum(death), total = n(), risk = deaths/total)
+```
+
+
+# Adjusted risk ratios
+
+The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` need to be supplied:
+
+```{r basic}
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
+summary(fit_rr)
+```
+
+  
+# Adjusted risk differences
+
+To obtain risk differences, use `riskdiff`, which has the same syntax:
+
+```{r basic2}
+fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
+summary(fit_rd)
+```
+
+For example, the risk of death was 57 percentage points higher in women with stage III breast cancer compared to stage I (95% confidence interval, 39 to 76 percentage points), adjusting for hormone receptor status.
+
+The model summary in `riskratio()` and `riskdiff()` includes to two additions compared to a regular `glm()` model:
+
+*  In the first line of `summary()`, the type of risk regression model is displayed (in the example, "`Risk ratio model, fitted as binomial model...`"). 
+*  At the end of the output, confidence intervals for the model coefficients are printed.
+
+
+# Accessing model coefficients
+
+The risks package provides an interface to `broom::tidy()`, which returns a data frame of all coefficients (risk differences in this example), their standard errors, *z* statistics, and confidence intervals.
+
+```{r basic3}
+tidy(fit_rd)
+```
+
+\
+In accordance with `glm()` standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients for risk ratios are easily obtained via `tidy(..., exponentiate = TRUE)`:
+
+```{r basic4}
+tidy(fit_rr, exponentiate = TRUE)
+```
+
+For example, the risk of death was 5.9 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.8 to 12 times), adjusting for hormone receptor status.
+
+
+# More post-estimation commands
+
+Typical R functions that build on regression models can further process fitted `risks` models. In addition to `tidy()`, examples are:
+
+*  `coef(fit)` or `coefficients(fit)` return model coefficients (*i.e.*, RDs or log(RR)) as a numeric vector
+*  `confint(fit, level = 0.9)` returns *90%* confidence intervals.
+*  `predict(fit, type = "response")` or `fitted.values(fit)` return predicted probabilities of the binary outcome.
+*  `residuals(fit)` returns model residuals.

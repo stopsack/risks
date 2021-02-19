@@ -9,6 +9,8 @@
   conf.int = TRUE,
   conf.level = 0.95,
   bootrepeats = 200,
+  bootci = c("bca", "normal", "nonpar"),
+  bootverbose = FALSE,
   exponentiate = FALSE,
   default = TRUE,
   ...
@@ -19,19 +21,36 @@
 
 \item{conf.int}{Show confidence intervals?}
 
-\item{conf.level}{Optional: Confidence level. Defaults to 0.95.}
+\item{conf.level}{Optional. Confidence level. Defaults to \code{0.95}.}
 
-\item{bootrepeats}{Optional: Number of bootstrap repeats.
-Applicable to models fitted via marginal standardization (\code{approach = "margstd"}).
-Defaults to 200, a very low number of repeats.
-It is strongly recommended to increase repeats to >1000.}
+\item{bootrepeats}{Optional. Number of bootstrap repeats.
+Applicable to models fitted via marginal standardization
+(\code{approach = "margstd"}). Defaults to 200. Strongly recommended
+to increase repeats to >1000.}
 
-\item{exponentiate}{Exponentiate coefficients and confidence limits? Defaults to FALSE.
-Setting \code{exponentiate = TRUE} is useful for relative risk models (log links).}
+\item{bootci}{Optional and applicable for \code{approach = "margstd"} only.
+Type of bootstrap confidence interval:
+\itemize{
+\item \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
+confidence intervals.
+\item \code{"normal"} Parametric normality-based confidence intervals,
+which require lower repeat numbers but are less accurate and
+may result in invalid results for ratios.
+\item \code{"nonpar"} Non-parametric BCa confidence intervals,
+which should be used with caution because of the risk
+of sparse-data bias with non-parametric bootstrapping.
+}}
 
-\item{default}{Use normality-based confidence intervals? Defaults to TRUE.
-With \code{default = FALSE}, profile likelihood-based confidence intervals
-can be calculated for binomial models.}
+\item{bootverbose}{Optional. Add values of \code{bootrepeats} and
+\code{bootci} parameters to the returned tibble? Defaults to \code{FALSE}.}
+
+\item{exponentiate}{Optional. Exponentiate coefficients and confidence limits?
+Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
+relative risk models (log links).}
+
+\item{default}{Use default, normality-based confidence intervals?
+Defaults to TRUE. With \code{default = FALSE}, for binomial models only,
+profile likelihood-based confidence intervals can be calculated.}
 
 \item{...}{Passed on}
 }
@@ -50,9 +69,8 @@ column of the tibble includes the name of the model. See examples.
 }
 \examples{
 # Define example data
-library(tibble)  # for tibble() function
-library(broom)   # required for tidy.risks()
-dat <- tibble(
+library(broom)  # provides tidy() function
+dat <- tibble::tibble(
   death    = c(rep(1, 54), rep(0, 138)),
   stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
                rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
@@ -65,10 +83,12 @@ tidy(fit_rr)
 
 # Marginal standardization,
 # increase number of bootstrap repeats:
-fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "margstd")
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
+                    approach = "margstd")
 tidy(fit_rr, bootrepeats = 1000)
 
 # Multiple types of models fitted:
-fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "all")
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
+                    approach = "all")
 tidy(fit_rr)
 }

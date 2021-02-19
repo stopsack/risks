@@ -12,7 +12,8 @@ norowname <- function(x) {
 
 # Helper function for tidy.risks()
 risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
-                             bootreps = 200,
+                             bootreps, bootci,
+                             bootverbose,
                              exponentiate = FALSE,
                              default = TRUE, ...) {
   # This is broom:::process_lm(), but defaults to calling confint.default(),
@@ -39,7 +40,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     # use bootstrapped CIs for the marginally standardized model
     if(("margstd" %in% class(x)))
       CI <- suppressMessages(confint.margstd(x, level = conf.level,
-                                             bootrepeats = bootreps, ...))
+                                             bootrepeats = bootreps,
+                                             bootci = bootci, ...))
     # Use normality-based confidence intervals in general:
     if(default == TRUE & !("margstd" %in% class(x)) & !("robpoisson" %in% class(x)))
       CI <- suppressMessages(stats::confint.default(x, level = conf.level))
@@ -58,6 +60,15 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     ret <- cbind(ret, trans(norowname(CI)))  # instead of :::unrowname
   }
   ret$estimate <- trans(ret$estimate)
+  if(bootverbose == TRUE) {
+    if(!"margstd" %in% class(x)) {
+      bootreps <- NA_real_
+      bootci <- NA_character_
+    }
+    ret <- dplyr::mutate(ret,
+                         bootrepeats = bootreps,
+                         bootci = bootci[1])
+  }
   tibble::as_tibble(ret)
 }
 
@@ -75,16 +86,30 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' @param x Model
 #' @param conf.int Show confidence intervals?
-#' @param conf.level Optional: Confidence level. Defaults to 0.95.
-#' @param bootrepeats Optional: Number of bootstrap repeats.
-#' Applicable to models fitted via marginal standardization (\code{approach = "margstd"}).
-#' Defaults to 200, a very low number of repeats.
-#' It is strongly recommended to increase repeats to >1000.
-#' @param exponentiate Exponentiate coefficients and confidence limits? Defaults to FALSE.
-#' Setting \code{exponentiate = TRUE} is useful for relative risk models (log links).
-#' @param default Use normality-based confidence intervals? Defaults to TRUE.
-#' With \code{default = FALSE}, profile likelihood-based confidence intervals
-#' can be calculated for binomial models.
+#' @param conf.level Optional. Confidence level. Defaults to \code{0.95}.
+#' @param bootrepeats Optional. Number of bootstrap repeats.
+#'   Applicable to models fitted via marginal standardization
+#'   (\code{approach = "margstd"}). Defaults to 200. Strongly recommended
+#'   to increase repeats to >1000.
+#' @param bootci Optional and applicable for \code{approach = "margstd"} only.
+#'   Type of bootstrap confidence interval:
+#'
+#'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
+#'     confidence intervals.
+#'   * \code{"normal"} Parametric normality-based confidence intervals,
+#'     which require lower repeat numbers but are less accurate and
+#'     may result in invalid results for ratios.
+#'   * \code{"nonpar"} Non-parametric BCa confidence intervals,
+#'     which should be used with caution because of the risk
+#'     of sparse-data bias with non-parametric bootstrapping.
+#' @param bootverbose Optional. Add values of \code{bootrepeats} and
+#'   \code{bootci} parameters to the returned tibble? Defaults to \code{FALSE}.
+#' @param exponentiate Optional. Exponentiate coefficients and confidence limits?
+#'   Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
+#'   relative risk models (log links).
+#' @param default Use default, normality-based confidence intervals?
+#'   Defaults to TRUE. With \code{default = FALSE}, for binomial models only,
+#'   profile likelihood-based confidence intervals can be calculated.
 
 #' @param ... Passed on
 #'
@@ -93,9 +118,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' @examples
 #' # Define example data
-#' library(tibble)  # for tibble() function
-#' library(broom)   # required for tidy.risks()
-#' dat <- tibble(
+#' library(broom)  # provides tidy() function
+#' dat <- tibble::tibble(
 #'   death    = c(rep(1, 54), rep(0, 138)),
 #'   stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
 #'                rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
@@ -108,17 +132,21 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' # Marginal standardization,
 #' # increase number of bootstrap repeats:
-#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "margstd")
+#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
+#'                     approach = "margstd")
 #' tidy(fit_rr, bootrepeats = 1000)
 #'
 #' # Multiple types of models fitted:
-#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat, approach = "all")
+#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
+#'                     approach = "all")
 #' tidy(fit_rr)
 tidy.risks <- function(
   x,
   conf.int     = TRUE,
   conf.level   = 0.95,
   bootrepeats  = 200,
+  bootci = c("bca", "normal", "nonpar"),
+  bootverbose  = FALSE,
   exponentiate = FALSE,
   default      = TRUE,
   ...) {
@@ -134,18 +162,21 @@ tidy.risks <- function(
   if(is.null(purrr::pluck(x, "all_models"))) {
     ret <- getmodel(x)
     risks_process_lm(ret, x, conf.int = conf.int, conf.level = conf.level,
-                     bootreps = bootrepeats,
+                     bootreps = bootrepeats,  bootci = bootci,
+                     bootverbose = bootverbose,
                      exponentiate = exponentiate, default = default, ...) %>%
       dplyr::mutate(model = paste0(class(x)[2], x$risks_start))
   } else {  # in case estimate_risk(approach = "all") was called
     purrr::map_dfr(
       .x = purrr::pluck(x, "all_models"),
       .f = ~{
-        if((purrr::pluck(.x, "converged") == TRUE) & (purrr::pluck(.x, "boundary") == FALSE)) {
+        if((purrr::pluck(.x, "converged") == TRUE) &
+           (purrr::pluck(.x, "boundary") == FALSE)) {
           tryCatch({
             ret <- getmodel(.x)
             risks_process_lm(ret, .x, conf.int = conf.int, conf.level = conf.level,
-                             bootreps = bootrepeats,
+                             bootreps = bootrepeats, bootci = bootci,
+                             bootverbose = bootverbose,
                              exponentiate = exponentiate, default = default, ...) %>%
               dplyr::mutate(model = paste0(class(.x)[2], .x$risks_start))
           },
@@ -314,11 +345,14 @@ print.summary.risks <- function(
     cat("Confidence intervals for coefficients: (profiling-based)\n")
     print(confint(x$object, ...))
   }
+
   if(conf.int == TRUE & "margstd" %in% class(x$object)) {
     # retrieve CIs that were generated when bootstrapping SEs for model summary
-    cat(paste("Confidence intervals for coefficients: (based on",
-              x$margstd.bootrepeats,
-              "bootstrap repeats)\n"))
+    cat(paste0("Confidence intervals for coefficients: (",
+              x$margstd.bootrepeats, " ",
+              c("bca" = "BCa", "normal" = "normal",
+                "nonpar" = "nonparametric BCa")[x$margstd.bootci],
+              " bootstrap repeats)\n"))
     ci <- x$conf.int %>%
       dplyr::select(.data$conf.low, .data$conf.high) %>%
       as.matrix()

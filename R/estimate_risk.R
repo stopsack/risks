@@ -35,15 +35,18 @@
 #'
 #'   The other options allow for directly selecting a fitting approach,
 #'   some of which may not converge or yield out-of-range predicted probabilities.
-#'   See full documentation (currently at \url{https://github.com/stopsack/risks}) for details.
+#'   See full documentation (currently at
+#'   \url{https://stopsack.github.io/risks}) for details.
 #'
 #'   * \code{"glm"} Binomial model.
 #'   * \code{"glm_start"} Binomial model with starting values from Poisson model.
 #'   * \code{"robpoisson"} Poisson model with robust covariance.
-#'   * \code{"glm_cem"} Binomial model fitted with combinatorial expectation maximization.
+#'   * \code{"glm_cem"} Binomial model fitted with combinatorial expectation
+#'     maximization.
 #'   * \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
 #'   * \code{"margstd"} Marginal standardization after logistic model.
-#'   * \code{"logistic"} For comparison only: the logistic model. Only available in \code{riskratio()}.
+#'   * \code{"logistic"} For comparison only: the logistic model. Only available
+#'     in \code{riskratio()}.
 #' @param variable Optional: exposure variable to use for marginal standardization.
 #'   If \code{variable} is not provided and marginal standardization is
 #'   attempted, then the first binary or categorical variable in the model
@@ -54,17 +57,12 @@
 #' @param at Optional: Levels of exposure variable \code{variable} for marginal
 #'   standardization. \code{at =} determines the levels at which contrasts of the exposure
 #'   are to be assessed. The level listed first is used as the reference.
-#'   Levels must exist in the data for character, factor or ordered factor variables.
-#'   For numeric variables, levels that do not exist in the data
+#'   Levels must exist in the data for character, factor or ordered factor
+#'   variables. For numeric variables, levels that do not exist in the data
 #'   can be interpolations or extrapolations; if levels exceed the
 #'   extremes of the data (extrapolation), a warning will be displayed.
-#' @param weights Precision weights for individual observations (integers).
-#'   See help for \code{\link[stats]{glm}}.
-#'   Precision weights are not supported by approaches \code{"glm_cem"} and \code{"glm_cem_start"}.
-#'   Not to be confused with frequency or sampling weights;
-#'   use \code{\link[survey]{svyglm}} if such weights are needed.
-#' @param ... Optional: Further arguments passed to fitting functions (\code{glm},
-#'   \code{logbin}, or \code{addreg}).
+#' @param ... Optional: Further arguments passed to fitting functions
+#'   (\code{glm}, \code{logbin}, or \code{addreg}).
 #'
 #' @references Wacholder S. Binomial regression in GLIM: Estimating risk ratios
 #'   and risk differences. Am J Epidemiol 1986;123:174-184.
@@ -134,27 +132,18 @@
 #' summary(fit_rd)
 riskratio <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
                                                   "glm_cem", "glm_cem_start", "margstd", "logistic"),
-                      variable = NULL, at = NULL, weights = NULL, ...) {
-  if(deparse(substitute(weights)) == "NULL")
-    estimate_risk(formula = formula, data = data, estimate = "rr",
-                  approach = approach, variable = variable, at = at, ...)
-  else
-    eval(substitute(estimate_risk(formula = formula, data = data, estimate = "rr",
-                                  approach = approach, variable = variable, at = at,
-                                  weights = weights, ...)))
+                      variable = NULL, at = NULL, ...) {
+  estimate_risk(formula = formula, data = data, estimate = "rr",
+                approach = approach, variable = variable, at = at, ...)
 }
 
 #' @describeIn riskratio Fit risk difference models
 #' @export
 riskdiff <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
                                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
-                     variable = NULL, at = NULL, weights = NULL, ...) {
-  if(deparse(substitute(weights)) == "NULL")
-    estimate_risk(formula = formula, data = data, estimate = "rd",
-                  approach = approach, variable = variable, at = at, ...)
-  else
-  eval(substitute(estimate_risk(formula = formula, data = data, estimate = "rd",
-                approach = approach, variable = variable, at = at, weights = weights, ...)))
+                     variable = NULL, at = NULL, ...) {
+  estimate_risk(formula = formula, data = data, estimate = "rd",
+                approach = approach, variable = variable, at = at, ...)
 }
 
 # Workhorse for riskratio and riskdiff
@@ -164,7 +153,6 @@ estimate_risk <- function(formula, data,
                                        "glm_cem", "glm_cem_start", "margstd", "logistic"),
                           variable = NULL,
                           at = NULL,
-                          weights = NULL,
                           ...) {
   implausible <- 0.99999
   link <- switch(EXPR = estimate[1], rr = "log", rd = "identity")
@@ -179,46 +167,44 @@ estimate_risk <- function(formula, data,
                 # Automated model fitting
                 auto = {
                   # 1) try regular GLM with Fisher scoring
-                  fit_glm <- eval(substitute(possibly_estimate_glm(formula = formula, data = data,
-                                                                   link = link, weights = weights, ...)))
+                  fit_glm <- possibly_estimate_glm(formula = formula, data = data,
+                                                                   link = link, ...)
                   if(fit_glm$converged == TRUE &
                      fit_glm$maxprob < implausible &
                      fit_glm$boundary == FALSE)
                     return(fit_glm)
 
                   # 2) try GLM with starting values from Poisson
-                  fit_poisson <- eval(substitute(possibly_estimate_poisson(formula = formula,
-                                                                           data = data, link = link,
-                                                                           weights = weights, ...)))
+                  fit_poisson <- possibly_estimate_poisson(formula = formula,
+                                                           data = data, link = link,
+                                                           ...)
                   if(fit_poisson$converged == TRUE) {
-                    fit_glm_start <- eval(substitute(possibly_estimate_glm(formula = formula, data = data,
-                                                                           link = link,
-                                                                           start = coef(fit_poisson),
-                                                                           weights = weights, ...)))
+                    fit_glm_start <- possibly_estimate_glm(formula = formula, data = data,
+                                                           link = link,
+                                                           start = coef(fit_poisson),
+                                                           ...)
                     if(fit_glm_start$converged == TRUE &
                        fit_glm_start$maxprob < implausible  &
                        fit_glm_start$boundary == FALSE)
                       return(fit_glm_start)
                   }
 
-                  # 3) try GLM fitted via CEM (only if unweighted; addreg/logbin do not support weights)
-                  if(deparse(substitute(weights)) != "NULL") {
-                    if(link == "log")
-                      fit_glm_cem <- possibly_estimate_logbin(formula = formula, data = data, ...)
-                    else
-                      fit_glm_cem <- possibly_estimate_addreg(formula = formula, data = data, ...)
+                  # 3) try GLM fitted via CEM
+                  if(link == "log")
+                    fit_glm_cem <- possibly_estimate_logbin(formula = formula, data = data, ...)
+                  else
+                    fit_glm_cem <- possibly_estimate_addreg(formula = formula, data = data, ...)
 
-                    if(fit_glm_cem$converged == TRUE &
-                       fit_glm_cem$maxprob < implausible  &
-                       fit_glm_cem$boundary == FALSE)
-                      return(fit_glm_cem)
-                  }
+                  if(fit_glm_cem$converged == TRUE &
+                     fit_glm_cem$maxprob < implausible  &
+                     fit_glm_cem$boundary == FALSE)
+                    return(fit_glm_cem)
 
                   # 4) Try marginal standardization after logistic model
-                  fit_margstd <- eval(substitute(possibly_estimate_margstd(formula = formula,
+                  fit_margstd <- possibly_estimate_margstd(formula = formula,
                                                                            data = data,
                                                                            estimate = estimate,
-                                                                           weights = weights, ...)))
+                                                                           ...)
                   if(fit_margstd$converged == TRUE &
                      fit_margstd$maxprob < implausible &
                      fit_margstd$boundary == FALSE)
@@ -237,33 +223,25 @@ estimate_risk <- function(formula, data,
 
                 # All models requested to fit
                 all  = {
-                  fit1 <- eval(substitute(possibly_estimate_poisson(formula = formula, data = data,
-                                                                    link = link, weights = weights, ...)))
+                  fit1 <- possibly_estimate_poisson(formula = formula, data = data,
+                                                                    link = link, ...)
 
-                  fit2 <- eval(substitute(possibly_estimate_glm(formula = formula, data = data,
-                                                                link = link, weights = weights, ...)))
+                  fit2 <- possibly_estimate_glm(formula = formula, data = data,
+                                                                link = link, ...)
 
                   if(!is.null(coef(fit1)))  # attempt only if Poisson converged
-                    fit3 <- eval(substitute(possibly_estimate_glm(formula = formula, data = data,
+                    fit3 <- possibly_estimate_glm(formula = formula, data = data,
                                                                   link = link, start = coef(fit1),
-                                                                  weights = weights, ...)))
+                                                                  ...)
                   else  # make possibly_estimate_glm return a non-converged object
                     fit3 <- possibly_estimate_glm(formula = "nonsense", data = "nodata")
 
-                  if(link == "log") {
-                    if(deparse(substitute(weights)) == "NULL")
-                      fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
-                    else  # logbin/addreg do not support weights
-                      fit4 <- possibly_estimate_logbin(formula = "nosense", data = "nodata")
-                  } else {
-                    if(deparse(substitute(weights)) == "NULL")
-                      fit4 <- possibly_estimate_addreg(formula = formula, data = data, ...)
-                    else
-                      fit4 <- possibly_estimate_addreg(formula = "nonsense", data = "nodata")
-                  }
+                  if(link == "log")
+                    fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
+                  else
+                    fit4 <- possibly_estimate_addreg(formula = formula, data = data, ...)
 
                   if(link == "log") {
-                    if(deparse(substitute(weights)) == "NULL") {
                       if(!is.null(coef(fit1))) # attempt only if Poisson converged
                         fit5 <- possibly_estimate_logbin(formula = formula, data = data,
                                                          start = coef(fit1), ...)
@@ -271,12 +249,7 @@ estimate_risk <- function(formula, data,
                         fit5 <- possibly_estimate_logbin(formula = "nonsense", data = "nodata")
                       if(fit5$converged == FALSE)
                         fit5$risks_start = "_start"
-                    } else {
-                      fit5 <- possibly_estimate_logbin(formula = "nosense", data = "nodata")
-                      fit5$risks_start = "_start"
-                    }
                   } else {
-                    if(deparse(substitute(weights)) == "NULL") {
                       if(!is.null(coef(fit1))) # attempt only if Poisson converged
                         fit5 <- possibly_estimate_addreg(formula = formula, data = data,
                                                          start = coef(fit1), ...)
@@ -284,21 +257,17 @@ estimate_risk <- function(formula, data,
                         fit5 <- possibly_estimate_addreg(formula = "nonsense", data = "nodata")
                       if(fit5$converged == FALSE)
                         fit5$risks_start = "_start"
-                    } else {
-                      fit5 <- possibly_estimate_addreg(formula = "nonsense", data = "nodata")
-                      fit5$risks_start = "_start"
-                    }
                   }
 
-                  fit6 <- eval(substitute(possibly_estimate_margstd(formula = formula, data = data,
+                  fit6 <- possibly_estimate_margstd(formula = formula, data = data,
                                                                     estimate = estimate,
                                                                     variable = variable, at = at,
-                                                                    weights = weights, ...)))
+                                                                    ...)
 
                   # If RR requested, add on plain logistic model for comparison
                   if(estimate[1] == "rr") {
-                    fit7 <- eval(substitute(possibly_estimate_logistic(formula = formula, data = data,
-                                                                       weights = weights, ...)))
+                    fit7 <- possibly_estimate_logistic(formula = formula, data = data,
+                                                                       ...)
 
                     fit1$all_models = list(
                       model1 = fit1, model2 = fit2, model3 = fit3, model4 = fit4,
@@ -311,47 +280,41 @@ estimate_risk <- function(formula, data,
                 },
 
                 # Specific models that were directly requested
-                robpoisson = eval(substitute(estimate_poisson(formula = formula, data = data,
-                                                              link = link, weights = weights, ...))),
-                glm        = eval(substitute(estimate_glm(formula = formula, data = data,
-                                                          link = link, weights = weights, ...))),
+                robpoisson = estimate_poisson(formula = formula, data = data,
+                                                              link = link, ...),
+                glm        = estimate_glm(formula = formula, data = data,
+                                                          link = link, ...),
                 glm_start  = {
-                  fit_poisson <- eval(substitute(estimate_poisson(formula = formula, data = data,
-                                                                  link = link, weights = weights, ...)))
-                  eval(substitute(estimate_glm(formula = formula, data = data, link = link,
-                                               start = coef(fit_poisson), weights = weights, ...)))
+                  fit_poisson <- estimate_poisson(formula = formula, data = data,
+                                                  link = link, ...)
+                  estimate_glm(formula = formula, data = data, link = link,
+                               start = coef(fit_poisson), ...)
                 },
                 glm_cem    = {
-                  if(deparse(substitute(weights)) != "NULL")
-                    stop(paste("A weighted model was requested, but approach = 'glm_cem' does not",
-                               "support weights."))
                   if(link == "log")
                     estimate_logbin(formula = formula, data = data, ...)
                   else
                     estimate_addreg(formula = formula, data = data, ...)
                 },
                 glm_cem_start = {
-                  if(deparse(substitute(weights)) != "NULL")
-                    stop(paste("A weighted model was requested, but approach = 'glm_cem' does not",
-                               "support weights."))
                   fit_poisson <- estimate_poisson(formula = formula, data = data, link = link, ...)
                   if(link == "log")
                     estimate_logbin(formula = formula, data = data, start = coef(fit_poisson), ...)
                   else
                     estimate_addreg(formula = formula, data = data, start = coef(fit_poisson), ...)
                 },
-                margstd    = eval(substitute(estimate_margstd(formula = formula, data = data,
+                margstd    = estimate_margstd(formula = formula, data = data,
                                                               estimate = estimate,
                                                               variable = variable, at = at,
-                                                              weights = weights, ...))),
+                                                              ...),
                 logistic = {
                   if(estimate[1] == "rd")
                     stop(paste0("Odds difference models are not implemented.\n",
                     "Further reading: Wacholder S. The Case-Control Study ",
                     "as Data Missing by Design: Estimating Risk Differences. ",
                     "Epidemiology 1996;7:144-150."))
-                  eval(substitute(estimate_logistic(formula = formula, data = data,
-                                                    weights = weights, ...)))
+                  estimate_logistic(formula = formula, data = data,
+                                                    ...)
                 })
   return(fit)
 }
