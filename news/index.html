@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Summary for Poisson model with robust covariance — summary.robpoisson • risks</title>
+<title>Changelog • risks</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,7 @@
 
 
 
-<meta property="og:title" content="Summary for Poisson model with robust covariance — summary.robpoisson" />
-<meta property="og:description" content="Summarize results from fitting a Poisson model with
-robust/empirical/sandwich covariance.
-The output is the same as for a regular summary(glm(...)),
-except for using robust standard errors." />
+<meta property="og:title" content="Changelog" />
 
 
 
@@ -62,7 +58,7 @@ except for using robust standard errors." />
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-topic">
+    <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -132,59 +128,40 @@ except for using robust standard errors." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Summary for Poisson model with robust covariance</h1>
-    <small class="dont-index">Source: <a href='https://github.com/stopsack/risks/blob/master/R/robpoisson-utils.R'><code>R/robpoisson-utils.R</code></a></small>
-    <div class="hidden name"><code>summary.robpoisson.Rd</code></div>
+      <h1 data-toc-skip>Changelog <small></small></h1>
+      <small>Source: <a href='https://github.com/stopsack/risks/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div class="ref-description">
-    <p>Summarize results from fitting a Poisson model with
-robust/empirical/sandwich covariance.
-The output is the same as for a regular <code><a href='https://rdrr.io/r/base/summary.html'>summary(glm(...))</a></code>,
-except for using robust standard errors.</p>
-    </div>
-
-    <pre class="usage"><span class='co'># S3 method for robpoisson</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  dispersion <span class='op'>=</span> <span class='cn'>NULL</span>,
-  correlation <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  symbolic.cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
-
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>object</th>
-      <td><p>Model</p></td>
-    </tr>
-    <tr>
-      <th>dispersion</th>
-      <td><p>Not used</p></td>
-    </tr>
-    <tr>
-      <th>correlation</th>
-      <td><p>Not used</p></td>
-    </tr>
-    <tr>
-      <th>symbolic.cor</th>
-      <td><p>Not used</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments, not used</p></td>
-    </tr>
-    </table>
-
-
+    <div id="risks-020" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.0">
+<a href="#risks-020" class="anchor"></a>risks 0.2.0</h1>
+<ul>
+<li>Expand bootstrapping options after marginal standardization:
+<ul>
+<li>Parametric BCa bootstrap confidence intervals via the <a href="https://cran.r-project.org/web/packages/bcaboot/">bcaboot package</a> are the new default.</li>
+<li>Parametric normality-based intervals are a backup.</li>
+<li>Non-parametric bootstrapping with BCa intervals is retained as an option for completeness.</li>
+</ul>
+</li>
+<li>Remove precision <code>weight</code> option.</li>
+<li>Expand documentation.</li>
+</ul>
+</div>
+    <div id="risks-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#risks-010" class="anchor"></a>risks 0.1.0</h1>
+<ul>
+<li>First release</li>
+</ul>
+</div>
   </div>
+
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
+
 </div>
 
 

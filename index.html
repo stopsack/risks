@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -39,18 +39,39 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
+  <a href="articles/risks.html">Get started</a>
+</li>
+<li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/margstd.html">Marginal standardization</a>
+    </li>
+    <li>
+      <a href="articles/models.html">Models and model comparisons</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/stopsack/risks/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -73,16 +94,10 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>Currently, the development version of <code>risks</code> can be installed from <a href="https://github.com/">GitHub</a> using:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="co"># install.packages("remotes")  # The "remotes" package needs to be installed</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://remotes.r-lib.org">remotes</a></span>)
-<span class="kw">remotes</span>::<span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"stopsack/risks"</span>)
-</pre></div>
-<p>Once released on <a href="https://CRAN.R-project.org">CRAN</a>, installation will be possible with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"risks"</span>)
-</pre></div>
+<p>Once risks is released on CRAN, <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("risks")</a></code> will be available. Currently, the development version of <code>risks</code> can be installed from <a href="https://github.com/">GitHub</a> using:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("remotes")  # The "remotes" package needs to be installed</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"stopsack/risks"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="summary" class="section level1">
@@ -90,540 +105,17 @@
 <a href="#summary" class="anchor"></a>Summary</h1>
 <p>The <code>risks</code> package fits regression models for risk ratios (RR) and risk differences (RD). For brevity, the package refers to “risk,” but “prevalence” can be substituted throughout.</p>
 <p>What is the association between an exposure (men/women, age in years, or underweight/lean/overweight/obese) and the risk of a binary outcome (dead/alive, disease/healthy), perhaps adjusting for confounders (smoker/nonsmoker, years of education)? For such binary outcomes, many studies default to reporting odds ratios (OR). Yet outside of case-control studies, odds ratios are unnecessary to report. Risk ratios and risk differences have much more intuitive interpretations. Additionally, when the outcome is not rare, odds ratios are significant overestimates for risk ratios. Despite these drawbacks, odds ratios are often simply reported because they are easily obtained from logistic regression models. Obtaining risk ratios or risk differences, especially after adjusting for covariates (<em>e.g.,</em> confounders) has been quite challenging and often required more advanced biostatistics and programming skills, including in R.</p>
-<p>The <code>risks</code> package fills this gap by providing a user-friendly approach that makes obtaining adjusted risk ratios and risk differences as simple as fitting a logistic regression model. No advanced programming or biostatistics skills are required. Build-in routines automatically switch to more computationally demanding model fitting approaches if simple binomial models have convergence issues, making <code>risks</code> return valid estimates whenever the data would allow for fitting a logistic model. At the same time, several options for customization of model fitting and reporting as well as comparisons between different approaches are provided.</p>
-<p>Implemented are binomial models, Poisson models with robust covariance, binomial models aided in convergence by starting values obtained through Poisson models, binomial models fitted via combinatorial expectation maximization instead of Fisher scoring (optionally also with Poisson starting values), and marginal standardization after fitting logistic models.</p>
+<p>The <code>risks</code> package fills this gap by providing a user-friendly approach that makes obtaining adjusted risk ratios and risk differences as simple as fitting a logistic regression model. No advanced programming or biostatistics skills are required. Build-in routines automatically switch to more computationally demanding model fitting approaches if simple binomial models have convergence issues, making <code>risks</code> return valid estimates whenever the data would allow for fitting a logistic model. At the same time, several options for customization of model fitting and reporting as well as comparisons between different approaches are provided (see: <a href="articles/risks.html">Get started</a>).</p>
+<p>Five different approaches are implemented (see <a href="articles/models.html">Models and model comparisons</a>): Poisson models with robust covariance, binomial models aided in convergence by starting values obtained through Poisson models, binomial models fitted via combinatorial expectation maximization instead of Fisher scoring (optionally also with Poisson starting values), and marginal standardization after fitting logistic models (see <a href="articles/margstd.html">Marginal standardization</a> for details).</p>
 </div>
-<div id="basic-usage" class="section level1">
+<div id="further-reading" class="section level1">
 <h1 class="hasAnchor">
-<a href="#basic-usage" class="anchor"></a>Basic usage</h1>
-<p>We define a cohort of women with breast cancer, as used by Spiegelman and Hertzmark (<a href="https://pubmed.ncbi.nlm.nih.gov/15987728">Am J Epidemiol 2005</a>) and Greenland (<a href="https://pubmed.ncbi.nlm.nih.gov/15286014">Am J Epidemiol 2004</a>). The the categorical exposure is <code>stage</code>, the binary outcome is <code>death</code>, and the binary confounder is <code>receptor</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/stopsack/risks">risks</a></span>)      <span class="co"># provides riskratio(), riskdiff(), and postestimation functions as below</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">tidyverse</span>)  <span class="co"># For data handling</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://broom.tidymodels.org">broom</a></span>)      <span class="co"># For tidy() model summaries</span>
-
-<span class="co"># Sample data originally from:</span>
-<span class="co"># Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3</span>
-<span class="kw">dat</span> <span class="op">&lt;-</span> <span class="fu">tibble</span>(
-  death    = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">1</span>, <span class="fl">54</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">0</span>, <span class="fl">138</span>)),
-  stage    = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage I"</span>, <span class="fl">7</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage II"</span>, <span class="fl">26</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage III"</span>, <span class="fl">21</span>),
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage I"</span>, <span class="fl">60</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage II"</span>, <span class="fl">70</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Stage III"</span>, <span class="fl">8</span>)),
-  receptor = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">2</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">5</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">9</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">17</span>),
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">12</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">9</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">10</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">50</span>),
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">13</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">57</span>), <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"Low"</span>, <span class="fl">2</span>),  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"High"</span>, <span class="fl">6</span>)))
-
-<span class="co"># Display the sample data</span>
-<span class="kw">dat</span> <span class="op">%&gt;%</span> 
-  <span class="fu">group_by</span>(<span class="kw">receptor</span>, <span class="kw">stage</span>) <span class="op">%&gt;%</span> 
-  <span class="fu">summarize</span>(deaths = <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="kw">death</span>), total = <span class="fu">n</span>(), risk = <span class="kw">deaths</span><span class="op">/</span><span class="kw">total</span>)
-<span class="co">#&gt; # A tibble: 6 x 5</span>
-<span class="co">#&gt; # Groups:   receptor [2]</span>
-<span class="co">#&gt;   receptor stage     deaths total   risk</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 High     Stage I        5    55 0.0909</span>
-<span class="co">#&gt; 2 High     Stage II      17    74 0.230 </span>
-<span class="co">#&gt; 3 High     Stage III      9    15 0.6   </span>
-<span class="co">#&gt; 4 Low      Stage I        2    12 0.167 </span>
-<span class="co">#&gt; 5 Low      Stage II       9    22 0.409 </span>
-<span class="co">#&gt; 6 Low      Stage III     12    14 0.857</span>
-</pre></div>
-<p>The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using <code>risks</code> models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model <code>family</code> or <code>link</code> need to be supplied:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskratio</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_rr</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_start).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(from Poisson model)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -2.0209  -0.7436  -0.4472   0.5272   2.1689  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; (Intercept)     -2.3521     0.3602  -6.531 6.55e-11 ***</span>
-<span class="co">#&gt; stageStage II    0.9314     0.3930   2.370   0.0178 *  </span>
-<span class="co">#&gt; stageStage III   1.7695     0.3851   4.595 4.33e-06 ***</span>
-<span class="co">#&gt; receptorLow      0.4436     0.1968   2.254   0.0242 *  </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 185.85  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 193.85</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (normality-based)</span>
-<span class="co">#&gt;                      2.5 %     97.5 %</span>
-<span class="co">#&gt; (Intercept)    -3.05805977 -1.6461981</span>
-<span class="co">#&gt; stageStage II   0.16107688  1.7018004</span>
-<span class="co">#&gt; stageStage III  1.01475475  2.5242885</span>
-<span class="co">#&gt; receptorLow     0.05781282  0.8294095</span>
-</pre></div>
-<p>To obtain risk differences, use <code>riskdiff</code>, which has the same syntax:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">fit_rd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskdiff</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_rd</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted as binomial model (glm).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(no starting values)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -1.8441  -0.7284  -0.4184   0.6350   2.2268  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; (Intercept)     0.08381    0.03633   2.307  0.02107 *  </span>
-<span class="co">#&gt; stageStage II   0.14921    0.05755   2.593  0.00953 ** </span>
-<span class="co">#&gt; stageStage III  0.57227    0.09472   6.042 1.52e-09 ***</span>
-<span class="co">#&gt; receptorLow     0.16131    0.07587   2.126  0.03349 *  </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 186.38  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 194.38</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 5</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (normality-based)</span>
-<span class="co">#&gt;                     2.5 %    97.5 %</span>
-<span class="co">#&gt; (Intercept)    0.01260046 0.1550111</span>
-<span class="co">#&gt; stageStage II  0.03640945 0.2620070</span>
-<span class="co">#&gt; stageStage III 0.38663167 0.7579168</span>
-<span class="co">#&gt; receptorLow    0.01261165 0.3100162</span>
-</pre></div>
-<p>For example, the risk of death was 57 percentage points higher in women with stage III breast cancer compared to stage I (95% confidence interval, 39 to 76 percentage points), adjusting for hormone receptor status.</p>
-<p>The model summary in <code>risks</code> includes to two additions compared to a regular <code>glm</code> model:</p>
+<a href="#further-reading" class="anchor"></a>Further reading</h1>
 <ul>
-<li>In the first line of <code><a href="https://rdrr.io/r/base/summary.html">summary(...)</a></code>, the type of risk regression model is displayed (in the example, “<code>Risk ratio model, fitted as binomial model...</code>”).</li>
-<li>At the end of the output, confidence intervals for the model coefficients are printed.</li>
+<li><a href="articles/risks.html">Get started with the risks package</a></li>
+<li><a href="articles/models.html">Models and model comparisons</a></li>
+<li><a href="articles/margstd.html">Marginal standardization</a></li>
 </ul>
-<p><code>risks</code> provides an interface to <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code>, which returns a data frame of all coefficients (risk differences in this example), their standard errors, and confidence intervals.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="kw">fit_rd</span>)
-<span class="co">#&gt; # A tibble: 4 x 8</span>
-<span class="co">#&gt;   term         estimate std.error statistic     p.value conf.low conf.high model</span>
-<span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;</span>
-<span class="co">#&gt; 1 (Intercept)    0.0838    0.0363      2.31     2.11e-2   0.0126     0.155 glm  </span>
-<span class="co">#&gt; 2 stageStage …   0.149     0.0576      2.59     9.53e-3   0.0364     0.262 glm  </span>
-<span class="co">#&gt; 3 stageStage …   0.572     0.0947      6.04     1.52e-9   0.387      0.758 glm  </span>
-<span class="co">#&gt; 4 receptorLow    0.161     0.0759      2.13     3.35e-2   0.0126     0.310 glm</span>
-</pre></div>
-<p>In accordance with <code>glm</code> standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients for risk ratios are easily obtained via <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy(..., exponentiate = TRUE)</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="kw">fit_rr</span>, exponentiate = <span class="fl">TRUE</span>)
-<span class="co">#&gt; # A tibble: 4 x 8</span>
-<span class="co">#&gt;   term         estimate std.error statistic  p.value conf.low conf.high model   </span>
-<span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   </span>
-<span class="co">#&gt; 1 (Intercept)    0.0952     0.360     -6.53 6.55e-11   0.0470     0.193 glm_sta…</span>
-<span class="co">#&gt; 2 stageStage …   2.54       0.393      2.37 1.78e- 2   1.17       5.48  glm_sta…</span>
-<span class="co">#&gt; 3 stageStage …   5.87       0.385      4.60 4.33e- 6   2.76      12.5   glm_sta…</span>
-<span class="co">#&gt; 4 receptorLow    1.56       0.197      2.25 2.42e- 2   1.06       2.29  glm_sta…</span>
-</pre></div>
-<p>For example, the risk of death was 5.9 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.8 to 12 times), adjusting for hormone receptor status.</p>
-<p>Typical R functions that build on regression models can further process fitted <code>risks</code> models. Examples:</p>
-<ul>
-<li>
-<code><a href="https://rdrr.io/r/stats/coef.html">coef(fit)</a></code> or <code><a href="https://rdrr.io/r/stats/coef.html">coefficients(fit)</a></code> return model coefficients (<em>i.e.</em>, log(RR) or RDs) as a numeric vector</li>
-<li>
-<code><a href="https://rdrr.io/r/stats/confint.html">confint(fit, level = 0.9)</a></code> returns <em>90%</em> confidence intervals.</li>
-<li>
-<code><a href="https://rdrr.io/r/stats/predict.html">predict(fit, type = "response")</a></code> or <code><a href="https://rdrr.io/r/stats/fitted.values.html">fitted.values(fit)</a></code> return predicted probabilities of the binary outcome.</li>
-<li>
-<code><a href="https://rdrr.io/r/stats/residuals.html">residuals(fit)</a></code> returns model residuals.</li>
-</ul>
-</div>
-<div id="advanced-usage" class="section level1">
-<h1 class="hasAnchor">
-<a href="#advanced-usage" class="anchor"></a>Advanced usage</h1>
-</div>
-<div id="implemented-model-types" class="section level1">
-<h1 class="hasAnchor">
-<a href="#implemented-model-types" class="anchor"></a>Implemented model types</h1>
-<p><code>risks</code> implements all major regression models that have been proposed for relative risks and risk differences. By default (<code>approach = "auto"</code>), <code>riskratio</code> and <code>riskdiff</code> estimate the most efficient valid model that converges; in more numerically challenging cases, they default to computationally less efficient models while ensuring that a valid result is returned.</p>
-<p>The following models are implemented in <code>risks</code>:</p>
-<table class="table">
-<colgroup>
-<col width="3%">
-<col width="2%">
-<col width="7%">
-<col width="2%">
-<col width="27%">
-<col width="55%">
-</colgroup>
-<thead><tr class="header">
-<th>#<sup>1</sup>
-</th>
-<th><code>approach =</code></th>
-<th>RR</th>
-<th>RD</th>
-<th>Model</th>
-<th>Reference</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td><code>glm</code></td>
-<td><code>riskratio</code></td>
-<td><code>riskdiff</code></td>
-<td>Binomial model with a log or identity link</td>
-<td>Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/3509965">Am J Epidemiol 1986;123:174-184</a>.</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td><code>glm_start</code></td>
-<td><code>riskratio</code></td>
-<td><code>riskdiff</code></td>
-<td>Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model</td>
-<td>Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15987728">Am J Epidemiol 2005;162:199-200</a>.</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td><code>glm_cem</code></td>
-<td><code>riskratio</code></td>
-<td>—</td>
-<td>Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring</td>
-<td>Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. <a href="http://dx.doi.org/10.18637/jss.v086.i09">J Stat Softw 2018;86(9)</a>.</td>
-</tr>
-<tr class="even">
-<td>3</td>
-<td><code>glm_cem</code></td>
-<td>—</td>
-<td><code>riskdiff</code></td>
-<td>Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring</td>
-<td>Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. <a href="https://doi.org/10.1016/j.csda.2014.06.019">Comput Stat Data Anal 2014;80:184-96</a>.</td>
-</tr>
-<tr class="odd">
-<td>4</td>
-<td><code>margstd</code></td>
-<td><code>riskratio</code></td>
-<td><code>riskdiff</code></td>
-<td>Marginally standardized estimates using binomial model with a logit link (logistic model)</td>
-<td>Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. <a href="https://www.ncbi.nlm.nih.gov/pubmed/17689803">J Clin Epidemiol 2007;60(9):874-82</a>.</td>
-</tr>
-<tr class="even">
-<td>–</td>
-<td><code>robpoisson</code></td>
-<td><code>riskratio</code></td>
-<td><code>riskdiff</code></td>
-<td>Log-linear (Poisson) model with robust/sandwich/empirical standard errors</td>
-<td>Zou G. A modified Poisson regression approach to prospective studies with binary data. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15033648">Am J Epidemiol 2004;159(7):702-6</a>
-</td>
-</tr>
-<tr class="odd">
-<td>–</td>
-<td><code>logistic</code></td>
-<td>
-<code>riskratio</code>, for comparison only</td>
-<td>—</td>
-<td>Binomial model with logit link (<em>i.e.</em>, the logistic model), returning odds ratios</td>
-<td>Included for comparison purposes only.</td>
-</tr>
-</tbody>
-</table>
-<p><sup>1</sup> Indicates the priority with which the default modelling strategy (<code>approach = "auto"</code>) attempts model fitting.</p>
-<p>Which model was fitted is always indicated in the first line of the output of <code><a href="https://rdrr.io/r/base/summary.html">summary(...)</a></code> and in the <code>model</code> column of <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy(...)</a></code>. In methods sections of manuscripts, the approach can be described in detail as follows: “Risk ratios (or risk differences) were obtained via (method listed in the first line of model <code><a href="reference/summary.risks.html">summary.risks(...)</a></code>) using the <code>risks</code> R package (reference to this package and/or the article listed in the column”reference“).”</p>
-<p>For example: “Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the <code>risks</code> R package (<a href="https://github.com/stopsack/risks" class="uri">https://github.com/stopsack/risks</a>).”</p>
-<div id="model-choice" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-choice" class="anchor"></a>Model choice</h2>
-<p>By default, automatic model fitting according to the priority listed in the table above is attempted. Alternatively, any of the options listed under <code>approach =</code> in the table can be requested directly. However, unlike with <code>approach = "auto"</code> (the default), the selected model may not converge.</p>
-<p>Selecting a binomial model with starting values from the Poisson model:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="fu"><a href="reference/riskratio.html">riskratio</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, approach = <span class="st">"glm_start"</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk ratio model</span>
-<span class="co">#&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(from Poisson model)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;    (Intercept)   stageStage II  stageStage III     receptorLow  </span>
-<span class="co">#&gt;        -2.3521          0.9314          1.7695          0.4436  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Degrees of Freedom: 191 Total (i.e. Null);  188 Residual</span>
-<span class="co">#&gt; Null Deviance:       228.1 </span>
-<span class="co">#&gt; Residual Deviance: 185.9     AIC: 193.9</span>
-</pre></div>
-<p>However, the binomial model without starting values does not converge:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="reference/riskratio.html">riskratio</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, approach = <span class="st">"glm"</span>)
-<span class="co">#&gt; Error: no valid set of coefficients has been found: please supply starting values</span>
-</pre></div>
-</div>
-<div id="marginal-standardization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#marginal-standardization" class="anchor"></a>Marginal standardization</h2>
-<p>Marginal standardization, <code>approach = "margstd"</code>, makes use of the good convergence properties of the logit link, which is also guaranteed to result in probabilities within (0; 1). After fitting a logistic model, predicted probabilities for each observation are obtained for the levels of the exposure variable. Risk ratios and risk differences are calculated by contrasting the predicted probabilities as ratios or differences. Standard errors and confidence intervals are obtained via bootstrapping the entire procedure. Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model. In addition, in order to derive contrasts, continuous exposures have to be evaluated at discrete levels.</p>
-<ul>
-<li>By default, the first categorical right-hand variable in the model formula will be assumed to be the exposure. The variable types <code>logical</code>, <code>factor</code>, <code>ordered</code>, and <code>character</code> are taken to represent categorical variables, as are variables of the type <code>numeric</code> with only two levels (e.g., <code>0</code> and <code>1</code>).</li>
-<li>Using <code>variable =</code>, a different variable can be specified.</li>
-<li>Using <code>at =</code>, levels for contrasts and the order of levels can be specified. The first level is used as the reference with a risk ratio of 1 or a risk difference of 0. The option <code>at =</code> is required for continuous variables or <code>numeric</code> variables with more than two levels. A warning will be shown for continuous values if the requested levels exceed the range of data (extrapolation).</li>
-<li>For models fitted via <code>approach = "margstd"</code>, standard errors/confidence intervals are obtained via bootstrapping. The default are (currently) 200 bootstrap repeats to reduce initial computation time. For final, precise estimates, the number of repeats should be increased to &gt;&gt;1000. Use the option <code>bootrepeats =</code> in <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code>, or <code><a href="https://rdrr.io/r/stats/confint.html">confint()</a></code>.</li>
-</ul>
-<p>We fit the same risk difference model as in section 2:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="kw">fit_margstd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskdiff</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, 
-                        approach = <span class="st">"margstd"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_margstd</span>, bootrepeats = <span class="fl">500</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted via marginal standardization of a logistic model (margstd).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(no starting values)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
-<span class="co">#&gt;                                         </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
-<span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; stageStage I    0.00000    0.00000      NA       NA    </span>
-<span class="co">#&gt; stageStage II   0.16303    0.05819   2.802  0.00508 ** </span>
-<span class="co">#&gt; stageStage III  0.57097    0.09495   6.013 1.82e-09 ***</span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 185.88  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 193.88</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (based on 500 bootstrap repeats)</span>
-<span class="co">#&gt;                      2.5%     97.5%</span>
-<span class="co">#&gt; stageStage I           NA        NA</span>
-<span class="co">#&gt; stageStage II  0.04676527 0.2815745</span>
-<span class="co">#&gt; stageStage III 0.37834806 0.7524654</span>
-</pre></div>
-<p>Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death (bootstrapped 95% confidence interval, 35 to 76 percentage points), adjusting for hormone receptor status.</p>
-<p>Note that coefficients and standard errors are only estimated for the exposure variable. Model fit characteristics and predicted values stem directly from the underlying logistic model.</p>
-<p>Requesting a different exposure variable:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="kw">fit_margstd2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskdiff</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, 
-                         approach = <span class="st">"margstd"</span>, variable = <span class="st">"receptor"</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_margstd2</span>, bootrepeats = <span class="fl">500</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted via marginal standardization of a logistic model (margstd).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(no starting values)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
-<span class="co">#&gt;                                         </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
-<span class="co">#&gt;              Estimate Std. Error z value Pr(&gt;|z|)  </span>
-<span class="co">#&gt; receptorHigh  0.00000    0.00000      NA       NA  </span>
-<span class="co">#&gt; receptorLow   0.16163    0.07171   2.254   0.0242 *</span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 185.88  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 193.88</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 4</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (based on 500 bootstrap repeats)</span>
-<span class="co">#&gt;                    2.5%    97.5%</span>
-<span class="co">#&gt; receptorHigh         NA       NA</span>
-<span class="co">#&gt; receptorLow  0.03281886 0.335073</span>
-</pre></div>
-</div>
-<div id="model-comparisons" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-comparisons" class="anchor"></a>Model comparisons</h2>
-<p>With <code>approach = "all"</code>, all model types listed in the tables are fitted. The fitted object, <em>e.g.</em>, <code>fit</code>, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of <code><a href="https://rdrr.io/r/base/summary.html">summary(fit)</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="kw">fit_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskdiff</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, 
-                    approach = <span class="st">"all"</span>)
-<span class="co">#&gt; Loading required package: doParallel</span>
-<span class="co">#&gt; Loading required package: foreach</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'foreach'</span>
-<span class="co">#&gt; The following objects are masked from 'package:purrr':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     accumulate, when</span>
-<span class="co">#&gt; Loading required package: iterators</span>
-<span class="co">#&gt; Loading required package: parallel</span>
-<span class="co">#&gt; Loading required package: numDeriv</span>
-<span class="co">#&gt; Loading required package: quantreg</span>
-<span class="co">#&gt; Loading required package: SparseM</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'SparseM'</span>
-<span class="co">#&gt; The following object is masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     backsolve</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'turboEM'</span>
-<span class="co">#&gt; The following objects are masked from 'package:numDeriv':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     grad, hessian</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_all</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; All fitted models:</span>
-<span class="co">#&gt;          Model Converged Max.prob.</span>
-<span class="co">#&gt; 1   robpoisson      TRUE 0.7907040</span>
-<span class="co">#&gt; 2          glm      TRUE 0.8173940</span>
-<span class="co">#&gt; 3    glm_start      TRUE 0.8173882</span>
-<span class="co">#&gt; 4       addreg      TRUE 0.8173957</span>
-<span class="co">#&gt; 5 addreg_start      TRUE 0.8173957</span>
-<span class="co">#&gt; 6      margstd      TRUE 0.8158560</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted as Poisson model with robust covariance (robpoisson).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = poisson(link = "identity"), </span>
-<span class="co">#&gt;     data = data, weights = NULL, start = "(no starting values)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -1.2575  -0.6870  -0.4147   0.2260   1.7546  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; (Intercept)     0.08600    0.03871   2.222 0.026292 *  </span>
-<span class="co">#&gt; stageStage II   0.14998    0.06474   2.317 0.020519 *  </span>
-<span class="co">#&gt; stageStage III  0.56505    0.16482   3.428 0.000607 ***</span>
-<span class="co">#&gt; receptorLow     0.13965    0.09602   1.454 0.145866    </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 137.00  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 110.57  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 226.57</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 5</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (normality-based)</span>
-<span class="co">#&gt;                      2.5 %    97.5 %</span>
-<span class="co">#&gt; (Intercept)     0.01013792 0.1618699</span>
-<span class="co">#&gt; stageStage II   0.02309478 0.2768559</span>
-<span class="co">#&gt; stageStage III  0.24200852 0.8880958</span>
-<span class="co">#&gt; receptorLow    -0.04855731 0.3278532</span>
-</pre></div>
-<p>Individual models can be accessed as <code>fit$all_models[[1]]</code> through <code>fit$all_models[[6]]</code> (or <code>[[7]]</code> if fitting a risk ratio model). <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> shows coefficients and confidence intervals from all models that converged:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="kw">fit_all</span>) <span class="op">%&gt;%</span>
-  <span class="fu">select</span>(<span class="op">-</span><span class="kw">statistic</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(n = <span class="fl">25</span>)
-<span class="co">#&gt; # A tibble: 23 x 7</span>
-<span class="co">#&gt;    term           estimate std.error   p.value conf.low conf.high model       </span>
-<span class="co">#&gt;    &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       </span>
-<span class="co">#&gt;  1 (Intercept)      0.0860    0.0387   2.63e-2  0.0122      0.160 robpoisson  </span>
-<span class="co">#&gt;  2 stageStage II    0.150     0.0647   2.05e-2  0.0366      0.263 robpoisson  </span>
-<span class="co">#&gt;  3 stageStage III   0.565     0.165    6.07e-4  0.377       0.753 robpoisson  </span>
-<span class="co">#&gt;  4 receptorLow      0.140     0.0960   1.46e-1 -0.00878     0.288 robpoisson  </span>
-<span class="co">#&gt;  5 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm         </span>
-<span class="co">#&gt;  6 stageStage II    0.149     0.0576   9.53e-3  0.0364      0.262 glm         </span>
-<span class="co">#&gt;  7 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm         </span>
-<span class="co">#&gt;  8 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm         </span>
-<span class="co">#&gt;  9 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm_start   </span>
-<span class="co">#&gt; 10 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 glm_start   </span>
-<span class="co">#&gt; 11 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm_start   </span>
-<span class="co">#&gt; 12 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm_start   </span>
-<span class="co">#&gt; 13 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg      </span>
-<span class="co">#&gt; 14 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg      </span>
-<span class="co">#&gt; 15 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg      </span>
-<span class="co">#&gt; 16 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg      </span>
-<span class="co">#&gt; 17 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg_start</span>
-<span class="co">#&gt; 18 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg_start</span>
-<span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start</span>
-<span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start</span>
-<span class="co">#&gt; 21 stageStage I     0         0      NaN       NA          NA     margstd     </span>
-<span class="co">#&gt; 22 stageStage II    0.163     0.0615   7.98e-3  0.0525      0.305 margstd     </span>
-<span class="co">#&gt; 23 stageStage III   0.571     0.107    1.00e-7  0.314       0.741 margstd</span>
-</pre></div>
-</div>
-<div id="precision-weights" class="section level2">
-<h2 class="hasAnchor">
-<a href="#precision-weights" class="anchor"></a>Precision weights</h2>
-<p>At this point, integer <em>precision</em> weights are supported, as in <code>glm</code>, but not frequency weights or sampling weights, such as for inverse-probability weighting. The latter can be handled, <em>e.g.</em>, via <code>survey::svyglm()</code>. Binomial models fitted via combinatorial expectation maximization do not support precision weights.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit">
-<span class="kw">dat</span> <span class="op">&lt;-</span> <span class="kw">dat</span> <span class="op">%&gt;%</span>  <span class="co"># generate some non-random weights</span>
-  <span class="fu">mutate</span>(myweight = <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>((<span class="fu">row_number</span>() <span class="op">+</span> <span class="fl">20</span>) <span class="op">/</span> <span class="fl">20</span>))
-
-<span class="kw">fit_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/riskratio.html">riskdiff</a></span>(formula = <span class="kw">death</span> <span class="op">~</span> <span class="kw">stage</span> <span class="op">+</span> <span class="kw">receptor</span>, data = <span class="kw">dat</span>, 
-                    approach = <span class="st">"all"</span>, weights = <span class="kw">myweight</span>)
-<span class="co">#&gt; Warning in log(y/mu): NaNs produced</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="kw">fit_all</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; All fitted models:</span>
-<span class="co">#&gt;          Model Converged Max.prob.</span>
-<span class="co">#&gt; 1   robpoisson     FALSE        NA</span>
-<span class="co">#&gt; 2          glm      TRUE 0.5069874</span>
-<span class="co">#&gt; 3          glm     FALSE        NA</span>
-<span class="co">#&gt; 4       addreg     FALSE        NA</span>
-<span class="co">#&gt; 5 addreg_start     FALSE        NA</span>
-<span class="co">#&gt; 6      margstd      TRUE 0.6122871</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted as binomial model (glm).</span>
-<span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), </span>
-<span class="co">#&gt;     data = data, weights = myweight, start = "(no starting values)")</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -3.7609  -1.1253  -0.4468   2.0188   4.0169  </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Coefficients:</span>
-<span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; (Intercept)    0.016498   0.007577   2.178  0.02944 *  </span>
-<span class="co">#&gt; stageStage II  0.051436   0.012916   3.982 6.82e-05 ***</span>
-<span class="co">#&gt; stageStage III 0.402776   0.042239   9.536  &lt; 2e-16 ***</span>
-<span class="co">#&gt; receptorLow    0.087713   0.027488   3.191  0.00142 ** </span>
-<span class="co">#&gt; ---</span>
-<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     Null deviance: 795.33  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 628.29  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 636.29</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 5</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (normality-based)</span>
-<span class="co">#&gt;                      2.5 %     97.5 %</span>
-<span class="co">#&gt; (Intercept)    0.001648228 0.03134866</span>
-<span class="co">#&gt; stageStage II  0.026121923 0.07675055</span>
-<span class="co">#&gt; stageStage III 0.319988684 0.48556311</span>
-<span class="co">#&gt; receptorLow    0.033836589 0.14158944</span>
-</pre></div>
-<p>In this example, the Poisson model and models using its coeffients as starting values do not converge. Overview of the converged models using weights with <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> (<code>glm</code>’s warnings are suppressed):</p>
-<div class="sourceCode" id="cb15"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="kw">fit_all</span>) <span class="op">%&gt;%</span>
-  <span class="fu">select</span>(<span class="op">-</span><span class="kw">statistic</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(n = <span class="fl">25</span>)
-<span class="co">#&gt; # A tibble: 7 x 7</span>
-<span class="co">#&gt;   term           estimate std.error    p.value conf.low conf.high model  </span>
-<span class="co">#&gt;   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;  </span>
-<span class="co">#&gt; 1 (Intercept)      0.0165   0.00758   2.94e- 2  0.00165    0.0313 glm    </span>
-<span class="co">#&gt; 2 stageStage II    0.0514   0.0129    6.82e- 5  0.0261     0.0768 glm    </span>
-<span class="co">#&gt; 3 stageStage III   0.403    0.0422    1.49e-21  0.320      0.486  glm    </span>
-<span class="co">#&gt; 4 receptorLow      0.0877   0.0275    1.42e- 3  0.0338     0.142  glm    </span>
-<span class="co">#&gt; 5 stageStage I     0        0       NaN        NA         NA      margstd</span>
-<span class="co">#&gt; 6 stageStage II    0.0648   0.0226    4.13e- 3  0.0293     0.109  margstd</span>
-<span class="co">#&gt; 7 stageStage III   0.397    0.102     1.09e- 4  0.223      0.643  margstd</span>
-</pre></div>
-</div>
 </div>
 
   </div>

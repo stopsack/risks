@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -80,18 +80,39 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
+  <a href="../articles/risks.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/margstd.html">Marginal standardization</a>
+    </li>
+    <li>
+      <a href="../articles/models.html">Models and model comparisons</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/stopsack/risks/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -118,15 +139,16 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for margstd</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(
-  <span class='kw'>object</span>,
-  dispersion = <span class='kw'>NULL</span>,
-  correlation = <span class='fl'>FALSE</span>,
-  symbolic.cor = <span class='fl'>FALSE</span>,
-  level = <span class='fl'>0.95</span>,
-  bootrepeats = <span class='fl'>200</span>,
-  <span class='kw'>...</span>
-)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  dispersion <span class='op'>=</span> <span class='cn'>NULL</span>,
+  correlation <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  symbolic.cor <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  level <span class='op'>=</span> <span class='fl'>0.95</span>,
+  bootrepeats <span class='op'>=</span> <span class='fl'>200</span>,
+  bootci <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"bca"</span>, <span class='st'>"normal"</span>, <span class='st'>"nonpar"</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,11 +171,25 @@
     </tr>
     <tr>
       <th>level</th>
-      <td><p>Confidence level, defaults to 95%</p></td>
+      <td><p>Confidence level, defaults to <code>0.95</code>.</p></td>
     </tr>
     <tr>
       <th>bootrepeats</th>
-      <td><p>Bootstrap repeats for standard errors. Defaults to 200. Strongly recommend &gt;1000.</p></td>
+      <td><p>Bootstrap repeats for standard errors. Defaults to 200.
+Strongly recommend &gt;1000.</p></td>
+    </tr>
+    <tr>
+      <th>bootci</th>
+      <td><p>Type of bootstrap confidence interval:</p><ul>
+<li><p><code>"bca"</code> Default. Parametric BCa (bias-corrected accelerated)
+confidence intervals.</p></li>
+<li><p><code>"normal"</code> Parametric normality-based confidence intervals,
+which require lower repeat numbers but are less accurate and
+may result in invalid results for ratios.</p></li>
+<li><p><code>"nonpar"</code> Non-parametric BCa confidence intervals,
+which should be used with caution because of the risk
+of sparse-data bias with non-parametric bootstrapping.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>...</th>
