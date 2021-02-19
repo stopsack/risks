@@ -13,3 +13,4 @@
 ^_pkgdown\.yml$
 ^index\.md$
 ^index\.Rmd$
+^codecov\.yml$

@@ -1,6 +1,8 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
+<!-- badges: start -->
+  [![Codecov test coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
+  <!-- badges: end -->
+  
 # risks
 
 ## Installation

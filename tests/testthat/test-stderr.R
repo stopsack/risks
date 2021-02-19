@@ -21,7 +21,7 @@ test_that("Standard errors for RR(receptorLow) are the same", {
 
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_lt(se_glm,    summary(rd_robpoisson)$coefficients["receptorLow", "Std. Error"])
+  expect_lt(se_glm,    summary.robpoisson(rd_robpoisson)$coefficients["receptorLow", "Std. Error"])
   expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_margstd, bootrepeats = 500)$coefficients["receptorLow", "Std. Error"],
