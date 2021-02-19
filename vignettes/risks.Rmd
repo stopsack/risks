@@ -28,9 +28,9 @@ remotes::install_github("stopsack/risks")
 We define a cohort of women with breast cancer, as used by Spiegelman and Hertzmark ([Am J Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland ([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
 
 ```{r load, message = FALSE}
-library(risks)      # provides riskratio(), riskdiff(), postestimation functions
-library(tidyverse)  # For data handling
-library(broom)      # For tidy() model summaries
+library(risks)  # provides riskratio(), riskdiff(), postestimation functions
+library(dplyr)  # For data handling
+library(broom)  # For tidy() model summaries
 
 # Sample data originally from:
 # Newman SC. Biostatistical methods in epidemiology. 

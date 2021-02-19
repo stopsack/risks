@@ -24,9 +24,9 @@ After fitting a logistic model, predicted probabilities for each observation are
 We use the same example data as in the [Get Started vignette](risks.html#an-example-cohort-study).
 
 ```{r load, message = FALSE}
-library(risks)      # provides riskratio(), riskdiff(), postestimation functions
-library(tidyverse)  # For data handling
-library(broom)      # For tidy() model summaries
+library(risks)  # provides riskratio(), riskdiff(), postestimation functions
+library(dplyr)  # For data handling
+library(broom)  # For tidy() model summaries
 dat <- tibble::tibble(
   death    = c(rep(1, 54), rep(0, 138)),
   stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),

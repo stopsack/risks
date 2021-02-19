@@ -40,7 +40,5 @@ Imports:
     tidyr
 Depends:
     logbin
-Recommends:
-    tidyverse
 RdMacros: lifecycle
 VignetteBuilder: knitr
