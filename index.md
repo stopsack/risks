@@ -1,6 +1,3 @@
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # risks
 
 ## Installation
@@ -10,7 +7,7 @@ available. Currently, the development version of `risks` can be
 installed from [GitHub](https://github.com/) using:
 
 ``` r
-# install.packages("remotes")  # The "remotes" package needs to be installed
+# install.packages("remotes")  # The "remotes" package needs to be available
 remotes::install_github("stopsack/risks")
 ```
 
@@ -26,7 +23,7 @@ underweight/lean/overweight/obese) and the risk of a binary outcome
 (smoker/nonsmoker, years of education)? For such binary outcomes, many
 studies default to reporting odds ratios (OR). Yet outside of
 case-control studies, odds ratios are unnecessary to report. Risk ratios
-and risk differences have much more intuitive interpretations.
+and risk differences have more intuitive interpretations.
 Additionally, when the outcome is not rare, odds ratios are significant
 overestimates for risk ratios. Despite these drawbacks, odds ratios are
 often simply reported because they are easily obtained from logistic
@@ -38,13 +35,13 @@ programming skills, including in R.
 The `risks` package fills this gap by providing a user-friendly approach
 that makes obtaining adjusted risk ratios and risk differences as simple
 as fitting a logistic regression model. No advanced programming or
-biostatistics skills are required. Build-in routines automatically
+biostatistics skills are required. Built-in routines automatically
 switch to more computationally demanding model fitting approaches if
 simple binomial models have convergence issues, making `risks` return
 valid estimates whenever the data would allow for fitting a logistic
 model. At the same time, several options for customization of model
 fitting and reporting as well as comparisons between different
-approaches are provided (see: [Get started](articles/risks.html)).
+approaches are provided (see [Get started](articles/risks.html)).
 
 Five different approaches are implemented 
 (see [Models and model comparisons](articles/models.html)): 
