@@ -133,8 +133,8 @@
 <span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
 <span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
 <span class="co">#&gt; stageStage I    0.00000    0.00000      NA       NA    </span>
-<span class="co">#&gt; stageStage II   0.16303    0.05905   2.761  0.00577 ** </span>
-<span class="co">#&gt; stageStage III  0.57097    0.09609   5.942 2.82e-09 ***</span>
+<span class="co">#&gt; stageStage II   0.16303    0.05743   2.839  0.00453 ** </span>
+<span class="co">#&gt; stageStage III  0.57097    0.10085   5.662  1.5e-08 ***</span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
@@ -149,8 +149,8 @@
 <span class="co">#&gt; Confidence intervals for coefficients: (500 BCa bootstrap repeats)</span>
 <span class="co">#&gt;                      2.5%     97.5%</span>
 <span class="co">#&gt; stageStage I           NA        NA</span>
-<span class="co">#&gt; stageStage II  0.04016338 0.2818349</span>
-<span class="co">#&gt; stageStage III 0.38343740 0.7554064</span></code></pre></div>
+<span class="co">#&gt; stageStage II  0.06555094 0.2834205</span>
+<span class="co">#&gt; stageStage III 0.34804454 0.7478250</span></code></pre></div>
 <p>Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death, adjusting for hormone receptor status (with slightly different bootstrapped 95% confidence intervals).</p>
 <p>Note that coefficients and standard errors are only estimated for the exposure variable. Model fit characteristics and predicted values stem directly from the underlying logistic model.</p>
 </div>
@@ -181,7 +181,7 @@
 <span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
 <span class="co">#&gt;              Estimate Std. Error z value Pr(&gt;|z|)  </span>
 <span class="co">#&gt; receptorHigh  0.00000    0.00000      NA       NA  </span>
-<span class="co">#&gt; receptorLow   0.16163    0.08175   1.977    0.048 *</span>
+<span class="co">#&gt; receptorLow   0.16163    0.07872   2.053     0.04 *</span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
@@ -194,9 +194,9 @@
 <span class="co">#&gt; Number of Fisher Scoring iterations: 4</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Confidence intervals for coefficients: (500 BCa bootstrap repeats)</span>
-<span class="co">#&gt;                      2.5%     97.5%</span>
-<span class="co">#&gt; receptorHigh           NA        NA</span>
-<span class="co">#&gt; receptorLow  -0.007200991 0.3164465</span></code></pre></div>
+<span class="co">#&gt;                     2.5%     97.5%</span>
+<span class="co">#&gt; receptorHigh          NA        NA</span>
+<span class="co">#&gt; receptorLow  0.002604117 0.3067263</span></code></pre></div>
 </div>
 <div id="bootstrap-confidence-intervals" class="section level1">
 <h1 class="hasAnchor">
