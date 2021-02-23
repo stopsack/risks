@@ -43,6 +43,7 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   rd_cem        <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem")
   rd_cem_start  <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem_start")
   rd_margstd    <- riskdiff(formula = death ~ receptor, data = dat, approach = "margstd")
+  sum_margstd <- summary(rd_margstd, bootrepeats = 500)
 
   se_glm <- summary(rd_glm)$coefficients["receptorLow", "Std. Error"]
   tol <- 0.01
@@ -52,6 +53,7 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   expect_lt(se_glm,    summary(rd_robpoisson)$coefficients["receptorLow", "Std. Error"])
   expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
   expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_margstd, bootrepeats = 500)$coefficients["receptorLow", "Std. Error"],
+  expect_equal(se_glm, sum_margstd$coefficients["receptorLow", "Std. Error"],
                tolerance = 0.03)
+  expect_output(print(sum_margstd), "Confidence intervals for coefficients")
 })

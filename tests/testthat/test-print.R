@@ -9,12 +9,15 @@ dat <- data.frame(
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
 test_that("printing functions give output", {
+  fit_all <- riskratio(formula = death ~ stage + receptor, data = dat,
+                       approach = "all")
   fit_risks <- riskratio(formula = death ~ stage + receptor, data = dat)
   fit_margstd <- riskratio(formula = death ~ stage + receptor, data = dat,
                            approach = "margstd", variable = "stage",
                            at = c("Stage I", "Stage III"))
   fit_robpoisson <- riskratio(formula = death ~ stage + receptor, data = dat,
                               approach = "robpoisson")
+  expect_output(print.summary.risks(summary(fit_all)), "All fitted models")
   expect_output(print.risks(fit_risks), "Risk ratio model")
   expect_output(print.risks(fit_risks), "(from Poisson model)")
   expect_output(print.risks(fit_risks), "188 Residual")
