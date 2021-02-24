@@ -73,7 +73,7 @@ generate appropriate summary." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -141,7 +141,7 @@ generate appropriate summary.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for risks</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, conf.int <span class='op'>=</span> <span class='cn'>TRUE</span>, default <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,6 +149,16 @@ generate appropriate summary.</p>
     <tr>
       <th>object</th>
       <td><p>Fitted model</p></td>
+    </tr>
+    <tr>
+      <th>conf.int</th>
+      <td><p>Add confidence intervals to printout? Defaults to TRUE.</p></td>
+    </tr>
+    <tr>
+      <th>default</th>
+      <td><p>Normal confidence intervals via confint.default()?
+Default to TRUE. By setting <code>default = FALSE</code>, profiling-based
+confidence intervals can be calculated for binomial models.</p></td>
     </tr>
     <tr>
       <th>...</th>

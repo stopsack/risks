@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -209,7 +209,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Risk ratio model</span>
 <span class="co">#&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), </span>
-<span class="co">#&gt;     data = data, start = "(from Poisson model)")</span>
+<span class="co">#&gt;     data = dat, start = "(from Poisson model)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients:</span>
 <span class="co">#&gt;    (Intercept)   stageStage II  stageStage III     receptorLow  </span>
@@ -263,7 +263,7 @@ However, the binomial model without starting values does not converge:</p>
 <span class="co">#&gt; Risk difference model, fitted as Poisson model with robust covariance (robpoisson).</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = poisson(link = "identity"), </span>
-<span class="co">#&gt;     data = data, start = "(no starting values)")</span>
+<span class="co">#&gt;     data = dat, start = "(no starting values)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -322,8 +322,8 @@ Individual models can be accessed as <code>fit$all_models[[1]]</code> through <c
 <span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start</span>
 <span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start</span>
 <span class="co">#&gt; 21 stageStage I     0         0      NaN       NA          NA     margstd     </span>
-<span class="co">#&gt; 22 stageStage II    0.163     0.0554   3.26e-3  0.0421      0.270 margstd     </span>
-<span class="co">#&gt; 23 stageStage III   0.571     0.105    5.72e-8  0.384       0.726 margstd</span></code></pre></div>
+<span class="co">#&gt; 22 stageStage II    0.163     0.0554   3.25e-3  0.0610      0.263 margstd     </span>
+<span class="co">#&gt; 23 stageStage III   0.571     0.0956   2.30e-9  0.407       0.799 margstd</span></code></pre></div>
 </div>
   </div>
 

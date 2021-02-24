@@ -85,7 +85,7 @@ Adjusting for covariates (e.g., confounders) in the model specification (formula
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -319,7 +319,7 @@ logistic model; <code>approach = "margstd"</code>)</p>
 </div><div class='output co'>#&gt; 
 #&gt; Risk ratio model
 #&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), 
-#&gt;     data = data, start = "(from Poisson model)")
+#&gt;     data = dat, start = "(from Poisson model)")
 #&gt; 
 #&gt; Coefficients:
 #&gt;    (Intercept)   stageStage II  stageStage III     receptorLow  
@@ -332,7 +332,7 @@ logistic model; <code>approach = "margstd"</code>)</p>
 #&gt; Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_start).
 #&gt; Call:
 #&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), 
-#&gt;     data = data, start = "(from Poisson model)")
+#&gt;     data = dat, start = "(from Poisson model)")
 #&gt; 
 #&gt; Deviance Residuals: 
 #&gt;     Min       1Q   Median       3Q      Max  
@@ -367,7 +367,7 @@ logistic model; <code>approach = "margstd"</code>)</p>
 </div><div class='output co'>#&gt; 
 #&gt; Risk difference model
 #&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), 
-#&gt;     data = data, start = "(no starting values)")
+#&gt;     data = dat, start = "(no starting values)")
 #&gt; 
 #&gt; Coefficients:
 #&gt;    (Intercept)   stageStage II  stageStage III     receptorLow  
@@ -380,7 +380,7 @@ logistic model; <code>approach = "margstd"</code>)</p>
 #&gt; Risk difference model, fitted as binomial model (glm).
 #&gt; Call:
 #&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), 
-#&gt;     data = data, start = "(no starting values)")
+#&gt;     data = dat, start = "(no starting values)")
 #&gt; 
 #&gt; Deviance Residuals: 
 #&gt;     Min       1Q   Median       3Q      Max  

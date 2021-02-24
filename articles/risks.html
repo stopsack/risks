@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -152,7 +152,7 @@
 <span class="co">#&gt; Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_start).</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), </span>
-<span class="co">#&gt;     data = data, start = "(from Poisson model)")</span>
+<span class="co">#&gt;     data = dat, start = "(from Poisson model)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -193,7 +193,7 @@
 <span class="co">#&gt; Risk difference model, fitted as binomial model (glm).</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "identity"), </span>
-<span class="co">#&gt;     data = data, start = "(no starting values)")</span>
+<span class="co">#&gt;     data = dat, start = "(no starting values)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>

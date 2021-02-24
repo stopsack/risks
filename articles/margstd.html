@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
       </span>
     </div>
 
@@ -124,7 +124,7 @@
 <span class="co">#&gt; Risk difference model, fitted via marginal standardization of a logistic model (margstd).</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
-<span class="co">#&gt;     data = data, start = "(no starting values)")</span>
+<span class="co">#&gt;     data = dat, start = "(no starting values)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
@@ -133,8 +133,8 @@
 <span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
 <span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
 <span class="co">#&gt; stageStage I    0.00000    0.00000      NA       NA    </span>
-<span class="co">#&gt; stageStage II   0.16303    0.05743   2.839  0.00453 ** </span>
-<span class="co">#&gt; stageStage III  0.57097    0.10085   5.662  1.5e-08 ***</span>
+<span class="co">#&gt; stageStage II   0.16303    0.06132   2.659  0.00784 ** </span>
+<span class="co">#&gt; stageStage III  0.57097    0.09801   5.826 5.69e-09 ***</span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
@@ -149,8 +149,8 @@
 <span class="co">#&gt; Confidence intervals for coefficients: (500 BCa bootstrap repeats)</span>
 <span class="co">#&gt;                      2.5%     97.5%</span>
 <span class="co">#&gt; stageStage I           NA        NA</span>
-<span class="co">#&gt; stageStage II  0.06555094 0.2834205</span>
-<span class="co">#&gt; stageStage III 0.34804454 0.7478250</span></code></pre></div>
+<span class="co">#&gt; stageStage II  0.05577282 0.2836183</span>
+<span class="co">#&gt; stageStage III 0.34460153 0.7307196</span></code></pre></div>
 <p>Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death, adjusting for hormone receptor status (with slightly different bootstrapped 95% confidence intervals).</p>
 <p>Note that coefficients and standard errors are only estimated for the exposure variable. Model fit characteristics and predicted values stem directly from the underlying logistic model.</p>
 </div>
@@ -172,7 +172,7 @@
 <span class="co">#&gt; Risk difference model, fitted via marginal standardization of a logistic model (margstd).</span>
 <span class="co">#&gt; Call:</span>
 <span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
-<span class="co">#&gt;     data = data, start = "(no starting values)")</span>
+<span class="co">#&gt;     data = dat, start = "(no starting values)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
@@ -181,7 +181,7 @@
 <span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span>
 <span class="co">#&gt;              Estimate Std. Error z value Pr(&gt;|z|)  </span>
 <span class="co">#&gt; receptorHigh  0.00000    0.00000      NA       NA  </span>
-<span class="co">#&gt; receptorLow   0.16163    0.07872   2.053     0.04 *</span>
+<span class="co">#&gt; receptorLow   0.16163    0.07636   2.117   0.0343 *</span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
@@ -194,9 +194,9 @@
 <span class="co">#&gt; Number of Fisher Scoring iterations: 4</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Confidence intervals for coefficients: (500 BCa bootstrap repeats)</span>
-<span class="co">#&gt;                     2.5%     97.5%</span>
-<span class="co">#&gt; receptorHigh          NA        NA</span>
-<span class="co">#&gt; receptorLow  0.002604117 0.3067263</span></code></pre></div>
+<span class="co">#&gt;                    2.5%     97.5%</span>
+<span class="co">#&gt; receptorHigh         NA        NA</span>
+<span class="co">#&gt; receptorLow  0.01268155 0.2949014</span></code></pre></div>
 </div>
 <div id="bootstrap-confidence-intervals" class="section level1">
 <h1 class="hasAnchor">
