@@ -1,3 +1,10 @@
+# risks 0.2.1
+
+* Fix bugs in `bootci = "normal"` and in `summary.risks()`.
+* Return name of dataset.
+* Expand test coverage.
+
+
 # risks 0.2.0
 
 * Expand bootstrapping options after marginal standardization:

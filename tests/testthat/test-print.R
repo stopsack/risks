@@ -17,6 +17,10 @@ test_that("printing functions give output", {
                            at = c("Stage I", "Stage III"))
   fit_robpoisson <- riskratio(formula = death ~ stage + receptor, data = dat,
                               approach = "robpoisson")
+  fit_logistic <- riskratio(formula = death ~ stage + receptor, data = dat,
+                            approach = "logistic")
+  fit_addreg <- riskdiff(formula = death ~ stage + receptor, data = dat,
+                         approach = "glm_cem")
   expect_output(print.summary.risks(summary(fit_all)), "All fitted models")
   expect_output(print.risks(fit_risks), "Risk ratio model")
   expect_output(print.risks(fit_risks), "(from Poisson model)")
@@ -25,9 +29,15 @@ test_that("printing functions give output", {
                 "model with starting values")
   expect_output(print.summary.risks(summary.risks(fit_risks)),
                 "Confidence interval")
+  expect_output(print.summary.risks(summary.risks(fit_risks, default = FALSE)),
+                "profiling")
   expect_output(print.risks(fit_margstd), "Risk ratio model")
   expect_output(print.risks(fit_margstd), "(no starting values)")
   expect_output(print(summary.margstd(fit_margstd)), "logit")
   expect_output(print(summary.robpoisson(fit_robpoisson)),
                 "poisson")
+  expect_output(print(summary(fit_logistic)),
+                "logistic model")
+  expect_output(print(summary(fit_addreg)),
+                "addreg::addreg")
 })

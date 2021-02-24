@@ -4,10 +4,16 @@
 \alias{summary.risks}
 \title{Generate model summary}
 \usage{
-\method{summary}{risks}(object, ...)
+\method{summary}{risks}(object, conf.int = TRUE, default = TRUE, ...)
 }
 \arguments{
 \item{object}{Fitted model}
+
+\item{conf.int}{Add confidence intervals to printout? Defaults to TRUE.}
+
+\item{default}{Normal confidence intervals via confint.default()?
+Default to TRUE. By setting \code{default = FALSE}, profiling-based
+confidence intervals can be calculated for binomial models.}
 
 \item{...}{Passed on}
 }

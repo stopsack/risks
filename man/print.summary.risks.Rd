@@ -4,16 +4,10 @@
 \alias{print.summary.risks}
 \title{Print model summary}
 \usage{
-\method{print}{summary.risks}(x, conf.int = TRUE, default = TRUE, ...)
+\method{print}{summary.risks}(x, ...)
 }
 \arguments{
 \item{x}{Model}
-
-\item{conf.int}{Add confidence intervals to printout? Defaults to TRUE.}
-
-\item{default}{Normal confidence intervals via confint.default()? Default to TRUE.
-By setting \code{default = FALSE}, profile likelihood-based
-confidence intervals can be calculated for binomial models.}
 
 \item{...}{Passed on}
 }

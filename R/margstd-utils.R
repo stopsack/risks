@@ -60,8 +60,10 @@ estimate_margstd <- function(
                                  .f = ~length(unique(fit$model %>%
                                                        dplyr::pull(.x))))) %>%
       dplyr::slice(-1) %>%
-      dplyr::filter(.data$type %in% c("character", "factor", "logical", "ordered") |
-                      (.data$type == "numeric" & nlevels == 2)) %>%
+      dplyr::filter(.data$type %in% c("character", "factor",
+                                      "logical", "ordered") |
+                      (.data$type %in% c("numeric", "integer") &
+                         nlevels == 2)) %>%
       dplyr::slice(1)
 
     if(nrow(model_vars) > 0)
@@ -90,13 +92,11 @@ estimate_margstd <- function(
                        "for the variable '", predictor, "'."))
     levels <- at
   } else {
-    if(!is.null(fit$xlevels))
-      if(predictor %in% names(fit$xlevels))  # retain level ordering as in model
-        levels <- fit$xlevels[[predictor]]
-      else
-        levels <- unique(fit$model %>% dplyr::pull(predictor))
-      else  # if "hidden" categorical, use level orderings as in data
-        levels <- unique(fit$model %>% dplyr::pull(predictor))
+    if(!is.null(fit$xlevels) & predictor %in% names(fit$xlevels))
+      # retain level ordering as in model
+      levels <- fit$xlevels[[predictor]]
+    else  # if "hidden" categorical, use level orderings as in data
+      levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
   eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels,
@@ -155,7 +155,7 @@ bootci_nonpar <- function(boot.out, conf, parameters) {
 
 #' @importFrom rlang :=
 # Parametric bootstrapping using boot::boot, use with normal CIs
-boot_eststd_norm <- function(object, bootrepeats, link = "identity") {
+boot_eststd_norm <- function(object, bootrepeats) {
   mainfit <- stats::glm(formula = object$formula,
                         family = binomial(link = "logit"),
                         data = object$data)
@@ -172,33 +172,24 @@ boot_eststd_norm <- function(object, bootrepeats, link = "identity") {
                                             prob = mle))
   }
 
-  res <- boot::boot(data = object$data,
-                    statistic = bootfn,
-                    R = bootrepeats,
-                    sim = "parametric",
-                    ran.gen = rangen,
-                    mle = predict(mainfit, type = "response"),
-                    fitformula = list(formula = object$formula),
-                    predictor = object$margstd_predictor,
-                    levels = object$margstd_levels,
-                    estimate = object$estimate[1])
-  # for ratios:
-  if(link == "log") {
-    res$t0 <- log(res$t0)
-    res$t <- log(res$t)
-  }
-  res
+  boot::boot(data = object$data,
+             statistic = bootfn,
+             R = bootrepeats,
+             sim = "parametric",
+             ran.gen = rangen,
+             mle = predict(mainfit, type = "response"),
+             fitformula = list(formula = object$formula),
+             predictor = object$margstd_predictor,
+             levels = object$margstd_levels,
+             estimate = object$estimate[1])
 }
 
 # Normal bootstrap confidence intervals after parametric bootstrapping
-bootci_norm <- function(boot.out, conf, parameters, link = "identity") {
+bootci_norm <- function(boot.out, conf, parameters) {
   getbootci_norm <- function(boot.out, index, conf) {
     mybootci <- boot::boot.ci(boot.out = boot.out, index = index,
                               type = "norm", conf = conf)$normal
-    if(link == "log")
-      res <- exp(as.numeric(mybootci[1, 2:3]))
-    else
-      res <- as.numeric(mybootci[1, 2:3])
+    res <- as.numeric(mybootci[1, 2:3])
     names(res) <- c("conf.low", "conf.high")
     return(res)
   }
@@ -294,12 +285,11 @@ confint.margstd <- function(object, parm = NULL,
 
   switch(EXPR = match.arg(bootci),
          normal = {
-           myboot <- boot_eststd_norm(object = object, bootrepeats = bootrepeats,
-                                      link = object$family$link)
+           myboot <- boot_eststd_norm(object = object,
+                                      bootrepeats = bootrepeats)
 
            ci[] <- bootci_norm(boot.out = myboot, conf = level,
-                               parameters = length(pnames),
-                          link = object$family$link) %>%
+                               parameters = length(pnames)) %>%
              as.matrix()
          },
          nonpar = {
@@ -326,21 +316,13 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
   switch(
     EXPR = bootci,
     normal = {
-      myboot <- boot_eststd_norm(object = object, bootrepeats = bootreps,
-                                 link = object$family$link)
+      myboot <- boot_eststd_norm(object = object, bootrepeats = bootreps)
 
-      if(object$family$link == "log")
-        res <- tibble::tibble(estimate = coef(object),
-                              std.error = exp(base::apply(myboot$t,
-                                                          MARGIN = 2, FUN = sd)))
-      else
-        res <- tibble::tibble(estimate = coef(object),
-                              std.error = base::apply(myboot$t,
-                                                      MARGIN = 2, FUN = sd))
-      res %>%
+      tibble::tibble(estimate = coef(object),
+                     std.error = base::apply(myboot$t,
+                                             MARGIN = 2, FUN = sd)) %>%
         dplyr::bind_cols(bootci_norm(boot.out = myboot, conf = level,
-                                     parameters = length(coef(object)),
-                                     link = object$family$link))
+                                     parameters = length(coef(object))))
     },
     nonpar = {
       myboot <- boot_eststd_nonpar(object = object, bootrepeats = bootreps)
