@@ -37,7 +37,8 @@ Imports:
     sandwich,
     stats,
     tibble,
-    tidyr
+    tidyr,
+    MASS
 Depends:
     logbin
 RdMacros: lifecycle
