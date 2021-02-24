@@ -228,10 +228,17 @@ print.risks <- function(x, ...) {
 #' via the returned list \code{$all_models}.
 #'
 #' @param object Fitted model
+#' @param conf.int Add confidence intervals to printout? Defaults to TRUE.
+#' @param default Normal confidence intervals via confint.default()?
+#'   Default to TRUE. By setting \code{default = FALSE}, profiling-based
+#'   confidence intervals can be calculated for binomial models.
 #' @param ... Passed on
 #' @return Model summary (list)
 #' @export
-summary.risks <- function(object, ...) {
+summary.risks <- function(object,
+                          conf.int = TRUE,
+                          default  = TRUE,
+                          ...) {
   # Exception: Multiple models were fitted but the Poisson model failed
   # Retrieve the first converged model to make sure summary() does not fail
   if(object$converged == FALSE & !is.null(object$all_models)) {
@@ -265,7 +272,8 @@ summary.risks <- function(object, ...) {
     "addreg_start" = "as binomial model with combinatorial expectation maximization, starting values",
     "logbin"       = "as binomial model with combinatorial expectation maximization",
     "logbin_start" = "as binomial model with combinatorial expectation maximization, starting values",
-    "margstd"      = "via marginal standardization of a logistic model")
+    "margstd"      = "via marginal standardization of a logistic model",
+    "logistic"     = "as a logistic model: binomial model with logit link")
   modeldescr <- paste0("\nRisk ",
                        dplyr::if_else(object$family$link == "identity" | estimate == "rd",
                                true = "difference", false = "ratio"),
@@ -273,9 +281,11 @@ summary.risks <- function(object, ...) {
                        modeltypes[modeltype], " (", modeltype, ").")
 
   # Transfer additional elements from 'object' fit for use in print.summary.risks()
-  mysummary <- append(mysummary, list(modeldescr = modeldescr,
-                                      modeltype  = class(object)[2],
-                                      object     = object))
+  mysummary <- append(mysummary, list(modeldescr      = modeldescr,
+                                      modeltype       = class(object)[2],
+                                      print_confint   = conf.int,
+                                      confint_default = default,
+                                      object          = object))
   if(!is.null(purrr::pluck(object, "all_models")))
     mysummary <- append(mysummary, list(all_models = purrr::pluck(object, "all_models")))
 
@@ -295,19 +305,10 @@ summary.risks <- function(object, ...) {
 #' and confidence intervals for model parameters are printed at the end.
 #'
 #' @param x Model
-#' @param conf.int Add confidence intervals to printout? Defaults to TRUE.
-#' @param default Normal confidence intervals via confint.default()? Default to TRUE.
-#'   By setting \code{default = FALSE}, profile likelihood-based
-#'   confidence intervals can be calculated for binomial models.
 #' @param ... Passed on
 #'
 #' @export
-print.summary.risks <- function(
-  x,
-  conf.int = TRUE,
-  default  = TRUE,
-  ...) {
-
+print.summary.risks <- function(x, ...) {
   # If estimate_risk(approach = "all") was called:
   if(!is.null(purrr::pluck(x, "all_models"))) {
     cat("\nAll fitted models:\n")
@@ -333,20 +334,22 @@ print.summary.risks <- function(
     printsummaryglm(x, ...)
 
   # Print confidence intervals
-  if(conf.int == TRUE &   # addreg and logbin use standard CIs
-     (default == TRUE | "addreg" %in% class(x$object) | "logbin" %in% class(x$object)) &
+  if(x$print_confint == TRUE &   # addreg and logbin use standard CIs
+     (x$confint_default == TRUE |
+      "addreg" %in% class(x$object) |
+      "logbin" %in% class(x$object)) &
      !("margstd" %in% class(x$object))) {
     cat("Confidence intervals for coefficients: (normality-based)\n")
     print(confint.default(x$object, ...))
   }
-  if(conf.int == TRUE &
-     default == FALSE &
+  if(x$print_confint == TRUE &
+     x$confint_default == FALSE &
      sum(c("margstd", "addreg", "logbin") %in% class(x$object)) == 0) {
     cat("Confidence intervals for coefficients: (profiling-based)\n")
     print(confint(x$object, ...))
   }
 
-  if(conf.int == TRUE & "margstd" %in% class(x$object)) {
+  if(x$print_confint == TRUE & "margstd" %in% class(x$object)) {
     # retrieve CIs that were generated when bootstrapping SEs for model summary
     cat(paste0("Confidence intervals for coefficients: (",
               x$margstd.bootrepeats, " ",
@@ -359,7 +362,8 @@ print.summary.risks <- function(
     a <- (1 - x$level) / 2
     a <- c(a, 1 - a)
     ci <- array(NA, dim = c(length(x$object$margstd_levels), 2L),
-                dimnames = list(paste0(x$object$margstd_predictor, x$object$margstd_levels),
+                dimnames = list(paste0(x$object$margstd_predictor,
+                                       x$object$margstd_levels),
                                 paste0(format(100 * a, trim = TRUE,
                                               scientific = FALSE, digits = 3), "%")))
     ci[] <- x$conf.int %>%

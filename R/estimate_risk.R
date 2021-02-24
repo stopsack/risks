@@ -130,8 +130,9 @@
 #' fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
 #' fit_rd
 #' summary(fit_rd)
-riskratio <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
+riskratio <- function(formula, data,
+                      approach = c("auto", "all", "robpoisson", "glm", "glm_start",
+                                   "glm_cem", "glm_cem_start", "margstd", "logistic"),
                       variable = NULL, at = NULL, ...) {
   estimate_risk(formula = formula, data = data, estimate = "rr",
                 approach = approach, variable = variable, at = at, ...)
@@ -139,8 +140,9 @@ riskratio <- function(formula, data, approach = c("auto", "all", "robpoisson", "
 
 #' @describeIn riskratio Fit risk difference models
 #' @export
-riskdiff <- function(formula, data, approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                                 "glm_cem", "glm_cem_start", "margstd", "logistic"),
+riskdiff <- function(formula, data,
+                     approach = c("auto", "all", "robpoisson", "glm", "glm_start",
+                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
                      variable = NULL, at = NULL, ...) {
   estimate_risk(formula = formula, data = data, estimate = "rd",
                 approach = approach, variable = variable, at = at, ...)
@@ -149,8 +151,9 @@ riskdiff <- function(formula, data, approach = c("auto", "all", "robpoisson", "g
 # Workhorse for riskratio and riskdiff
 estimate_risk <- function(formula, data,
                           estimate = c("rr", "rd"),
-                          approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                       "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                          approach = c("auto", "all", "robpoisson", "glm",
+                                       "glm_start", "glm_cem", "glm_cem_start",
+                                       "margstd", "logistic"),
                           variable = NULL,
                           at = NULL,
                           ...) {

@@ -45,4 +45,16 @@ test_that("bootci types give similar SE in summary", {
   se_nonpar <- unname(se_nonpar)
   expect_equal(se_bcapar, se_normal, tolerance = 0.5)
   expect_equal(se_bcapar, se_nonpar, tolerance = 0.5)
+
+  set.seed(123)
+  se_bcapar <- summary(riskdiff(formula = death ~ stage + receptor,
+                                 data = dat, approach = "margstd"),
+                       bootci = "bca", bootrepeats = 500)$conf.int$std.error
+  se_bcapar <- unname(se_bcapar)
+  set.seed(123)
+  se_normal <- summary(riskdiff(formula = death ~ stage + receptor,
+                                 data = dat, approach = "margstd"),
+                       bootci = "normal", bootrepeats = 200)$conf.int$std.error
+  se_normal <- unname(se_normal)
+  expect_equal(se_bcapar, se_normal, tolerance = 0.5)
 })

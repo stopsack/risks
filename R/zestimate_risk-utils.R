@@ -8,14 +8,24 @@ estimate_maxprob <- function(fit, formula, data, link, start = NULL) {
   # in case they converge on implausible values
   fit$maxprob <- maxprob <- max(predict(fit, type = "response"))
   if(maxprob > implausible)
-    message(paste0("Implausible predicted probability >", implausible, " occurred: ", maxprob))
+    message(paste0("Implausible predicted probability >", implausible,
+                   " occurred: ", maxprob))
   if(!is.null(start) & fit$method != "glm.fit")
     fit$risks_start <- "_start"
   else
     fit$risks_start <- ""
   fit$call$formula <- formula
   fit$call$family$link <- link
-  fit$call$data <- substitute(data)
+  #fit$call$data <- substitute(data)
+
+  # get name to dataset provided to the main frontend function
+  calls_list <- sys.calls()
+  goback <- (length(calls_list) - which(grepl("riskratio|riskdiff|estimate_risk",
+                                              calls_list))) * -1
+  fit$call$data <- tryCatch({ match.call(def = sys.function(which = goback),
+                                         call = sys.call(which = goback))$data },
+                            error = function(e) "data")
+  # end
   fit$call$start <- dplyr::if_else(!is.null(start),
                            true  = "(from Poisson model)",
                            false = "(no starting values)")
