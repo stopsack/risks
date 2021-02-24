@@ -299,31 +299,31 @@ Individual models can be accessed as <code>fit$all_models[[1]]</code> through <c
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">statistic</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 23 x 7</span>
-<span class="co">#&gt;    term           estimate std.error   p.value conf.low conf.high model       </span>
-<span class="co">#&gt;    &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       </span>
-<span class="co">#&gt;  1 (Intercept)      0.0860    0.0387   2.63e-2  0.0122      0.160 robpoisson  </span>
-<span class="co">#&gt;  2 stageStage II    0.150     0.0647   2.05e-2  0.0366      0.263 robpoisson  </span>
-<span class="co">#&gt;  3 stageStage III   0.565     0.165    6.07e-4  0.377       0.753 robpoisson  </span>
-<span class="co">#&gt;  4 receptorLow      0.140     0.0960   1.46e-1 -0.00878     0.288 robpoisson  </span>
-<span class="co">#&gt;  5 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm         </span>
-<span class="co">#&gt;  6 stageStage II    0.149     0.0576   9.53e-3  0.0364      0.262 glm         </span>
-<span class="co">#&gt;  7 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm         </span>
-<span class="co">#&gt;  8 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm         </span>
-<span class="co">#&gt;  9 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm_start   </span>
-<span class="co">#&gt; 10 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 glm_start   </span>
-<span class="co">#&gt; 11 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm_start   </span>
-<span class="co">#&gt; 12 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm_start   </span>
-<span class="co">#&gt; 13 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg      </span>
-<span class="co">#&gt; 14 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg      </span>
-<span class="co">#&gt; 15 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg      </span>
-<span class="co">#&gt; 16 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg      </span>
-<span class="co">#&gt; 17 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg_start</span>
-<span class="co">#&gt; 18 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg_start</span>
-<span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start</span>
-<span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start</span>
-<span class="co">#&gt; 21 stageStage I     0         0      NaN       NA          NA     margstd     </span>
-<span class="co">#&gt; 22 stageStage II    0.163     0.0571   4.29e-3  0.0637      0.316 margstd     </span>
-<span class="co">#&gt; 23 stageStage III   0.571     0.104    3.78e-8  0.384       0.737 margstd</span></code></pre></div>
+<span class="co">#&gt;    term           estimate std.error    p.value conf.low conf.high model       </span>
+<span class="co">#&gt;    &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       </span>
+<span class="co">#&gt;  1 (Intercept)      0.0860    0.0387   2.63e- 2  0.0122      0.160 robpoisson  </span>
+<span class="co">#&gt;  2 stageStage II    0.150     0.0647   2.05e- 2  0.0366      0.263 robpoisson  </span>
+<span class="co">#&gt;  3 stageStage III   0.565     0.165    6.07e- 4  0.377       0.753 robpoisson  </span>
+<span class="co">#&gt;  4 receptorLow      0.140     0.0960   1.46e- 1 -0.00878     0.288 robpoisson  </span>
+<span class="co">#&gt;  5 (Intercept)      0.0838    0.0363   2.11e- 2  0.0126      0.155 glm         </span>
+<span class="co">#&gt;  6 stageStage II    0.149     0.0576   9.53e- 3  0.0364      0.262 glm         </span>
+<span class="co">#&gt;  7 stageStage III   0.572     0.0947   1.52e- 9  0.387       0.758 glm         </span>
+<span class="co">#&gt;  8 receptorLow      0.161     0.0759   3.35e- 2  0.0126      0.310 glm         </span>
+<span class="co">#&gt;  9 (Intercept)      0.0838    0.0363   2.11e- 2  0.0126      0.155 glm_start   </span>
+<span class="co">#&gt; 10 stageStage II    0.149     0.0576   9.52e- 3  0.0364      0.262 glm_start   </span>
+<span class="co">#&gt; 11 stageStage III   0.572     0.0947   1.52e- 9  0.387       0.758 glm_start   </span>
+<span class="co">#&gt; 12 receptorLow      0.161     0.0759   3.35e- 2  0.0126      0.310 glm_start   </span>
+<span class="co">#&gt; 13 (Intercept)      0.0838    0.0363   2.11e- 2  0.0126      0.155 addreg      </span>
+<span class="co">#&gt; 14 stageStage II    0.149     0.0576   9.52e- 3  0.0364      0.262 addreg      </span>
+<span class="co">#&gt; 15 stageStage III   0.572     0.0947   1.52e- 9  0.387       0.758 addreg      </span>
+<span class="co">#&gt; 16 receptorLow      0.161     0.0759   3.35e- 2  0.0126      0.310 addreg      </span>
+<span class="co">#&gt; 17 (Intercept)      0.0838    0.0363   2.11e- 2  0.0126      0.155 addreg_start</span>
+<span class="co">#&gt; 18 stageStage II    0.149     0.0576   9.52e- 3  0.0364      0.262 addreg_start</span>
+<span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e- 9  0.387       0.758 addreg_start</span>
+<span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e- 2  0.0126      0.310 addreg_start</span>
+<span class="co">#&gt; 21 stageStage I     0         0      NaN        NA          NA     margstd     </span>
+<span class="co">#&gt; 22 stageStage II    0.163     0.0568   4.10e- 3  0.0656      0.327 margstd     </span>
+<span class="co">#&gt; 23 stageStage III   0.571     0.0922   5.99e-10  0.347       0.738 margstd</span></code></pre></div>
 </div>
   </div>
 
