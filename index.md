@@ -1,3 +1,9 @@
+
+<!-- badges: start -->
+  [![Codecov test coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
+<!-- badges: end -->
+
+
 # risks
 
 ## Installation
@@ -7,7 +13,7 @@ available. Currently, the development version of `risks` can be
 installed from [GitHub](https://github.com/) using:
 
 ``` r
-# install.packages("remotes")  # The "remotes" package needs to be available
+install.packages("remotes")  # Skip if the 'remotes' package is installed
 remotes::install_github("stopsack/risks")
 ```
 
