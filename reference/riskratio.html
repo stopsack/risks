@@ -85,7 +85,7 @@ Adjusting for covariates (e.g., confounders) in the model specification (formula
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -178,7 +178,7 @@ and estimates obtained via marginal standardization after logistic regression.</
   <span class='va'>formula</span>,
   <span class='va'>data</span>,
   approach <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"auto"</span>, <span class='st'>"all"</span>, <span class='st'>"robpoisson"</span>, <span class='st'>"glm"</span>, <span class='st'>"glm_start"</span>, <span class='st'>"glm_cem"</span>,
-    <span class='st'>"glm_cem_start"</span>, <span class='st'>"margstd"</span>, <span class='st'>"logistic"</span><span class='op'>)</span>,
+    <span class='st'>"glm_cem_start"</span>, <span class='st'>"margstd"</span><span class='op'>)</span>,
   variable <span class='op'>=</span> <span class='cn'>NULL</span>,
   at <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
@@ -189,7 +189,7 @@ and estimates obtained via marginal standardization after logistic regression.</
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>formula</th>
-      <td><p>A formula object of the form 'response ~ predictors'.</p></td>
+      <td><p>A formula object of the form <code>response ~ predictors</code>.</p></td>
     </tr>
     <tr>
       <th>data</th>

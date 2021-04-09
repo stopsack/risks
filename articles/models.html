@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -192,7 +192,7 @@
 <p>By default, automatic model fitting according to the priority listed in the table above is attempted. Alternatively, any of the options listed under <code>approach =</code> in the table can be requested directly. However, unlike with <code>approach = "auto"</code> (the default), the selected model may not converge.</p>
 <p>We load the same example data as in the <a href="risks.html#an-example-cohort-study">Get Started vignette</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/stopsack/risks">risks</a></span><span class="op">)</span>  <span class="co"># provides riskratio(), riskdiff(), postestimation functions</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://stopsack.github.io/risks">risks</a></span><span class="op">)</span>  <span class="co"># provides riskratio(), riskdiff(), postestimation functions</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>  <span class="co"># For data handling</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span>  <span class="co"># For tidy() model summaries</span>
 <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
@@ -322,8 +322,8 @@ Individual models can be accessed as <code>fit$all_models[[1]]</code> through <c
 <span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start</span>
 <span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start</span>
 <span class="co">#&gt; 21 stageStage I     0         0      NaN       NA          NA     margstd     </span>
-<span class="co">#&gt; 22 stageStage II    0.163     0.0592   5.90e-3  0.0630      0.295 margstd     </span>
-<span class="co">#&gt; 23 stageStage III   0.571     0.104    4.10e-8  0.248       0.699 margstd</span></code></pre></div>
+<span class="co">#&gt; 22 stageStage II    0.163     0.0588   5.57e-3  0.0334      0.274 margstd     </span>
+<span class="co">#&gt; 23 stageStage III   0.571     0.105    5.36e-8  0.419       0.799 margstd</span></code></pre></div>
 </div>
   </div>
 

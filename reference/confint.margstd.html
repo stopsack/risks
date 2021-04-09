@@ -73,7 +73,7 @@ based on parametric bootstrapping." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -147,6 +147,7 @@ based on parametric bootstrapping.</p>
   level <span class='op'>=</span> <span class='fl'>0.95</span>,
   bootrepeats <span class='op'>=</span> <span class='fl'>200</span>,
   bootci <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"bca"</span>, <span class='st'>"normal"</span>, <span class='st'>"nonpar"</span><span class='op'>)</span>,
+  jacksd <span class='op'>=</span> <span class='cn'>FALSE</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -182,6 +183,11 @@ may result in invalid results for ratios.</p></li>
 which should be used with caution because of the risk
 of sparse-data bias with non-parametric bootstrapping.</p></li>
 </ul></td>
+    </tr>
+    <tr>
+      <th>jacksd</th>
+      <td><p>Return jackknife Monte-Carlo error for the confidence limits?
+Only functional with BCa confidence intervals. Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>

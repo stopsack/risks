@@ -74,7 +74,7 @@ and p-values. A column with the type of model fitted is added." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
       </span>
     </div>
 
@@ -194,7 +194,9 @@ of sparse-data bias with non-parametric bootstrapping.</p></li>
     <tr>
       <th>bootverbose</th>
       <td><p>Optional. Add values of <code>bootrepeats</code> and
-<code>bootci</code> parameters to the returned tibble? Defaults to <code>FALSE</code>.</p></td>
+<code>bootci</code> parameters and the jackknife-based Monte-Carlo error for the
+confidence limits (only for <code>type = "bca"</code>) to the returned tibble?
+Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>exponentiate</th>
