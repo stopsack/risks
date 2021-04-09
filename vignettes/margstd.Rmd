@@ -76,7 +76,18 @@ Confidence intervals for coefficients are calculated based on BC~a~ confidence i
 For comparison purposes, alternative approaches to bootstrapping and confidence interval estimation can requested in `tidy()`, `summary.margstd()`, and `confint()`:
 
 * `bootci = "normal"`: Normality-based confidence intervals after parametric bootstrapping. These may give out-of-range estimates for confidence limits.
-* `bootci = "nonpar"`: BC~a~ intervals after *nonparametric* bootstrapping. Here, the data are resampled, rather than the outcome predicted from the model. Especially in the small datasets in which regular binomial models with log links may not converge and marginal standardization may be the only option, resampling the data comes with the risk of empty strata in the resamples, resulting in sparse-data bias or model nonconvergence. The resulting confidence intervals may be too low. This option should be used with caution.
+* `bootci = "nonpar"`: BC~a~ intervals after *nonparametric* bootstrapping. Here, the data are resampled, rather than the outcome predicted from the model. Especially in the small datasets in which regular binomial models with log links may not converge and marginal standardization may be the only option, resampling the data comes with the risk of empty strata in the resamples, resulting in sparse-data bias or model nonconvergence. The resulting confidence intervals may be too narrow. This option should be used with caution.
+
+When using `tidy()` to access model results, the parameter `bootverbose = TRUE` will add bootstrapping parameters and properties to tibble
+
+```{r margstd_bootverbose}
+tidy(fit_margstd2, bootverbose = TRUE) %>%
+  select(-statistic, -p.value)  # allow the other columns to get printed instead
+```
+
+* `bootrepeats`: Number of bootstrap repeats.
+* `bootci`: Type of bootstrap confidence interval (`bca`, `normal`, or `nonpar`, see above).
+* `jacksd.low` and `jacksd.high`: Jackknife-based Monte-Carlo standard errors for the lower and upper limits of the confidence interval. Available for `bca` intervals only. If these simulation errors are large compared to the desired precision of the confidence limits, then the number of bootstrap repeats needs to be substantially increased.
 
 
 # Bootstrap repeats

@@ -42,7 +42,9 @@ of sparse-data bias with non-parametric bootstrapping.
 }}
 
 \item{bootverbose}{Optional. Add values of \code{bootrepeats} and
-\code{bootci} parameters to the returned tibble? Defaults to \code{FALSE}.}
+\code{bootci} parameters and the jackknife-based Monte-Carlo error for the
+confidence limits (only for \code{type = "bca"}) to the returned tibble?
+Defaults to \code{FALSE}.}
 
 \item{exponentiate}{Optional. Exponentiate coefficients and confidence limits?
 Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for

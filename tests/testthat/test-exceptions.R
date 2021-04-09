@@ -25,12 +25,12 @@ test_that("nothing works", {
   expect_equal(return_failure(family = "poisson",
                               classname = "robpoisson")$converged,
                FALSE)
-  expect_error(suppressWarnings(print(riskratio(formula = death ~ receptor,
-                                                data = dat[1:50],
+  expect_error(suppressWarnings(print(riskratio(formula = death ~ stage + receptor,
+                                                data = dat[55:75, ],
                                                 approach = "all"))),
                "No model converged")
-  expect_error(suppressWarnings(print(summary(riskratio(formula = death ~ receptor,
-                                                        data = dat[1:50],
+  expect_error(suppressWarnings(print(summary(riskratio(formula = death ~ receptor + stage,
+                                                        data = dat[55:75, ],
                                                         approach = "all")))),
                "No model converged")
 })

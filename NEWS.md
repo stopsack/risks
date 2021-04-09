@@ -1,3 +1,12 @@
+# risks 0.2.2
+
+* `tidy(bootverbose = TRUE)`: For BC~a~ bootstrap confidence intervals,
+  also return `jacksd.low` and `jacksd.high`, the jackknife-based Monte-Carlo 
+  standard errors for the upper and lower confidence limits.
+* `riskdiff()`: Remove leftover "logistic" parameter.
+* `summary.risks()`, `tidy.risk()`: fix error handling if no model converged.
+
+
 # risks 0.2.1
 
 * Fix bugs in `bootci = "normal"` and in `summary.risks()`.

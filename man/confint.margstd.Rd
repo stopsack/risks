@@ -10,6 +10,7 @@
   level = 0.95,
   bootrepeats = 200,
   bootci = c("bca", "normal", "nonpar"),
+  jacksd = FALSE,
   ...
 )
 }
@@ -34,6 +35,9 @@ may result in invalid results for ratios.
 which should be used with caution because of the risk
 of sparse-data bias with non-parametric bootstrapping.
 }}
+
+\item{jacksd}{Return jackknife Monte-Carlo error for the confidence limits?
+Only functional with BCa confidence intervals. Defaults to \code{FALSE}.}
 
 \item{...}{Not used}
 }

@@ -24,7 +24,7 @@
 #' @import addreg
 #' @importFrom logbin logbin
 #'
-#' @param formula A formula object of the form 'response ~ predictors'.
+#' @param formula A formula object of the form \code{response ~ predictors}.
 #' @param data A \code{tibble} or \code{data.frame} object.
 #' @param approach Optional: Method for model fitting.
 #'   * \code{"auto"} (default) is recommended; it selects the most efficient
@@ -142,7 +142,7 @@ riskratio <- function(formula, data,
 #' @export
 riskdiff <- function(formula, data,
                      approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                  "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                                  "glm_cem", "glm_cem_start", "margstd"),
                      variable = NULL, at = NULL, ...) {
   estimate_risk(formula = formula, data = data, estimate = "rd",
                 approach = approach, variable = variable, at = at, ...)

@@ -5,11 +5,6 @@
 #' @import stats
 #' @importFrom rlang .data
 
-norowname <- function(x) {
-  rownames(x) <- NULL
-  x
-}
-
 # Helper function for tidy.risks()
 risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
                              bootreps, bootci,
@@ -38,10 +33,19 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     if("robpoisson" %in% class(x))
       CI <- suppressMessages(confint.robpoisson(x, level = conf.level, ...))
     # use bootstrapped CIs for the marginally standardized model
-    if(("margstd" %in% class(x)))
+    bca_jacksd <- tibble::tibble(jacksd.low = NA, jacksd.high = NA)  # for non-BCa CIs
+    if(("margstd" %in% class(x))) {
       CI <- suppressMessages(confint.margstd(x, level = conf.level,
                                              bootrepeats = bootreps,
-                                             bootci = bootci, ...))
+                                             bootci = bootci,
+                                             jacksd = TRUE,
+                                             ...))
+      if("jacksd.low" %in% dimnames(CI)[[2]]) {
+        bca_jacksd <- CI[, c("jacksd.low", "jacksd.high")] %>%
+        tibble::as_tibble()
+      }
+      CI <- CI[, 1:2]
+    }
     # Use normality-based confidence intervals in general:
     if(default == TRUE & !("margstd" %in% class(x)) & !("robpoisson" %in% class(x)))
       CI <- suppressMessages(stats::confint.default(x, level = conf.level))
@@ -57,7 +61,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
       CI <- CI[piv, , drop = FALSE]
     }
     colnames(CI) <- c("conf.low", "conf.high")
-    ret <- cbind(ret, trans(norowname(CI)))  # instead of :::unrowname
+    rownames(CI) <- NULL
+    ret <- cbind(ret, trans(CI))
   }
   ret$estimate <- trans(ret$estimate)
   if(bootverbose == TRUE) {
@@ -67,7 +72,9 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     }
     ret <- dplyr::mutate(ret,
                          bootrepeats = bootreps,
-                         bootci = bootci[1])
+                         bootci = bootci[1],
+                         jacksd.low = bca_jacksd$jacksd.low,
+                         jacksd.high = bca_jacksd$jacksd.high)
   }
   tibble::as_tibble(ret)
 }
@@ -103,7 +110,9 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'     which should be used with caution because of the risk
 #'     of sparse-data bias with non-parametric bootstrapping.
 #' @param bootverbose Optional. Add values of \code{bootrepeats} and
-#'   \code{bootci} parameters to the returned tibble? Defaults to \code{FALSE}.
+#'   \code{bootci} parameters and the jackknife-based Monte-Carlo error for the
+#'   confidence limits (only for \code{type = "bca"}) to the returned tibble?
+#'   Defaults to \code{FALSE}.
 #' @param exponentiate Optional. Exponentiate coefficients and confidence limits?
 #'   Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
 #'   relative risk models (log links).
@@ -199,11 +208,11 @@ tidy.risks <- function(
 #' @export
 print.risks <- function(x, ...) {
   if(x$converged == FALSE & !is.null(x$all_models)) {
-    converged <- min(which(purrr::map(.x = x$all_models,
-                                      .f = ~purrr::pluck(.x, "converged")) == TRUE))
-    if(is.null(converged) | converged == FALSE | converged == Inf)
+    converged <- purrr::map_lgl(.x = x$all_models,
+                                .f = ~purrr::pluck(.x, "converged"))
+    if(sum(converged) == 0)
       stop("No model converged")
-    x <- x$all_models[[converged]]
+    x <- x$all_models[[min(which(converged == TRUE))]]
   }
 
   if(!is.null(x$estimate))
@@ -244,11 +253,11 @@ summary.risks <- function(object,
   # Retrieve the first converged model to make sure summary() does not fail
   if(object$converged == FALSE & !is.null(object$all_models)) {
     all_models <- object$all_models
-    converged <- min(which(purrr::map(.x = object$all_models,
-                                      .f = ~purrr::pluck(.x, "converged")) == TRUE))
-    if(is.null(converged) | converged == FALSE | converged == Inf)
-      stop("No summary: No model converged")
-    object <- object$all_models[[converged]]
+    converged <- purrr::map_lgl(.x = object$all_models,
+                                .f = ~purrr::pluck(.x, "converged"))
+    if(sum(converged) == 0)
+      stop("No model converged")
+    object <- object$all_models[[min(which(converged == TRUE))]]
     object$all_models <- all_models
   }
 

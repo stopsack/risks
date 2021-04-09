@@ -19,14 +19,14 @@ riskdiff(
   formula,
   data,
   approach = c("auto", "all", "robpoisson", "glm", "glm_start", "glm_cem",
-    "glm_cem_start", "margstd", "logistic"),
+    "glm_cem_start", "margstd"),
   variable = NULL,
   at = NULL,
   ...
 )
 }
 \arguments{
-\item{formula}{A formula object of the form 'response ~ predictors'.}
+\item{formula}{A formula object of the form \code{response ~ predictors}.}
 
 \item{data}{A \code{tibble} or \code{data.frame} object.}
 

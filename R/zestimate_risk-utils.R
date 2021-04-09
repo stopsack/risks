@@ -22,7 +22,7 @@ estimate_maxprob <- function(fit, formula, data, link, start = NULL) {
   calls_list <- sys.calls()
   goback <- (length(calls_list) - which(grepl("riskratio|riskdiff|estimate_risk",
                                               calls_list))) * -1
-  fit$call$data <- tryCatch({ match.call(def = sys.function(which = goback),
+  fit$call$data <- tryCatch({ match.call(definition = sys.function(which = goback),
                                          call = sys.call(which = goback))$data },
                             error = function(e) "data")
   # end

@@ -232,8 +232,9 @@ bootci_bcapar <- function(boot_out, level, parameters) {
   getbootci_bcapar <- function(theta, theta_star, suff_stat, alpha) {
     mybca <- bcaboot::bcapar(t0 = theta, tt = theta_star, bb = suff_stat,
                              alpha = alpha)
-    res <- c(mybca$lims[1, "bca"], mybca$lims[3, "bca"])
-    names(res) <- c("conf.low", "conf.high")
+    res <- c(mybca$lims[1, "bca"],    mybca$lims[3, "bca"],
+             mybca$lims[1, "jacksd"], mybca$lims[3, "jacksd"])
+    names(res) <- c("conf.low", "conf.high", "jacksd.low", "jacksd.high")
     return(res)
   }
 
@@ -266,6 +267,8 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #'   * \code{"nonpar"} Non-parametric BCa confidence intervals,
 #'     which should be used with caution because of the risk
 #'     of sparse-data bias with non-parametric bootstrapping.
+#' @param jacksd Return jackknife Monte-Carlo error for the confidence limits?
+#'   Only functional with BCa confidence intervals. Defaults to \code{FALSE}.
 #'
 #' @param ... Not used
 #'
@@ -275,6 +278,7 @@ confint.margstd <- function(object, parm = NULL,
                             level = 0.95,
                             bootrepeats = 200,
                             bootci = c("bca", "normal", "nonpar"),
+                            jacksd = FALSE,
                             ...) {
   cf <- coef(object)
   pnames <- names(cf)
@@ -304,9 +308,18 @@ confint.margstd <- function(object, parm = NULL,
            boot_out <- boot_eststd_bcapar(object = object,
                                           bootrepeats = bootrepeats,
                                           vars = pnames)
-           ci[] <- bootci_bcapar(boot_out = boot_out, level = level,
-                                 parameters = length(pnames))  %>%
-             as.matrix()
+           ci_all <- bootci_bcapar(boot_out = boot_out, level = level,
+                                 parameters = length(pnames))
+           if(jacksd == FALSE) {
+             ci[] <- ci_all[, c("conf.low", "conf.high")] %>%
+               as.matrix()
+           } else {
+             ci <- array(NA, dim = c(length(pnames), 4L),
+                         dimnames = list(pnames,
+                                         c(pct, "jacksd.low", "jacksd.high")))
+             ci[] <- ci_all %>%
+               as.matrix()
+           }
          })
   return(ci)
 }
@@ -339,8 +352,10 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
       tibble::tibble(estimate = coef(object),
                      std.error = base::apply(boot_out$theta_star,
                                              MARGIN = 1, FUN = sd)) %>%
-        dplyr::bind_cols(bootci_bcapar(boot_out = boot_out, level = level,
-                                       parameters = length(coef(object))))
+        dplyr::bind_cols(
+          bootci_bcapar(
+            boot_out = boot_out, level = level,
+            parameters = length(coef(object)))[, c("conf.low", "conf.high")])
     })
 }
 
