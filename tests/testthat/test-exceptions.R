@@ -47,7 +47,7 @@ test_that("bad parameter values are caught", {
   expect_error(riskdiff(formula = death ~ stage + receptor,
                          approach = "logistic",
                          data = dat),
-               "Wacholder")
+               "Approach 'logistic' is not implemented")
   expect_warning(tidy(riskdiff(formula = death ~ stage + receptor, data = dat),
                       exponentiate = TRUE),
                  "model did not use a log or logit link")

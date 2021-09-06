@@ -9,23 +9,52 @@ test_that("Standard errors for RR(receptorLow) are the same", {
                  rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                  rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
-  rd_glm        <- riskratio(formula = death ~ receptor, data = dat, approach = "glm")
-  rd_glm_start  <- riskratio(formula = death ~ receptor, data = dat, approach = "glm_start")
-  rd_robpoisson <- riskratio(formula = death ~ receptor, data = dat, approach = "robpoisson")
-  rd_cem        <- riskratio(formula = death ~ receptor, data = dat, approach = "glm_cem")
-  rd_cem_start  <- riskratio(formula = death ~ receptor, data = dat, approach = "glm_cem_start")
-  rd_margstd    <- riskratio(formula = death ~ receptor, data = dat, approach = "margstd")
+  rr_glm        <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "glm")
+  rr_glm_start  <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "glm_start")
+  rr_robpoisson <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "robpoisson")
+  rr_duplicate  <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "duplicate")
+  rr_cem        <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "glm_cem")
+  rr_cem_start  <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "glm_cem_start")
+  rr_margstd    <- riskratio(formula = death ~ receptor, data = dat,
+                             approach = "margstd")
+  rr_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
+                                 outcome = death,
+                                 estimand = "rr")$std.error[1]
 
-  se_glm <- summary(rd_glm)$coefficients["receptorLow", "Std. Error"]
+  se_glm <- summary(rr_glm)$coefficients["receptorLow", "Std. Error"]
   tol <- 0.01
 
-  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_lt(se_glm,    summary.robpoisson(rd_robpoisson)$coefficients["receptorLow", "Std. Error"])
-  expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_margstd, bootrepeats = 500)$coefficients["receptorLow", "Std. Error"],
+  expect_equal(se_glm, summary(rr_glm_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_glm_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_robpoisson)$coefficients["receptorLow",
+                                                           "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_duplicate)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_cem)$coefficients["receptorLow",
+                                                    "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_cem_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rr_margstd,
+                               bootrepeats = 500)$coefficients["receptorLow",
+                                                               "Std. Error"],
                tolerance = 0.03)
+  expect_equal(se_glm, rr_mh,
+               tolerance = tol)
+
 })
 
 test_that("Standard errors for RD(receptorLow) are the same", {
@@ -37,23 +66,44 @@ test_that("Standard errors for RD(receptorLow) are the same", {
                  rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                  rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
-  rd_glm        <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm")
-  rd_glm_start  <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm_start")
-  rd_robpoisson <- riskdiff(formula = death ~ receptor, data = dat, approach = "robpoisson")
-  rd_cem        <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem")
-  rd_cem_start  <- riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem_start")
-  rd_margstd    <- riskdiff(formula = death ~ receptor, data = dat, approach = "margstd")
+  rd_glm        <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "glm")
+  rd_glm_start  <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "glm_start")
+  rd_robpoisson <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "robpoisson")
+  rd_cem        <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "glm_cem")
+  rd_cem_start  <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "glm_cem_start")
+  rd_margstd    <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "margstd")
   sum_margstd <- summary(rd_margstd, bootrepeats = 500)
+  rd_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
+                                 outcome = death,
+                                 estimand = "rd")$std.error[1]
 
   se_glm <- summary(rd_glm)$coefficients["receptorLow", "Std. Error"]
   tol <- 0.01
 
-  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
-  expect_lt(se_glm,    summary(rd_robpoisson)$coefficients["receptorLow", "Std. Error"])
-  expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",        "Std. Error"], tolerance = tol)
-  expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",  "Std. Error"], tolerance = tol)
+  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rd_glm_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rd_robpoisson)$coefficients["receptorLow",
+                                                           "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",
+                                                    "Std. Error"],
+               tolerance = tol)
+  expect_equal(se_glm, summary(rd_cem_start)$coefficients["receptorLow",
+                                                          "Std. Error"],
+               tolerance = tol)
   expect_equal(se_glm, sum_margstd$coefficients["receptorLow", "Std. Error"],
                tolerance = 0.03)
   expect_output(print(sum_margstd), "Confidence intervals for coefficients")
+  expect_equal(se_glm, rd_mh,
+               tolerance = tol)
 })

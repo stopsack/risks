@@ -64,6 +64,11 @@ possibly_estimate_poisson <- ext_possibly(
   otherwise = return_failure(family = list(family = "poisson"),
                              classname = "robpoisson"))
 
+possibly_estimate_duplicate <- ext_possibly(
+  .f = estimate_duplicate,
+  otherwise = return_failure(family = list(family = "binomial"),
+                             classname = "duplicate"))
+
 possibly_estimate_glm <- ext_possibly(
   .f = estimate_glm,
   otherwise = return_failure(family = list(family = "binomial"),

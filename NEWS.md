@@ -1,3 +1,13 @@
+# risks 0.3.0
+
+* `riskratio()`: Add `approach = "duplicate"`, the case duplication method 
+  proposed by Miettinen with cluster-robust standard errors proposed by 
+  Schouten.
+* `summary.robpoisson()`: Fix sandwich standard errors (CIs were correct).
+* `rr_rd_mantel_haenszel()`: New function for comparison purposes.
+* Remove usage of unexported functions from `stats`.
+
+
 # risks 0.2.2
 
 * `tidy(bootverbose = TRUE)`: For BC~a~ bootstrap confidence intervals,

@@ -9,21 +9,37 @@ test_that("RD coefficients for receptorLow are the same", {
                  rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                  rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
-  rd_glm        <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "glm"))
-  rd_glm_start  <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "glm_start"))
-  rd_robpoisson <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "robpoisson"))
-  rd_cem        <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem"))
-  rd_cem_start  <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "glm_cem_start"))
-  rd_margstd    <- coef(riskdiff(formula = death ~ receptor, data = dat, approach = "margstd"))
+  rd_glm        <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "glm"))
+  rd_glm_start  <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "glm_start"))
+  rd_robpoisson <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "robpoisson"))
+  rd_cem        <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "glm_cem"))
+  rd_cem_start  <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "glm_cem_start"))
+  rd_margstd    <- coef(riskdiff(formula = death ~ receptor, data = dat,
+                                 approach = "margstd"))
+  rd_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
+                                 outcome = death,
+                                 estimand = "rd")$estimate[1]
 
   tol <- 0.000001
 
-  expect_equal((23/48) - (31/144), as.numeric(rd_glm["receptorLow"]),        tolerance = tol)
-  expect_equal((23/48) - (31/144), as.numeric(rd_glm_start["receptorLow"]),  tolerance = tol)
-  expect_equal((23/48) - (31/144), as.numeric(rd_robpoisson["receptorLow"]), tolerance = tol)
-  expect_equal((23/48) - (31/144), as.numeric(rd_cem["receptorLow"]),        tolerance = tol)
-  expect_equal((23/48) - (31/144), as.numeric(rd_cem_start["receptorLow"]),  tolerance = tol)
-  expect_equal((23/48) - (31/144), as.numeric(rd_margstd["receptorLow"]),    tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_glm["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_glm_start["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_robpoisson["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_cem["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_cem_start["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), as.numeric(rd_margstd["receptorLow"]),
+               tolerance = tol)
+  expect_equal((23/48) - (31/144), rd_mh,    tolerance = tol)
   expect_equal(rd_glm, rd_glm_start, tolerance = 0.03)
   expect_equal(rd_glm, rd_robpoisson, tolerance = 0.03)
   expect_equal(rd_glm, rd_cem, tolerance = 0.01)
@@ -41,25 +57,46 @@ test_that("RR coefficients for receptorLow are the same", {
                  rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                  rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
-  rd_glm        <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "glm"))
-  rd_glm_start  <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "glm_start"))
-  rd_robpoisson <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "robpoisson"))
-  rd_cem        <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "glm_cem"))
-  rd_cem_start  <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "glm_cem_start"))
-  rd_margstd    <- coef(riskratio(formula = death ~ receptor, data = dat, approach = "margstd"))
+  rr_glm        <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "glm"))
+  rr_glm_start  <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "glm_start"))
+  rr_robpoisson <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "robpoisson"))
+  rr_duplicate <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                 approach = "duplicate"))
+  rr_cem        <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "glm_cem"))
+  rr_cem_start  <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "glm_cem_start"))
+  rr_margstd    <- coef(riskratio(formula = death ~ receptor, data = dat,
+                                  approach = "margstd"))
+  rr_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
+                                 outcome = death,
+                                 estimand = "rr")$estimate[1]
 
   tol <- 0.000001
 
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_glm["receptorLow"]),        tolerance = tol)
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_glm_start["receptorLow"]),  tolerance = tol)
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_robpoisson["receptorLow"]), tolerance = tol)
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_cem["receptorLow"]),        tolerance = tol)
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_cem_start["receptorLow"]),  tolerance = tol)
-  expect_equal(log((23/48) / (31/144)), as.numeric(rd_margstd["receptorLow"]),    tolerance = tol)
-  expect_equal(rd_glm, rd_glm_start, tolerance = 0.03)
-  expect_equal(rd_glm, rd_robpoisson, tolerance = 0.03)
-  expect_equal(rd_glm, rd_cem, tolerance = 0.01)
-  expect_equal(rd_glm, rd_cem_start, tolerance = 0.01)
-  expect_equal(rd_glm[c("stageStage II", "stageStage III")],
-               rd_margstd[c("stageStage II", "stageStage III")], tolerance = 0.03)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_glm["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_glm_start["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_robpoisson["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_cem["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_cem_start["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), as.numeric(rr_margstd["receptorLow"]),
+               tolerance = tol)
+  expect_equal(log((23/48) / (31/144)), rr_mh,
+               tolerance = tol)
+
+  expect_equal(rr_glm, rr_glm_start, tolerance = 0.03)
+  expect_equal(rr_glm, rr_robpoisson, tolerance = 0.03)
+  expect_equal(rr_glm, rr_cem, tolerance = 0.01)
+  expect_equal(rr_glm, rr_cem_start, tolerance = 0.01)
+  expect_equal(rr_glm[c("stageStage II", "stageStage III")],
+               rr_margstd[c("stageStage II", "stageStage III")],
+               tolerance = 0.03)
 })
