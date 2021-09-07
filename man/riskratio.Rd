@@ -8,8 +8,8 @@
 riskratio(
   formula,
   data,
-  approach = c("auto", "all", "robpoisson", "duplicate", "glm", "glm_start", "glm_cem",
-    "glm_cem_start", "margstd", "logistic"),
+  approach = c("auto", "all", "robpoisson", "duplicate", "glm", "glm_startp",
+    "glm_startd", "glm_cem", "glm_cem_startp", "margstd", "logistic"),
   variable = NULL,
   at = NULL,
   ...
@@ -18,8 +18,8 @@ riskratio(
 riskdiff(
   formula,
   data,
-  approach = c("auto", "all", "robpoisson", "glm", "glm_start", "glm_cem",
-    "glm_cem_start", "margstd"),
+  approach = c("auto", "all", "robpoisson", "glm", "glm_startp", "glm_cem",
+    "glm_cem_startp", "margstd"),
   variable = NULL,
   at = NULL,
   ...
@@ -45,13 +45,15 @@ See full documentation (currently at
 \url{https://stopsack.github.io/risks}) for details.
 \itemize{
 \item \code{"glm"} Binomial model.
-\item \code{"glm_start"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startp"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startd"} Binomial model with starting values from logistic
+model with case duplication.
 \item \code{"robpoisson"} Poisson model with robust covariance.
 \item \code{"duplicate"} Logistic model with duplication of cases. Only
 available in \code{riskratio()}.
 \item \code{"glm_cem"} Binomial model fitted with combinatorial expectation
 maximization.
-\item \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
+\item \code{"glm_cem_startp"} As \code{glm_cem}, with Poisson starting values.
 \item \code{"margstd"} Marginal standardization after logistic model.
 \item \code{"logistic"} For comparison only: the logistic model. Only available
 in \code{riskratio()}.
@@ -116,11 +118,11 @@ The risks package selects an efficient way to fit risk ratio or
 risk difference models successfully, which will converge whenever logistic
 models converge. Optionally, a specific approach to model fitting can also be
 requested. Implemented are Poisson models with robust covariance, binomial
-models, binomial models aided in convergence by starting values obtained
-through Poisson models, binomial models fitted via
+models, logistic models with case duplication, binomial models aided in
+convergence by starting values obtained through Poisson models or
+logistic models with case duplication, binomial models fitted via
 combinatorial expectation maximization (optionally also with Poisson starting
-values), logistic models for estimating relative risks using duplication of
-cases, and estimates obtained via marginal standardization after logistic
+values), and estimates obtained via marginal standardization after logistic
 regression.
 
 Adjusting for covariates (e.g., confounders) in the model specification

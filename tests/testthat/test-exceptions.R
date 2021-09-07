@@ -37,9 +37,9 @@ test_that("nothing works", {
 
 test_that("bad parameter values are caught", {
   expect_error(estimate_risk(formula = death ~ stage + receptor,
-                             estimate = "NONSENSE",
+                             estimand = "NONSENSE",
                              data = dat),
-               "Unknown estimate")
+               "should be one of")
   expect_error(riskratio(formula = death ~ stage + receptor,
                          approach = "NONSENSE",
                          data = dat),

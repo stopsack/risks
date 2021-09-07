@@ -1,11 +1,24 @@
 # risks 0.3.0
 
-* `riskratio()`: Add `approach = "duplicate"`, the case duplication method 
-  proposed by Miettinen with cluster-robust standard errors proposed by 
-  Schouten.
-* `summary.robpoisson()`: Fix sandwich standard errors (CIs were correct).
-* `rr_rd_mantel_haenszel()`: New function for comparison purposes.
-* Remove usage of unexported functions from `stats`.
+* **Breaking changes:**
+  + Rename `approach = "glm_start"` to `"glm_startp"` (for **P**oisson).
+* New estimators:
+  + `approach = "duplicate"`, the case duplication method for risk ratios,
+    proposed by Miettinen with cluster-robust standard errors proposed by 
+    Schouten.
+  + `approach = "glm_startd"`, using the case duplication-based 
+    coefficients as starting values for binomial models. 
+  + `rr_rd_mantel_haenszel()`: New function for comparison purposes.
+* Bug fixes:
+  + `summary.robpoisson()`: Fix sandwich standard errors. `tidy()` output was
+    correct.
+* Programming changes:
+  + Do not attach the logbin package to the namespace; export 
+    `logbin::conv.test()` on its behalf. Move MASS package (needed only for 
+    testthat) to `Suggests`.
+  + Remove usage of unexported functions from `stats`.
+  + Rewrite internal fitting function `fit_and_predict()`, replacing `eststd()`
+    and accelerating bootstrapping by factor >2.
 
 
 # risks 0.2.2

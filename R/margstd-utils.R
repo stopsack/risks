@@ -1,38 +1,31 @@
 # Helper functions for marginal standardization after
 # fitting a logistic regression model
 
+#' @importFrom dplyr %>%
+#' @importFrom rlang .data
 # Fit logistic model, obtained marginal predictions, generate contrasts
-# For better performance than with `::`, import a few functions for eststd()
-#' @importFrom stats predict glm binomial
-#' @importFrom tibble tibble
-#' @importFrom dplyr mutate
-#' @importFrom purrr %>% map map_dbl
-#' @importFrom rlang .data :=
-eststd <- function(x, data, predictor, levels, estimate) {
-  mdl <- glm(formula = x$formula, family = binomial(link = "logit"),
-             data = data)
-  results <- tibble(term = levels) %>%
-    mutate(data = map(.x = .data$term,
-                      .f = ~mutate(.data = data,
-                                   !!!predictor := .x)),
-           response = map(.x = data,
-                          .f = ~predict(object = mdl,
-                                        newdata = .x,
-                                        type = "response")),
-           means = map_dbl(.x = .data$response, .f = mean))
-  if(estimate == "rr")
-    res <- log(results$means / results$means[1])
-  if(estimate == "rd")
-    res <- results$means - results$means[1]
-  names(res) <- paste0(predictor, results$term)
+fit_and_predict <- function(data, predictor, levels, estimand, formula) {
+  fit <- stats::glm(formula = formula, data = data,
+                    family = binomial(link = "logit"))
+  data_rep <- data[rep(seq_len(nrow(data)), times = length(levels)), ]
+  data_rep[, predictor] <- rep(levels, each = nrow(data))
+  res <- tapply(X = predict(fit, newdata = data_rep, type = "response"),
+                INDEX = data_rep[, predictor],
+                FUN = mean)
+  if(estimand == "rd")
+    res <- res - res[1]
+  else
+    res <- log(res / res[1])
+  names(res) <- paste0(predictor, levels)
   return(res)
 }
+
 
 # Main function for marginal standardization
 estimate_margstd <- function(
   formula,
   data,
-  estimate   = c("rr", "rd"),
+  estimand   = c("rr", "rd"),
   variable   = NULL,    # where to standardize;
   # default: 1st binary var/categorical var/numeric var w/2 levels
   at         = NULL) {  # level of variable to standardize at)
@@ -99,11 +92,12 @@ estimate_margstd <- function(
       levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
-  eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels,
-                   estimate = estimate[1])
+  eststd <- fit_and_predict(data = data, predictor = predictor, levels = levels,
+                            formula = fit$formula,
+                            estimand = estimand[1])
 
   newfit <- list(coefficients      = eststd,
-                 estimate          = estimate[1],
+                 estimand          = estimand[1],
                  margstd_predictor = predictor,
                  margstd_levels    = levels,
                  rank              = 1)
@@ -123,7 +117,7 @@ estimate_margstd <- function(
 # Nonparametric bootstrapping
 boot_eststd_nonpar <- function(object, bootrepeats) {
   bootfn <- function(data, index, fit, ...) {
-    eststd(x = fit, data = data[index, ], ...)
+    fit_and_predict(data = data[index, ], formula = fit$formula, ...)
   }
 
   boot::boot(data = object$data,
@@ -134,7 +128,7 @@ boot_eststd_nonpar <- function(object, bootrepeats) {
                               data = object$data),
              predictor = object$margstd_predictor,
              levels = object$margstd_levels,
-             estimate = object$estimate[1])
+             estimand = object$estimand[1])
 }
 
 # BCa bootstrap confidence intervals after nonparametric bootstrapping
@@ -162,7 +156,7 @@ boot_eststd_norm <- function(object, bootrepeats) {
   yvar <- all.vars(object$formula)[1]
 
   bootfn <- function(data, fitformula, ...) {
-    eststd(x = fitformula, data = data, ...)
+    fit_and_predict(data = data, formula = fitformula$formula, ...)
   }
 
   # Parametric resampling function
@@ -181,7 +175,7 @@ boot_eststd_norm <- function(object, bootrepeats) {
              fitformula = list(formula = object$formula),
              predictor = object$margstd_predictor,
              levels = object$margstd_levels,
-             estimate = object$estimate[1])
+             estimand = object$estimand[1])
 }
 
 # Normal bootstrap confidence intervals after parametric bootstrapping
@@ -214,15 +208,17 @@ boot_eststd_bcapar <- function(object, bootrepeats, vars) {
   beta_star <- apply(y_star, 2, function(y) {
     boot_data <- glm_model$data
     boot_data[, yvar] <- y
-    eststd(x = object, data = boot_data,
-           predictor = object$margstd_predictor,
-           levels = object$margstd_levels,
-           estimate = object$estimate[1])
+    fit_and_predict(data = boot_data,
+                    predictor = object$margstd_predictor,
+                    levels = object$margstd_levels,
+                    estimand = object$estimand[1],
+                    formula = object$formula)
   })
-  list(theta = eststd(x = object, data = object$model,  # $data includes NA
+  list(theta = fit_and_predict(data = object$model,  # $data includes NA
                       predictor = object$margstd_predictor,
                       levels = object$margstd_levels,
-                      estimate = object$estimate[1])[vars],
+                      estimand = object$estimand[1],
+                      formula = object$formula)[vars],
        theta_star = beta_star[vars, ],
        suff_stat = t(y_star) %*% model.matrix(glm_model))
 }

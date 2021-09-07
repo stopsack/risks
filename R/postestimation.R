@@ -224,12 +224,12 @@ print.risks <- function(x, ...) {
     x <- x$all_models[[min(which(converged == TRUE))]]
   }
 
-  if(!is.null(x$estimate))
-    estimate <- x$estimate
+  if(!is.null(x$estimand))
+    estimand <- x$estimand
   else
-    estimate <- ""
+    estimand <- ""
   cat(paste("\nRisk",
-            dplyr::if_else(x$family$link == "identity" | estimate == "rd",
+            dplyr::if_else(x$family$link == "identity" | estimand == "rd",
                     true = "difference", false = "ratio"),
             "model"))
   class(x) <- "glm"
@@ -279,26 +279,27 @@ summary.risks <- function(object,
     summary.glm(object, ...))
   myclass <- class(mysummary)
 
-  if(!is.null(object$estimate))
-    estimate <- object$estimate
+  if(!is.null(object$estimand))
+    estimand <- object$estimand
   else
-    estimate <- ""
+    estimand <- ""
   modeltype <- paste0(class(object)[2], object$risks_start)
   # Type of model that was returned
   modeltypes <- c(
     "robpoisson" = "as Poisson model with robust covariance",
     "duplicate"  = "as logistic model with duplication of cases",
     "glm"        = "as binomial model",
-    "glm_start"  = "as binomial model with starting values from Poisson model",
+    "glm_startp" = "as binomial model with starting values from Poisson model",
+    "glm_startd" = "as binomial model with starting values from logistic model with case duplication",
     "addreg"     = "as binomial model with combinatorial expectation maximization",
-    "addreg_start" = "as binomial model with combinatorial expectation maximization, starting values",
-    "logbin"       = "as binomial model with combinatorial expectation maximization",
-    "logbin_start" = "as binomial model with combinatorial expectation maximization, starting values",
-    "margstd"      = "via marginal standardization of a logistic model",
-    "logistic"     = "as a logistic model: binomial model with logit link")
+    "addreg_startp" = "as binomial model with combinatorial expectation maximization, Poisson starting values",
+    "logbin"        = "as binomial model with combinatorial expectation maximization",
+    "logbin_startp" = "as binomial model with combinatorial expectation maximization, Poisson starting values",
+    "margstd"       = "via marginal standardization of a logistic model",
+    "logistic"      = "as a logistic model: binomial model with logit link")
   modeldescr <- paste0("\nRisk ",
                        dplyr::if_else(object$family$link == "identity" |
-                                        estimate == "rd",
+                                        estimand == "rd",
                                true = "difference", false = "ratio"),
                        " model, fitted ",
                        modeltypes[modeltype], " (", modeltype, ").")

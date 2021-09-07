@@ -1,6 +1,6 @@
 Package: risks
 Title: Estimate risk ratios and risk differences using regression
-Version: 0.2.2-9000
+Version: 0.2.2-9002
 Authors@R: 
     c(person(given = "Konrad",
            family = "Stopsack",
@@ -23,9 +23,10 @@ URL: https://stopsack.github.io/risks
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
     covr,
-    testthat,
     knitr,
-    rmarkdown
+    MASS,
+    rmarkdown,
+    testthat
 Imports: 
     addreg,
     boot,
@@ -33,14 +34,12 @@ Imports:
     broom,
     dplyr,
     lifecycle,
+    logbin,
     purrr,
     rlang,
     sandwich,
     stats,
     tibble,
-    tidyr,
-    MASS
-Depends:
-    logbin
+    tidyr
 RdMacros: lifecycle
 VignetteBuilder: knitr

@@ -8,18 +8,18 @@ dat <- data.frame(
                rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
-test_that("tidy(risk*(...), approach = 'all') returns 7 ratio, 6 diff models", {
+test_that("tidy(risk*(...), approach = 'all') returns 8 ratio, 6 diff models", {
   fit_rr <- riskratio(formula = death ~ stage + receptor,
                       data = dat, approach = "all")
   fit_rd <- riskdiff(formula  = death ~ stage + receptor,
                      data = dat, approach = "all")
 
-  expect_equal(length(unique(broom::tidy(fit_rr)$model)), 7)  # no glm
+  expect_equal(length(unique(broom::tidy(fit_rr)$model)), 8)  # no glm
   # no logistic, no duplicate:
   expect_equal(length(unique(broom::tidy(fit_rd)$model)), 6)
 
   expect_equal(nrow(tidy(riskratio(formula = death ~ stage + receptor,
-                                   data = dat, approach = "glm_start"),
+                                   data = dat, approach = "glm_startp"),
                          bootverbose = TRUE)),
                4)  # coefs from glm_start
 })

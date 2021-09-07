@@ -2,33 +2,38 @@
 
 # Fitting functions for individual models
 # Estimate maximum predicted probability, ensure later it is < 1
-estimate_maxprob <- function(fit, formula, data, link, start = NULL) {
+estimate_maxprob <- function(fit, formula, data, link,
+                             start = NULL, start_type = "") {
+  # GLM's predicted probabilities do not exactly reach 1
+  # in case they converge on implausible values (also cf. Wacholder)
   implausible <- 0.99999
-  # logbin and addreg predicted probablities do not exactly reach 1
-  # in case they converge on implausible values
-  fit$maxprob <- maxprob <- max(predict(fit, type = "response"))
-  if(maxprob > implausible)
+
+  fit$maxprob <- max(predict(object = fit, type = "response"))
+  if(fit$maxprob > implausible)
     message(paste0("Implausible predicted probability >", implausible,
-                   " occurred: ", maxprob))
+                   " occurred: ", fit$maxprob))
+
+  # Note whether starting values were in the model 'type'
   if(!is.null(start) & fit$method != "glm.fit")
-    fit$risks_start <- "_start"
+    fit$risks_start <- paste0("_start", start_type)
   else
     fit$risks_start <- ""
   fit$call$formula <- formula
   fit$call$family$link <- link
-  #fit$call$data <- substitute(data)
 
-  # get name to dataset provided to the main frontend function
+  # Get name to dataset provided to the main frontend function
   calls_list <- sys.calls()
   goback <- (length(calls_list) - which(grepl("riskratio|riskdiff|estimate_risk",
                                               calls_list))) * -1
-  fit$call$data <- tryCatch({ match.call(definition = sys.function(which = goback),
-                                         call = sys.call(which = goback))$data },
-                            error = function(e) "data")
+  fit$call$data <- tryCatch({
+    match.call(definition = sys.function(which = goback),
+               call = sys.call(which = goback))$data },
+    error = function(e) "data")
   # end
-  fit$call$start <- dplyr::if_else(!is.null(start),
-                           true  = "(from Poisson model)",
-                           false = "(no starting values)")
+  fit$call$start <- dplyr::case_when(
+    start_type == "p" ~ "(from Poisson model)",
+    start_type == "d" ~ "(from case-duplication logistic model)",
+    TRUE              ~ "(no starting values)")
   class(fit) <- c("risks", class(fit))
   return(fit)
 }
