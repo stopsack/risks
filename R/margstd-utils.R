@@ -215,10 +215,10 @@ boot_eststd_bcapar <- function(object, bootrepeats, vars) {
                     formula = object$formula)
   })
   list(theta = fit_and_predict(data = object$model,  # $data includes NA
-                      predictor = object$margstd_predictor,
-                      levels = object$margstd_levels,
-                      estimand = object$estimand[1],
-                      formula = object$formula)[vars],
+                               predictor = object$margstd_predictor,
+                               levels = object$margstd_levels,
+                               estimand = object$estimand[1],
+                               formula = object$formula)[vars],
        theta_star = beta_star[vars, ],
        suff_stat = t(y_star) %*% model.matrix(glm_model))
 }

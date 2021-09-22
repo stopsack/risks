@@ -1,10 +1,10 @@
-# risks 0.3.0
+# risks 0.3.0 (not released)
 
 * **Breaking changes:**
   + Rename `approach = "glm_start"` to `"glm_startp"` (for **P**oisson).
 * New estimators:
   + `approach = "duplicate"`, the case duplication method for risk ratios,
-    proposed by Miettinen with cluster-robust standard errors proposed by 
+    proposed by Miettinen, with cluster-robust standard errors proposed by 
     Schouten.
   + `approach = "glm_startd"`, using the case duplication-based 
     coefficients as starting values for binomial models. 
