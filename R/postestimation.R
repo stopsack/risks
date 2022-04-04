@@ -10,7 +10,9 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
                              bootreps, bootci,
                              bootverbose,
                              exponentiate = FALSE,
-                             default = TRUE, ...) {
+                             default = TRUE,
+                             confint_from_summary = NULL,
+                             ...) {
   # This is broom:::process_lm(), but defaults to calling confint.default(),
   # i.e., normality-based confidence intervals,
   # instead of profile likelihood-based confidence intervals from confint.glm(),
@@ -47,6 +49,24 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
       if("jacksd.low" %in% dimnames(CI)[[2]]) {
         bca_jacksd <- CI[, c("jacksd.low", "jacksd.high")] %>%
         tibble::as_tibble()
+      if(is.null(confint_from_summary)) {
+        # Used only with tidy() calls after approach = "all"
+        CI <- suppressMessages(confint.margstd_boot(x, level = conf.level,
+                                                    bootrepeats = bootreps,
+                                                    bootci = bootci,
+                                                    jacksd = TRUE,
+                                                    ...))
+        if("jacksd.low" %in% dimnames(CI)[[2]]) {
+          bca_jacksd <- CI[, c("jacksd.low", "jacksd.high")] %>%
+            tibble::as_tibble()
+        }
+        CI <- CI[, 1:2]
+      } else {
+        # Usually, take existing bootstrap CIs from summary.margstd_boot()
+        if("jacksd.low" %in% names(confint_from_summary)) {
+          bca_jacksd <- confint_from_summary[, c("jacksd.low", "jacksd.high")]
+        }
+        CI <- confint_from_summary[, c("conf.low", "conf.high")]
       }
       CI <- CI[, 1:2]
     }
@@ -166,21 +186,33 @@ tidy.risks <- function(
   exponentiate = FALSE,
   default      = TRUE,
   ...) {
-
-  getmodel <- function(x) {
+  bootci <- match.arg(bootci)
+  getmodel <- function(x, ...) {
     # new as of broom 0.7.0 with the removal of broom:::tidy.summary.lm():
-    ret <- tibble::as_tibble(summary(x)$coefficients, rownames = "term")
+    model_summary <- summary(x, ...)
+    ret <- tibble::as_tibble(model_summary$coefficients, rownames = "term")
     colnames(ret) <- c("term", "estimate", "std.error", "statistic", "p.value")
     coefs <- tibble::enframe(stats::coef(x), name = "term", value = "estimate")
-    dplyr::left_join(coefs, ret, by = c("term", "estimate"))
+    list(coefs = dplyr::left_join(coefs, ret, by = c("term", "estimate")),
+         confint = model_summary$conf.int)
   }
 
   if(is.null(purrr::pluck(x, "all_models"))) {
-    ret <- getmodel(x)
-    risks_process_lm(ret, x, conf.int = conf.int, conf.level = conf.level,
-                     bootreps = bootrepeats,  bootci = bootci,
+    ret <- getmodel(x,
+                    level = conf.level,
+                    bootrepeats = bootrepeats,
+                    bootci = match.arg(bootci))
+    risks_process_lm(ret = ret$coefs,
+                     x = x,
+                     conf.int = conf.int,
+                     conf.level = conf.level,
+                     bootreps = bootrepeats,
+                     bootci = bootci,
                      bootverbose = bootverbose,
-                     exponentiate = exponentiate, default = default, ...) %>%
+                     exponentiate = exponentiate,
+                     default = default,
+                     confint_from_summary = ret$confint,
+                     ...) %>%
       dplyr::mutate(model = paste0(class(x)[2], x$risks_start))
   } else {  # in case estimate_risk(approach = "all") was called
     purrr::map_dfr(
@@ -189,13 +221,17 @@ tidy.risks <- function(
         if((purrr::pluck(.x, "converged") == TRUE) &
            (purrr::pluck(.x, "boundary") == FALSE)) {
           tryCatch({
-            ret <- getmodel(.x)
-            risks_process_lm(ret, .x, conf.int = conf.int,
+            ret <- getmodel(.x)$coefs
+            risks_process_lm(ret, .x,
+                             conf.int = conf.int,
                              conf.level = conf.level,
-                             bootreps = bootrepeats, bootci = bootci,
+                             bootreps = bootrepeats,
+                             bootci = bootci,
                              bootverbose = bootverbose,
                              exponentiate = exponentiate,
-                             default = default, ...) %>%
+                             default = default,
+                             confint_from_summary = NULL,
+                             ...) %>%
               dplyr::mutate(model = paste0(class(.x)[2], .x$risks_start))
           },
           error   = function(x) { tibble() })
