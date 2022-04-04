@@ -13,7 +13,7 @@
      handle continuous exposures.
   + `approach = "duplicate"`, the case duplication method for risk ratios,
     proposed by Miettinen, with cluster-robust standard errors proposed by 
-    Schouten.
+    Schouten et al.
   + `approach = "glm_startd"`, using the case duplication-based 
     coefficients as starting values for binomial models. 
   + `rr_rd_mantel_haenszel()`: New function for comparison purposes.

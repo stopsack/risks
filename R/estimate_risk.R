@@ -58,13 +58,12 @@
 #'     delta method standard errors/confidence intervals.
 #'   * \code{"logistic"} For comparison only: the logistic model. Only available
 #'     in \code{riskratio()}.
-#' @param variable Optional: exposure variable to use for marginal standardization.
-#'   If \code{variable} is not provided and marginal standardization is
-#'   attempted, then the first binary or categorical variable in the model
+#' @param variable Optional: exposure variable to use for marginal
+#'   standardization. If \code{variable} is not provided and marginal
+#'   standardization is attempted, then the first variable in the model
 #'   is used as the exposure. Levels are determined automatically for
-#'   variables types \code{logical}, \code{character}, \code{factor},
-#'   and \code{numeric} (only if no more than 2 levels for the latter);
-#'   otherwise levels must be supplied via \code{at =}.
+#'   variables types \code{logical}, \code{character}, \code{factor} and can
+#'   optionally be supplied via \code{at =}.
 #' @param at Optional: Levels of exposure variable \code{variable} for marginal
 #'   standardization. \code{at =} determines the levels at which contrasts of
 #'   the exposure are to be assessed. The level listed first is used as the

@@ -262,7 +262,8 @@ print.risks <- function(x, ...) {
     estimand <- ""
   cat(paste("\nRisk",
             dplyr::if_else(x$family$link == "identity" | estimand == "rd",
-                    true = "difference", false = "ratio"),
+                           true = "difference",
+                           false = "ratio"),
             "model"))
   class(x) <- "glm"
   print(x, ...)

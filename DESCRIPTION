@@ -1,24 +1,24 @@
 Package: risks
 Title: Estimate risk ratios and risk differences using regression
-Version: 0.2.2-9003
+Version: 0.2.2-9006
 Authors@R: 
     c(person(given = "Konrad",
            family = "Stopsack",
            role = c("aut", "cre"),
-           email = "stopsack@mskcc.org",
+           email = "stopsack@post.harvard.edu",
            comment = c(ORCID = "0000-0002-0722-1311")),
     person(given = "Travis",
            family = "Gerke",
            role = c("aut"),
            email = "travis.gerke@moffitt.org",
            comment = c(ORCID = "0000-0002-9500-8907")))
-Description: The risks package allows for fitting risk ratio and risk difference 
-  models using regression.
+Description: The risks package fits risk ratio and risk difference models using 
+  regression.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 URL: https://stopsack.github.io/risks
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 

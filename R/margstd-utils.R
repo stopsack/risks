@@ -268,7 +268,8 @@ confint.margstd_boot <- function(object, parm = NULL,
   pnames <- names(cf)
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
+               "%")
   ci <- array(NA, dim = c(length(pnames), 2L), dimnames = list(pnames, pct))
 
   switch(EXPR = match.arg(bootci),
@@ -293,7 +294,7 @@ confint.margstd_boot <- function(object, parm = NULL,
                                           bootrepeats = bootrepeats,
                                           vars = pnames)
            ci_all <- bootci_bcapar(boot_out = boot_out, level = level,
-                                 parameters = length(pnames))
+                                   parameters = length(pnames))
            if(jacksd == FALSE) {
              ci[] <- ci_all[, c("conf.low", "conf.high")] %>%
                as.matrix()
@@ -325,7 +326,8 @@ margstd_boot_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
       myboot <- boot_eststd_nonpar(object = object, bootrepeats = bootreps)
 
       tibble::tibble(estimate = coef(object),
-                     std.error = base::apply(myboot$t, MARGIN = 2, FUN = sd)) %>%
+                     std.error = base::apply(myboot$t,
+                                             MARGIN = 2, FUN = sd)) %>%
         dplyr::bind_cols(bootci_nonpar(boot.out = myboot, conf = level,
                                        parameters = length(coef(object))))
     },

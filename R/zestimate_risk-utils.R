@@ -10,7 +10,8 @@ estimate_maxprob <- function(fit, formula, data, link,
 
   fit$maxprob <- max(predict(object = fit, type = "response"))
   if(fit$maxprob > implausible)
-    message(paste0("Implausible predicted probability >", implausible,
+    message(paste0(class(fit)[1],
+                   ": Implausible predicted probability >", implausible,
                    " occurred: ", fit$maxprob))
 
   # Note whether starting values were in the model 'type'
@@ -23,8 +24,9 @@ estimate_maxprob <- function(fit, formula, data, link,
 
   # Get name to dataset provided to the main frontend function
   calls_list <- sys.calls()
-  goback <- (length(calls_list) - which(grepl("riskratio|riskdiff|estimate_risk",
-                                              calls_list))) * -1
+  goback <- (length(calls_list) -
+               which(grepl("riskratio|riskdiff|estimate_risk",
+                           calls_list))) * -1
   fit$call$data <- tryCatch({
     match.call(definition = sys.function(which = goback),
                call = sys.call(which = goback))$data },

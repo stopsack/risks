@@ -34,7 +34,8 @@ confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
   #  parm <- pnames[parm]
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
+               "%")
   fac <- qnorm(a)
   ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
   # Robust covariance, but not the HC3.

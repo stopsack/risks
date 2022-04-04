@@ -46,8 +46,8 @@ of sparse-data bias with non-parametric bootstrapping.
 confidence limits (only for \code{type = "bca"}) to the returned tibble?
 Defaults to \code{FALSE}.}
 
-\item{exponentiate}{Optional. Exponentiate coefficients and confidence limits?
-Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
+\item{exponentiate}{Optional. Exponentiate coefficients and confidence
+limits? Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
 relative risk models (log links).}
 
 \item{default}{Use default, normality-based confidence intervals?
