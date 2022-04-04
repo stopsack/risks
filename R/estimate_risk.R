@@ -261,12 +261,14 @@ estimate_risk <- function(formula, data,
                                     link = link, ...)
 
       if(!is.null(coef(fit1)))  # attempt only if Poisson converged
-        fit3 <- possibly_estimate_glm(formula = formula, data = data,
-                                      link = link, start = coef(fit1),
-                                      start_type = "p",
-                                      ...)
+        fit3 <- possibly_estimate_glm_startp(formula = formula, data = data,
+                                             link = link, start = coef(fit1),
+                                             start_type = "p",
+                                             ...)
       else  # make possibly_estimate_glm return a non-converged object
-        fit3 <- possibly_estimate_glm(formula = "nonsense", data = "nodata")
+        fit3 <- possibly_estimate_glm_startp(formula = "nonsense",
+                                             data = "nodata",
+                                             start_type = "p")
 
       if(link == "log")
         fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
@@ -301,27 +303,29 @@ estimate_risk <- function(formula, data,
       # If RR requested, add on case-duplication model and, for comparison,
       # the plain logistic model
       if(estimand == "rr") {
-        fit7 <- possibly_estimate_logistic(formula = formula, data = data,
+        fit8 <- possibly_estimate_logistic(formula = formula, data = data,
                                            ...)
-        fit8 <- possibly_estimate_duplicate(formula = formula, data = data,
+        fit9 <- possibly_estimate_duplicate(formula = formula, data = data,
                                             ...)
 
-        if(!is.null(coef(fit8)))  # attempt only if 'duplicate' converged
-          fit9 <- possibly_estimate_glm(formula = formula, data = data,
-                                        link = link, start = coef(fit8),
-                                        start_type = "d",
-                                        ...)
+        if(!is.null(coef(fit9)))  # attempt only if 'duplicate' converged
+          fit10 <- possibly_estimate_glm_startd(formula = formula, data = data,
+                                                link = link, start = coef(fit9),
+                                                start_type = "d",
+                                                ...)
         else  # make possibly_estimate_glm return a non-converged object
-          fit9 <- possibly_estimate_glm(formula = "nonsense", data = "nodata")
+          fit10 <- possibly_estimate_glm_startd(formula = "nonsense",
+                                                data = "nodata",
+                                                start_type = "d")
 
         fit1$all_models = list(
           robpoisson = fit1, glm = fit2, glm_startp = fit3, glm_cem = fit4,
-          glm_cem_startp = fit5, margstd = fit6,
-          logistic = fit7, duplicate = fit8, glm_startd = fit9)
+          glm_cem_startp = fit5, margstd_boot = fit6, margstd_delta = fit7,
+          logistic = fit8, duplicate = fit9, glm_startd = fit10)
       } else
         fit1$all_models = list(
           robpoisson = fit1, glm = fit2, glm_start = fit3, glm_cem = fit4,
-          glm_cem_startp = fit5, margstd = fit6)
+          glm_cem_startp = fit5, margstd_boot = fit6, margstd_delta = fit7)
       fit1
     },
 

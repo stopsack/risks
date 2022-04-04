@@ -79,6 +79,16 @@ possibly_estimate_glm <- ext_possibly(
   otherwise = return_failure(family = list(family = "binomial"),
                              classname = NULL))
 
+possibly_estimate_glm_startp <- ext_possibly(
+  .f = estimate_glm,
+  otherwise = return_failure(family = list(family = "binomial"),
+                             classname = "glm_startp"))
+
+possibly_estimate_glm_startd <- ext_possibly(
+  .f = estimate_glm,
+  otherwise = return_failure(family = list(family = "binomial"),
+                             classname = "glm_startd"))
+
 possibly_estimate_logbin <- ext_possibly(
   .f = estimate_logbin,
   otherwise = return_failure(family = list(family = "binomial", link = "log"),
