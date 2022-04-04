@@ -40,7 +40,7 @@ We fit the same risk difference model as in the [Get Started vignette](risks.htm
 
 ```{r margstd}
 fit_margstd <- riskdiff(formula = death ~ stage + receptor, data = dat, 
-                        approach = "margstd")
+                        approach = "margstd_boot")
 summary(fit_margstd, bootrepeats = 500)
 ```
 
@@ -62,7 +62,7 @@ Requesting estimates for a different exposure variable, using `variable = "recep
 
 ```{r margstd2}
 fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
-                         approach = "margstd", variable = "receptor")
+                         approach = "margstd_boot", variable = "receptor")
 summary(fit_margstd2, bootrepeats = 500)
 ```
 

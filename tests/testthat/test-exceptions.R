@@ -52,27 +52,18 @@ test_that("bad parameter values are caught", {
                       exponentiate = TRUE),
                  "model did not use a log or logit link")
   expect_error(riskratio(formula = death ~ stage + receptor, data = dat,
-                         approach = "margstd", variable = "NONSENSE"),
+                         approach = "margstd_boot", variable = "NONSENSE"),
                "Variable 'NONSENSE' is not part of the model")
   expect_error(riskratio(formula = death ~ stage + receptor,
-                         approach = "margstd", at = "NONSENSE",
+                         approach = "margstd_boot", at = "NONSENSE",
                          data = dat),
-               "Because 'at' has less than 2 levels")
+               "'at' has fewer than 2 levels. Contrasts cannot be estimated.")
   expect_error(riskratio(formula = death ~ stage + receptor,
-                         approach = "margstd", at = c("NONSENSE1", "2"),
+                         approach = "margstd_boot", at = c("NONSENSE1", "2"),
                          data = dat),
                "Some of the levels, specificied via 'at ='")
-  expect_error(riskratio(formula = death ~ rand, data = dat,
-                         approach = "margstd", variable = "rand"),
-               "Variable 'rand' is not a factor, ")
-  expect_error(riskratio(formula = death ~ rand, data = dat,
-                         approach = "margstd"),
-               "No exposure variable identified")
   expect_warning(riskratio(formula = death ~ rand, data = dat,
-                           approach = "margstd", variable = "rand",
+                           approach = "margstd_boot", variable = "rand",
                            at = c(-1, 1)),
                  "out-of-range predictions for the variable 'rand'.")
-  # implicit binary variable passes:
-  expect_output(print(riskratio(death ~ bin, data = dat, approach = "margstd")),
-                "bin2")
 })

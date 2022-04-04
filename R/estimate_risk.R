@@ -19,7 +19,7 @@
 #' logistic models with case duplication, binomial models fitted via
 #' combinatorial expectation maximization (optionally also with Poisson starting
 #' values), and estimates obtained via marginal standardization after logistic
-#' regression.
+#' regression with bootstrapped or delta method for confidence intervals.
 #'
 #' Adjusting for covariates (e.g., confounders) in the model specification
 #' (\code{formula =}) is possible.
@@ -52,7 +52,10 @@
 #'   * \code{"glm_cem"} Binomial model fitted with combinatorial expectation
 #'     maximization.
 #'   * \code{"glm_cem_startp"} As \code{glm_cem}, with Poisson starting values.
-#'   * \code{"margstd"} Marginal standardization after logistic model.
+#'   * \code{"margstd_boot"} Marginal standardization after logistic model,
+#'     bootstrap standard errors/confidence intervals.
+#'   * \code{"margstd_delta"} Marginal standardization after logistic model,
+#'     delta method standard errors/confidence intervals.
 #'   * \code{"logistic"} For comparison only: the logistic model. Only available
 #'     in \code{riskratio()}.
 #' @param variable Optional: exposure variable to use for marginal standardization.
@@ -100,15 +103,16 @@
 #' @references Localio AR, Margolis DJ, Berlin JA.
 #'   Relative risks and confidence intervals were easily computed
 #'   indirectly from multivariable logistic regression.
-#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
-#'   logistic model; \code{approach = "margstd"})
+#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting
+#'   a logistic model; \code{approach = "margstd_boot"})
 #'
 #' @export
 #' @return Fitted model. This object can be passed on to post-processing
 #'   functions:
 #'   * \code{\link[risks]{summary.risks}}: an overview of results
 #'     (risks-specific S3 methods: \code{\link[risks]{summary.robpoisson}},
-#'     \code{\link[risks]{summary.margstd}}).
+#'     \code{\link[risks]{summary.margstd_boot}},
+#'     \code{\link[risks]{summary.margstd_delta}}).
 #'   * \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence
 #'     intervals.
 #'
@@ -117,7 +121,8 @@
 #'   * \code{\link[stats]{coef}}: a vector of coefficients.
 #'   * \code{\link[stats]{confint}}: a matrix of confidence intervals
 #'      (risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
-#'      \code{\link[risks]{confint.margstd}}).
+#'      \code{\link[risks]{confint.margstd_boot}},
+#'      \code{\link[risks]{confint.margstd_delta}}).
 #'   * \code{\link[stats]{predict.glm}(type = "response")}: fitted values
 #'     (predictions).
 #'   * \code{\link[stats]{residuals}}: residuals.
@@ -152,7 +157,9 @@
 riskratio <- function(formula, data,
                       approach = c("auto", "all", "robpoisson", "duplicate",
                                    "glm", "glm_startp", "glm_startd", "glm_cem",
-                                   "glm_cem_startp", "margstd", "logistic"),
+                                   "glm_cem_startp",
+                                   "margstd_boot", "margstd_delta",
+                                   "logistic"),
                       variable = NULL, at = NULL, ...) {
   estimate_risk(formula = formula, data = data, estimand = "rr",
                 approach = approach, variable = variable, at = at, ...)
@@ -163,7 +170,8 @@ riskratio <- function(formula, data,
 riskdiff <- function(formula, data,
                      approach = c("auto", "all", "robpoisson", "glm",
                                   "glm_startp",
-                                  "glm_cem", "glm_cem_startp", "margstd"),
+                                  "glm_cem", "glm_cem_startp",
+                                  "margstd_boot", "margstd_delta"),
                      variable = NULL, at = NULL, ...) {
   estimate_risk(formula = formula, data = data, estimand = "rd",
                 approach = approach, variable = variable, at = at, ...)
@@ -295,10 +303,15 @@ estimate_risk <- function(formula, data,
           fit5$risks_start = "_start"
       }
 
-      fit6 <- possibly_estimate_margstd(formula = formula, data = data,
-                                        estimand = estimand,
-                                        variable = variable, at = at,
-                                        ...)
+      fit6 <- possibly_estimate_margstd_boot(formula = formula, data = data,
+                                             estimand = estimand,
+                                             variable = variable, at = at,
+                                             ...)
+
+      fit7 <- possibly_estimate_margstd_delta(formula = formula, data = data,
+                                              estimand = estimand,
+                                              variable = variable, at = at,
+                                              ...)
 
       # If RR requested, add on case-duplication model and, for comparison,
       # the plain logistic model
@@ -365,10 +378,14 @@ estimate_risk <- function(formula, data,
                         data = data, start = coef(fit_poisson),
                         start_type = "p", ...)
     },
-    margstd    = estimate_margstd(formula = formula, data = data,
-                                  estimand = estimand,
-                                  variable = variable, at = at,
-                                  ...),
+    margstd_boot = estimate_margstd_boot(formula = formula, data = data,
+                                         estimand = estimand,
+                                         variable = variable, at = at,
+                                         ...),
+    margstd_delta = estimate_margstd_delta(formula = formula, data = data,
+                                           estimand = estimand,
+                                           variable = variable, at = at,
+                                           ...),
     logistic   = estimate_logistic(formula = formula, data = data,
                                    ...)
   )

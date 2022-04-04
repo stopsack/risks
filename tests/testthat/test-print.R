@@ -12,9 +12,12 @@ test_that("printing functions give output", {
   fit_all <- riskratio(formula = death ~ stage + receptor, data = dat,
                        approach = "all")
   fit_risks <- riskratio(formula = death ~ stage + receptor, data = dat)
-  fit_margstd <- riskratio(formula = death ~ stage + receptor, data = dat,
-                           approach = "margstd", variable = "stage",
-                           at = c("Stage I", "Stage III"))
+  fit_margstd_boot <- riskratio(formula = death ~ stage + receptor, data = dat,
+                                approach = "margstd_boot", variable = "stage",
+                                at = c("Stage I", "Stage III"))
+  fit_margstd_delta <- riskratio(formula = death ~ stage + receptor, data = dat,
+                                 approach = "margstd_delta", variable = "stage",
+                                 at = c("Stage I", "Stage III"))
   fit_robpoisson <- riskratio(formula = death ~ stage + receptor, data = dat,
                               approach = "robpoisson")
   fit_logistic <- riskratio(formula = death ~ stage + receptor, data = dat,
@@ -31,9 +34,12 @@ test_that("printing functions give output", {
                 "Confidence interval")
   expect_output(print.summary.risks(summary.risks(fit_risks, default = FALSE)),
                 "profiling")
-  expect_output(print.risks(fit_margstd), "Risk ratio model")
-  expect_output(print.risks(fit_margstd), "(no starting values)")
-  expect_output(print(summary.margstd(fit_margstd)), "logit")
+  expect_output(print.risks(fit_margstd_boot), "Risk ratio model")
+  expect_output(print.risks(fit_margstd_boot), "(no starting values)")
+  expect_output(print(summary.margstd_boot(fit_margstd_boot)), "logit")
+  expect_output(print.risks(fit_margstd_delta), "Risk ratio model")
+  expect_output(print.risks(fit_margstd_delta), "(no starting values)")
+  expect_output(print(summary.margstd_boot(fit_margstd_delta)), "logit")
   expect_output(print(summary.robpoisson(fit_robpoisson)),
                 "poisson")
   expect_output(print(summary(fit_logistic)),

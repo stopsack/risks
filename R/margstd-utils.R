@@ -39,13 +39,12 @@ fit_and_predict <- function(data, predictor, margstd_levels = NULL,
 
 
 # Main function for marginal standardization
-estimate_margstd <- function(
+estimate_margstd_boot <- function(
   formula,
   data,
   estimand   = c("rr", "rd"),
-  variable   = NULL,    # where to standardize;
-  # default: 1st binary var/categorical var/numeric var w/2 levels
-  at         = NULL) {  # level of variable to standardize at)
+  variable   = NULL,    # where to standardize; default: 1st variable
+  at         = NULL) {  # levels of variable to standardize at
   fit <- stats::glm(formula = formula, family = binomial(link = "logit"),
                     data = data)
 
@@ -129,7 +128,7 @@ estimate_margstd <- function(
                                  "model", "call", "formula", "terms", "data",
                                  "offset", "control", "method", "xlevels",
                                  "qr")])
-  class(newfit) <- c("margstd", "glm", "lm")
+  class(newfit) <- c("margstd_boot", "glm", "lm")
   newfit <- estimate_maxprob(fit = newfit, formula = formula,
                              data = data, link = "logit")
   return(newfit)
@@ -141,7 +140,7 @@ boot_eststd_nonpar <- function(object, bootrepeats) {
     fit_and_predict(data = data[index, ], formula = fit$formula, ...)
   }
 
-  boot::boot(data = object$data,
+  boot::boot(data = as.data.frame(object$data),
              statistic = bootfn,
              R = bootrepeats,
              fit = stats::glm(formula = object$formula,
@@ -320,7 +319,7 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
-confint.margstd <- function(object, parm = NULL,
+confint.margstd_boot <- function(object, parm = NULL,
                             level = 0.95,
                             bootrepeats = 200,
                             bootci = c("bca", "normal", "nonpar"),
@@ -370,8 +369,8 @@ confint.margstd <- function(object, parm = NULL,
   return(ci)
 }
 
-# Bootstrapped standard errors, required by summary.margstd()
-margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
+# Bootstrapped standard errors, required by summary.margstd_boot()
+margstd_boot_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
   switch(
     EXPR = bootci,
     normal = {
@@ -430,10 +429,10 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
 #' @return Model summary (list)
 #' @return
 #' @export
-summary.margstd <- function(object, dispersion = NULL,
-                            correlation = FALSE, symbolic.cor = FALSE,
-                            level = 0.95, bootrepeats = 200,
-                            bootci = c("bca", "normal",  "nonpar"), ...) {
+summary.margstd_boot <- function(object, dispersion = NULL,
+                                 correlation = FALSE, symbolic.cor = FALSE,
+                                 level = 0.95, bootrepeats = 200,
+                                 bootci = c("bca", "normal",  "nonpar"), ...) {
   est.disp <- FALSE
   df.r <- object$df.residual
   if (is.null(dispersion))
@@ -457,11 +456,10 @@ summary.margstd <- function(object, dispersion = NULL,
     if(is.null(Qr))
       stop(paste("lm object does not have a proper 'qr' component.\n",
                  "Rank zero or should not have used lm(.., qr=FALSE)."))
-    #coef.p <- object$coefficients[Qr$pivot[p1]]
     coef.p <- object$coefficients
-    stderror <- margstd_stderror(object = object, level = level,
-                                 bootreps = bootrepeats,
-                                 bootci = match.arg(bootci), ...)
+    stderror <- margstd_boot_stderror(object = object, level = level,
+                                      bootreps = bootrepeats,
+                                      bootci = match.arg(bootci), ...)
     s.err <- stderror$std.error
     tvalue <- coef.p/s.err
     dn <- c("Estimate", "Std. Error")
@@ -496,8 +494,8 @@ summary.margstd <- function(object, dispersion = NULL,
              coefficients = coef.table, aliased = aliased,
              dispersion = dispersion, df = c(object$rank, df.r, df.f),
              conf.int = stderror, level = level,
-             margstd.bootrepeats = bootrepeats,
-             margstd.bootci = match.arg(bootci)))
+             margstd_boot.bootrepeats = bootrepeats,
+             margstd_boot.bootci = match.arg(bootci)))
   class(ans) <- "summary.glm"
   return(ans)
 }

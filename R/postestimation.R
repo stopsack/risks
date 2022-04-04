@@ -17,7 +17,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
   # i.e., normality-based confidence intervals,
   # instead of profile likelihood-based confidence intervals from confint.glm(),
   # where profiling fails in difficult cases for the binomial model.
-  # In addition, for the margstd model, use bootstrapped CIs.
+  # In addition, for the margstd model, use bootstrapped or delta method CIs.
   if (exponentiate) {
     if (is.null(x$family) || (x$family$link != "logit" &&
                               x$family$link != "log")) {
@@ -37,18 +37,12 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     # Use robust CIs for the robpoisson model
     if("robpoisson" %in% class(x))
       CI <- suppressMessages(confint.robpoisson(x, level = conf.level, ...))
-    # Use bootstrapped CIs for the marginally standardized model
-    # for non-BCa CIs:
+    # Use delta method CIs for margstd_delta
+    if("margstd_delta" %in% class(x))
+      CI <- suppressMessages(confint.margstd_delta(x, level = conf.level, ...))
+    # Non-BCa CIs do not have estimates of jackknife standard errors
     bca_jacksd <- tibble::tibble(jacksd.low = NA, jacksd.high = NA)
-    if(("margstd" %in% class(x))) {
-      CI <- suppressMessages(confint.margstd(x, level = conf.level,
-                                             bootrepeats = bootreps,
-                                             bootci = bootci,
-                                             jacksd = TRUE,
-                                             ...))
-      if("jacksd.low" %in% dimnames(CI)[[2]]) {
-        bca_jacksd <- CI[, c("jacksd.low", "jacksd.high")] %>%
-        tibble::as_tibble()
+    if(("margstd_boot" %in% class(x))) {
       if(is.null(confint_from_summary)) {
         # Used only with tidy() calls after approach = "all"
         CI <- suppressMessages(confint.margstd_boot(x, level = conf.level,
@@ -68,32 +62,34 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
         }
         CI <- confint_from_summary[, c("conf.low", "conf.high")]
       }
-      CI <- CI[, 1:2]
     }
     # Use normality-based confidence intervals in general:
-    if(default == TRUE & !("margstd" %in% class(x)) &
+    if(default == TRUE &
+       !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
        !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x)))
       CI <- suppressMessages(stats::confint.default(x, level = conf.level))
     # profile-likelihood based confidence intervals; this may fail:
     if(default == FALSE &
-       !("margstd" %in% class(x)) &
+       !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
        !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x)))
       CI <- suppressMessages(stats::confint(x, level = conf.level))
     p <- x$rank
     if (!is.null(p) && !is.null(x$qr) &
-        !("margstd" %in% class(x)) &
+        !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
         !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x))) {
       # End change
       piv <- x$qr$pivot[seq_len(p)]
       CI <- CI[piv, , drop = FALSE]
     }
+    if(class(CI)[1] == "numeric")
+      CI <- as.data.frame(t(CI))
     colnames(CI) <- c("conf.low", "conf.high")
     rownames(CI) <- NULL
     ret <- cbind(ret, trans(CI))
   }
   ret$estimate <- trans(ret$estimate)
   if(bootverbose == TRUE) {
-    if(!"margstd" %in% class(x)) {
+    if(!"margstd_boot" %in% class(x)) {
       bootreps <- NA_real_
       bootci <- NA_character_
     }
@@ -122,11 +118,11 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' @param conf.int Show confidence intervals?
 #' @param conf.level Optional. Confidence level. Defaults to \code{0.95}.
 #' @param bootrepeats Optional. Number of bootstrap repeats.
-#'   Applicable to models fitted via marginal standardization
-#'   (\code{approach = "margstd"}). Defaults to 200. Strongly recommended
+#'   Applicable to models fitted via marginal standardization and bootstrapping
+#'   (\code{approach = "margstd_boot"}). Defaults to 200. Strongly recommended
 #'   to increase repeats to >1000.
-#' @param bootci Optional and applicable for \code{approach = "margstd"} only.
-#'   Type of bootstrap confidence interval:
+#' @param bootci Optional and applicable for \code{approach = "margstd_boot"}
+#'   only. Type of bootstrap confidence interval:
 #'
 #'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
 #'     confidence intervals.
@@ -140,8 +136,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'   \code{bootci} parameters and the jackknife-based Monte-Carlo error for the
 #'   confidence limits (only for \code{type = "bca"}) to the returned tibble?
 #'   Defaults to \code{FALSE}.
-#' @param exponentiate Optional. Exponentiate coefficients and confidence limits?
-#'   Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
+#' @param exponentiate Optional. Exponentiate coefficients and confidence
+#'   limits? Defaults to FALSE. Setting \code{exponentiate = TRUE} is useful for
 #'   relative risk models (log links).
 #' @param default Use default, normality-based confidence intervals?
 #'   Defaults to TRUE. With \code{default = FALSE}, for binomial models only,
@@ -169,7 +165,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' # Marginal standardization,
 #' # increase number of bootstrap repeats:
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
-#'                     approach = "margstd")
+#'                     approach = "margstd_boot")
 #' tidy(fit_rr, bootrepeats = 1000)
 #'
 #' # Multiple types of models fitted:
@@ -309,7 +305,8 @@ summary.risks <- function(object,
   mysummary <- switch(
     EXPR = class(object)[2],
     addreg = addreg::summary.addreg(object, ...),
-    margstd = summary.margstd(object, ...),
+    margstd_boot = summary.margstd_boot(object, ...),
+    margstd_delta = summary.margstd_delta(object, ...),
     robpoisson = summary.robpoisson(object, ...),
     duplicate = summary.duplicate(object, ...),
     summary.glm(object, ...))
@@ -331,7 +328,8 @@ summary.risks <- function(object,
     "addreg_startp" = "as binomial model with combinatorial expectation maximization, Poisson starting values",
     "logbin"        = "as binomial model with combinatorial expectation maximization",
     "logbin_startp" = "as binomial model with combinatorial expectation maximization, Poisson starting values",
-    "margstd"       = "via marginal standardization of a logistic model",
+    "margstd_boot"  = "via marginal standardization of a logistic model with bootstrapping",
+    "margstd_delta"  = "via marginal standardization of a logistic model with delta method",
     "logistic"      = "as a logistic model: binomial model with logit link")
   modeldescr <- paste0("\nRisk ",
                        dplyr::if_else(object$family$link == "identity" |
@@ -399,42 +397,49 @@ print.summary.risks <- function(x, ...) {
      (x$confint_default == TRUE |
       "addreg" %in% class(x$object) |
       "logbin" %in% class(x$object)) &
-     !("margstd" %in% class(x$object)) &
+     !("margstd_boot" %in% class(x$object)) &
+     !("margstd_delta" %in% class(x$object)) &
      !("duplicate" %in% class(x$object)) &
      !("robpoisson" %in% class(x$object))) {
     cat("Confidence intervals for coefficients: (normality-based)\n")
     print(confint.default(x$object, ...))
   }
-  if(x$print_confint == TRUE &   # addreg and logbin use standard CIs
+  if(x$print_confint == TRUE &
      "robpoisson" %in% class(x$object)) {
     cat("Confidence intervals for coefficients: (robust)\n")
     print(confint(x$object, ...))
   }
-  if(x$print_confint == TRUE &   # addreg and logbin use standard CIs
+  if(x$print_confint == TRUE &
      "duplicate" %in% class(x$object)) {
     cat("Confidence intervals for coefficients: (cluster-robust)\n")
     print(confint(x$object, ...))
   }
   if(x$print_confint == TRUE &
+     "margstd_delta" %in% class(x$object)) {
+    cat("Confidence intervals for coefficients: (delta method)\n")
+    print(confint(x$object, ...))
+  }
+  if(x$print_confint == TRUE &
      x$confint_default == FALSE &
-     sum(c("margstd", "addreg", "logbin") %in% class(x$object)) == 0) {
+     sum(c("margstd_boot", "margstd_delta",
+           "addreg", "logbin") %in% class(x$object)) == 0) {
     cat("Confidence intervals for coefficients: (profiling-based)\n")
     print(confint(x$object, ...))
   }
 
-  if(x$print_confint == TRUE & "margstd" %in% class(x$object)) {
+  if(x$print_confint == TRUE & "margstd_boot" %in% class(x$object)) {
     # retrieve CIs that were generated when bootstrapping SEs for model summary
     cat(paste0("Confidence intervals for coefficients: (",
-              x$margstd.bootrepeats, " ",
+              x$margstd_boot.bootrepeats, " ",
               c("bca" = "BCa", "normal" = "normal",
-                "nonpar" = "nonparametric BCa")[x$margstd.bootci],
+                "nonpar" = "nonparametric BCa")[x$margstd_boot.bootci],
               " bootstrap repeats)\n"))
     ci <- x$conf.int %>%
       dplyr::select(.data$conf.low, .data$conf.high) %>%
       as.matrix()
     a <- (1 - x$level) / 2
     a <- c(a, 1 - a)
-    ci <- array(NA, dim = c(length(x$object$margstd_levels), 2L),
+    ci <- array(NA, dim = c(max(length(x$object$margstd_levels), 1), 2L),
                 dimnames = list(paste0(x$object$margstd_predictor,
                                        x$object$margstd_levels),
                                 paste0(format(100 * a, trim = TRUE,

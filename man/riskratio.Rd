@@ -9,7 +9,8 @@ riskratio(
   formula,
   data,
   approach = c("auto", "all", "robpoisson", "duplicate", "glm", "glm_startp",
-    "glm_startd", "glm_cem", "glm_cem_startp", "margstd", "logistic"),
+    "glm_startd", "glm_cem", "glm_cem_startp", "margstd_boot", "margstd_delta",
+    "logistic"),
   variable = NULL,
   at = NULL,
   ...
@@ -19,7 +20,7 @@ riskdiff(
   formula,
   data,
   approach = c("auto", "all", "robpoisson", "glm", "glm_startp", "glm_cem",
-    "glm_cem_startp", "margstd"),
+    "glm_cem_startp", "margstd_boot", "margstd_delta"),
   variable = NULL,
   at = NULL,
   ...
@@ -54,18 +55,20 @@ available in \code{riskratio()}.
 \item \code{"glm_cem"} Binomial model fitted with combinatorial expectation
 maximization.
 \item \code{"glm_cem_startp"} As \code{glm_cem}, with Poisson starting values.
-\item \code{"margstd"} Marginal standardization after logistic model.
+\item \code{"margstd_boot"} Marginal standardization after logistic model,
+bootstrap standard errors/confidence intervals.
+\item \code{"margstd_delta"} Marginal standardization after logistic model,
+delta method standard errors/confidence intervals.
 \item \code{"logistic"} For comparison only: the logistic model. Only available
 in \code{riskratio()}.
 }}
 
-\item{variable}{Optional: exposure variable to use for marginal standardization.
-If \code{variable} is not provided and marginal standardization is
-attempted, then the first binary or categorical variable in the model
+\item{variable}{Optional: exposure variable to use for marginal
+standardization. If \code{variable} is not provided and marginal
+standardization is attempted, then the first variable in the model
 is used as the exposure. Levels are determined automatically for
-variables types \code{logical}, \code{character}, \code{factor},
-and \code{numeric} (only if no more than 2 levels for the latter);
-otherwise levels must be supplied via \code{at =}.}
+variables types \code{logical}, \code{character}, \code{factor} and can
+optionally be supplied via \code{at =}.}
 
 \item{at}{Optional: Levels of exposure variable \code{variable} for marginal
 standardization. \code{at =} determines the levels at which contrasts of
@@ -84,7 +87,8 @@ functions:
 \itemize{
 \item \code{\link[risks]{summary.risks}}: an overview of results
 (risks-specific S3 methods: \code{\link[risks]{summary.robpoisson}},
-\code{\link[risks]{summary.margstd}}).
+\code{\link[risks]{summary.margstd_boot}},
+\code{\link[risks]{summary.margstd_delta}}).
 \item \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence
 intervals.
 }
@@ -94,7 +98,8 @@ Standard post-processing functions can also be used:
 \item \code{\link[stats]{coef}}: a vector of coefficients.
 \item \code{\link[stats]{confint}}: a matrix of confidence intervals
 (risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
-\code{\link[risks]{confint.margstd}}).
+\code{\link[risks]{confint.margstd_boot}},
+\code{\link[risks]{confint.margstd_delta}}).
 \item \code{\link[stats]{predict.glm}(type = "response")}: fitted values
 (predictions).
 \item \code{\link[stats]{residuals}}: residuals.
@@ -123,7 +128,7 @@ convergence by starting values obtained through Poisson models or
 logistic models with case duplication, binomial models fitted via
 combinatorial expectation maximization (optionally also with Poisson starting
 values), and estimates obtained via marginal standardization after logistic
-regression.
+regression with bootstrapped or delta method for confidence intervals.
 
 Adjusting for covariates (e.g., confounders) in the model specification
 (\code{formula =}) is possible.
@@ -192,6 +197,6 @@ fitted via combinatorial expectation maximization;
 Localio AR, Margolis DJ, Berlin JA.
 Relative risks and confidence intervals were easily computed
 indirectly from multivariable logistic regression.
-J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
-logistic model; \code{approach = "margstd"})
+J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting
+a logistic model; \code{approach = "margstd_boot"})
 }

@@ -23,8 +23,10 @@ test_that("Standard errors for RR(receptorLow) are the same", {
                              approach = "glm_cem")
   rr_cem_startp  <- riskratio(formula = death ~ receptor, data = dat,
                              approach = "glm_cem_startp")
-  rr_margstd    <- riskratio(formula = death ~ receptor, data = dat,
-                             approach = "margstd")
+  rr_margstd_boot <- riskratio(formula = death ~ receptor, data = dat,
+                               approach = "margstd_boot")
+  rr_margstd_delta <- riskratio(formula = death ~ receptor, data = dat,
+                                approach = "margstd_delta")
   rr_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
                                  outcome = death,
                                  estimand = "rr")$std.error[1]
@@ -50,10 +52,13 @@ test_that("Standard errors for RR(receptorLow) are the same", {
   expect_equal(se_glm, summary(rr_cem_startp)$coefficients["receptorLow",
                                                           "Std. Error"],
                tolerance = tol)
-  expect_equal(se_glm, summary(rr_margstd,
+  expect_equal(se_glm, summary(rr_margstd_boot,
                                bootrepeats = 500)$coefficients["receptorLow",
                                                                "Std. Error"],
                tolerance = 0.03)
+  expect_equal(se_glm, summary(rr_margstd_delta)$coefficients["receptorLow",
+                                                               "Std. Error"],
+               tolerance = tol)
   expect_equal(se_glm, rr_mh,
                tolerance = tol)
 
@@ -78,9 +83,12 @@ test_that("Standard errors for RD(receptorLow) are the same", {
                             approach = "glm_cem")
   rd_cem_startp <- riskdiff(formula = death ~ receptor, data = dat,
                             approach = "glm_cem_startp")
-  rd_margstd    <- riskdiff(formula = death ~ receptor, data = dat,
-                            approach = "margstd")
-  sum_margstd <- summary(rd_margstd, bootrepeats = 500)
+  rd_margstd_boot <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "margstd_boot")
+  sum_margstd_boot <- summary(rd_margstd_boot, bootrepeats = 500)
+  rd_margstd_delta <- riskdiff(formula = death ~ receptor, data = dat,
+                            approach = "margstd_delta")
+  sum_margstd_delta <- summary(rd_margstd_delta, bootrepeats = 500)
   rd_mh <- rr_rd_mantel_haenszel(data = dat, exposure = receptor,
                                  outcome = death,
                                  estimand = "rd")$std.error[1]
@@ -100,9 +108,37 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   expect_equal(se_glm, summary(rd_cem_startp)$coefficients["receptorLow",
                                                           "Std. Error"],
                tolerance = tol)
-  expect_equal(se_glm, sum_margstd$coefficients["receptorLow", "Std. Error"],
+  expect_equal(se_glm, sum_margstd_boot$coefficients["receptorLow", "Std. Error"],
                tolerance = 0.03)
-  expect_output(print(sum_margstd), "Confidence intervals for coefficients")
+  expect_output(print(sum_margstd_boot), "Confidence intervals for coefficients")
+  expect_equal(se_glm, sum_margstd_delta$coefficients["receptorLow", "Std. Error"],
+               tolerance = tol)
+  expect_output(print(sum_margstd_delta), "Confidence intervals for coefficients")
   expect_equal(se_glm, rd_mh,
                tolerance = tol)
+})
+
+
+test_that("Standard errors work with continuous exposure, margstd", {
+  dat <- data.frame(
+    death    = c(rep(1, 54), rep(0, 138)),
+    stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+                 rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+    receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+                 rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+                 rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)),
+    cont     = runif(n = 192, min = -1, max = 1))
+
+  expect_output(print(summary(riskratio(death ~ cont + receptor,
+                                data = dat, approach = "margstd_boot"))),
+                "bootstrap repeats")
+  expect_output(print(summary(riskdiff(death ~ cont,
+                                        data = dat, approach = "margstd_boot"))),
+                "bootstrap repeats")
+  expect_output(print(summary(riskratio(death ~ cont + receptor,
+                                        data = dat, approach = "margstd_delta"))),
+                "delta")
+  expect_output(print(summary(riskdiff(death ~ cont,
+                                       data = dat, approach = "margstd_delta"))),
+                "delta")
 })

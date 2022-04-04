@@ -2,7 +2,15 @@
 
 * **Breaking changes:**
   + Rename `approach = "glm_start"` to `"glm_startp"` (for **P**oisson).
+  + Rename `approach = "margstd"` to `"margstd_boot"`.
+  + For consistency with other approaches, no longer treat numeric variables 
+    with only two levels (e.g., `1` and `2`) as categorical in 
+    `approach = "margstd_boot"`.
 * New estimators:
+  + `approach = "margstd_delta"`, marginal standardization after fitting a 
+    logistic model with standard errors via the delta method.
+  + `approach = "margstd_boot"` now also implements average marginal effects to 
+     handle continuous exposures.
   + `approach = "duplicate"`, the case duplication method for risk ratios,
     proposed by Miettinen, with cluster-robust standard errors proposed by 
     Schouten.
@@ -17,8 +25,10 @@
     `logbin::conv.test()` on its behalf. Move MASS package (needed only for 
     testthat) to `Suggests`.
   + Remove usage of unexported functions from `stats`.
-  + Rewrite internal fitting function `fit_and_predict()`, replacing `eststd()`
-    and accelerating bootstrapping by factor >2.
+  + For `approach = "margstd_boot"`, avoid two rounds of bootstrap for standard
+    error and confidence intervals separately. Rewrite internal fitting function
+    `fit_and_predict()`, replacing `eststd()`. Overall, bootstrapping is more
+    than two times faster now.
 
 
 # risks 0.2.2

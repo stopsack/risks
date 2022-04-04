@@ -104,7 +104,12 @@ possibly_estimate_logistic <- ext_possibly(
   otherwise = return_failure(family = list(family = "binomial", link = "logit"),
                              classname = "logistic"))
 
-possibly_estimate_margstd <- ext_possibly(
-  .f = estimate_margstd,
+possibly_estimate_margstd_boot <- ext_possibly(
+  .f = estimate_margstd_boot,
   otherwise = return_failure(family = list(family = "binomial", link = "logit"),
-                             classname = "margstd"))
+                             classname = "margstd_boot"))
+
+possibly_estimate_margstd_delta <- ext_possibly(
+  .f = estimate_margstd_delta,
+  otherwise = return_failure(family = list(family = "binomial", link = "logit"),
+                             classname = "margstd_delta"))

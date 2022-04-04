@@ -24,12 +24,12 @@
 \item{conf.level}{Optional. Confidence level. Defaults to \code{0.95}.}
 
 \item{bootrepeats}{Optional. Number of bootstrap repeats.
-Applicable to models fitted via marginal standardization
-(\code{approach = "margstd"}). Defaults to 200. Strongly recommended
+Applicable to models fitted via marginal standardization and bootstrapping
+(\code{approach = "margstd_boot"}). Defaults to 200. Strongly recommended
 to increase repeats to >1000.}
 
-\item{bootci}{Optional and applicable for \code{approach = "margstd"} only.
-Type of bootstrap confidence interval:
+\item{bootci}{Optional and applicable for \code{approach = "margstd_boot"}
+only. Type of bootstrap confidence interval:
 \itemize{
 \item \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
 confidence intervals.
@@ -86,7 +86,7 @@ tidy(fit_rr)
 # Marginal standardization,
 # increase number of bootstrap repeats:
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
-                    approach = "margstd")
+                    approach = "margstd_boot")
 tidy(fit_rr, bootrepeats = 1000)
 
 # Multiple types of models fitted:
