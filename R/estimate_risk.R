@@ -210,52 +210,36 @@ estimate_risk <- function(formula, data,
          fit_glm$boundary == FALSE)
         return(fit_glm)
 
-      # 2) try GLM with starting values from Poisson
-      fit_poisson <- possibly_estimate_poisson(formula = formula,
-                                               data = data, link = link,
-                                               ...)
-      if(fit_poisson$converged == TRUE) {
-        fit_glm_start <- possibly_estimate_glm(formula = formula, data = data,
-                                               link = link,
-                                               start = coef(fit_poisson),
-                                               start_type = "p",
-                                               ...)
-        if(fit_glm_start$converged == TRUE &
-           fit_glm_start$maxprob < implausible  &
-           fit_glm_start$boundary == FALSE)
-          return(fit_glm_start)
+      # 2) try GLM with starting values from Poisson for RRs only
+      if(link == "log") {
+        fit_poisson <- possibly_estimate_poisson(formula = formula,
+                                                 data = data,
+                                                 link = link,
+                                                 ...)
+        if(fit_poisson$converged == TRUE) {
+          fit_glm_start <- possibly_estimate_glm_startp(
+            formula = formula,
+            data = data,
+            link = link,
+            start = coef(fit_poisson),
+            start_type = "p",
+            ...)
+          if(fit_glm_start$converged == TRUE &
+             fit_glm_start$maxprob < implausible  &
+             fit_glm_start$boundary == FALSE)
+            return(fit_glm_start)
+        }
       }
 
-      # 3) try GLM fitted via CEM
-      if(link == "log")
-        fit_glm_cem <- possibly_estimate_logbin(formula = formula,
-                                                data = data, ...)
-      else
-        fit_glm_cem <- possibly_estimate_addreg(formula = formula,
-                                                data = data, ...)
-
-      if(fit_glm_cem$converged == TRUE &
-         fit_glm_cem$maxprob < implausible  &
-         fit_glm_cem$boundary == FALSE)
-        return(fit_glm_cem)
-
-      # 4) Try marginal standardization after logistic model
-      fit_margstd <- possibly_estimate_margstd(formula = formula,
-                                               data = data,
-                                               estimand = estimand,
-                                               ...)
-      if(fit_margstd$converged == TRUE &
-         fit_margstd$maxprob < implausible &
-         fit_margstd$boundary == FALSE)
-        return(fit_margstd)
-
-      # 5) If 1-4 do not work, return at least the Poisson model
-      if(fit_poisson$converged == TRUE &
-         fit_poisson$maxprob < implausible &
-         fit_margstd$boundary == FALSE) {
-        warning("Only the Poisson model converged")
-        return(fit_poisson)
-      }
+      # 3) Try marginal standardization after logistic model
+      fit_margstd_delta <- possibly_estimate_margstd_delta(formula = formula,
+                                                           data = data,
+                                                           estimand = estimand,
+                                                           ...)
+      if(fit_margstd_delta$converged == TRUE &
+         fit_margstd_delta$maxprob < implausible &
+         fit_margstd_delta$boundary == FALSE)
+        return(fit_margstd_delta)
 
       stop("No model converged or had within-range predicted probabilities of < 1.")
     },
