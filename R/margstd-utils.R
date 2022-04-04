@@ -92,14 +92,18 @@ estimate_margstd <- function(
       levels <- unique(fit$model %>% dplyr::pull(predictor))
   }
 
-  eststd <- fit_and_predict(data = data, predictor = predictor, levels = levels,
+  exposure <- find_margstd_exposure(fit = fit,
+                                    variable = variable,
+                                    at = at)
+  eststd <- fit_and_predict(data = as.data.frame(data),
+                            predictor = exposure$predictor,
+                            margstd_levels = exposure$margstd_levels,
                             formula = fit$formula,
                             estimand = estimand[1])
-
   newfit <- list(coefficients      = eststd,
                  estimand          = estimand[1],
-                 margstd_predictor = predictor,
-                 margstd_levels    = levels,
+                 margstd_predictor = exposure$predictor,
+                 margstd_levels    = exposure$margstd_levels,
                  rank              = 1)
   newfit <- append(newfit, fit[c("residuals", "fitted.values", "weights",
                                  "prior.weights", "family", "deviance", "aic",
@@ -210,13 +214,13 @@ boot_eststd_bcapar <- function(object, bootrepeats, vars) {
     boot_data[, yvar] <- y
     fit_and_predict(data = boot_data,
                     predictor = object$margstd_predictor,
-                    levels = object$margstd_levels,
+                    margstd_levels = object$margstd_levels,
                     estimand = object$estimand[1],
                     formula = object$formula)
   })
   list(theta = fit_and_predict(data = object$model,  # $data includes NA
                                predictor = object$margstd_predictor,
-                               levels = object$margstd_levels,
+                               margstd_levels = object$margstd_levels,
                                estimand = object$estimand[1],
                                formula = object$formula)[vars],
        theta_star = beta_star[vars, ],
