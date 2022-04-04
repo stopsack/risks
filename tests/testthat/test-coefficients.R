@@ -103,4 +103,26 @@ test_that("RR coefficients for receptorLow are the same", {
   expect_equal(rr_glm, rr_cem_startp, tolerance = 0.01)
   expect_equal(rr_glm["receptorLow"], rr_margstd["receptorLow"],
                tolerance = 0.03)
+test_that("Continuous and implicit binary variables pass in marg std", {
+  dat <- data.frame(
+    death    = c(rep(1, 54), rep(0, 138)),
+    stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+                 rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+    receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+                 rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+                 rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)),
+    cont     = runif(n = 192, min = -1, max = 1))
+
+  # specific levels for continuous variable pass in margstd_BOOT:
+  expect_output(print(riskratio(death ~ cont,
+                                at = c(-0.1, 0.3),
+                                data = dat, approach = "margstd_boot")),
+                "-0.1")
+  # a continuous variable passes:
+  expect_output(print(riskratio(death ~ cont,
+                                data = dat, approach = "margstd_boot")),
+                "cont")
+  expect_output(print(riskratio(death ~ cont,
+                                data = dat, approach = "margstd_delta")),
+                "cont")
 })
