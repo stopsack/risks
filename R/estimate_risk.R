@@ -240,7 +240,14 @@ estimate_risk <- function(formula, data,
          fit_margstd_delta$boundary == FALSE)
         return(fit_margstd_delta)
 
-      stop("No model converged or had within-range predicted probabilities of < 1.")
+      # 4) Check if a logistic model can be fitted
+      res <- stats::glm(formula = formula,
+                        data = data,
+                        family = stats::binomial(link = "logit"))
+      # Typically, execution will stop with a non-converged logistic model.
+      # If, surprisingly, only a logistic model converges, return an error.
+      stop(paste("No model besides the logistic model converged and had",
+                 "within-range predicted probabilities of < 1."))
     },
 
     # All models requested to fit
