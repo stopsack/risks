@@ -11,8 +11,10 @@
 # (2) Binomial
 estimate_glm <- function(formula, data, link, start = NULL, start_type = "",
                          ...) {
-  fit <- stats::glm(formula, data = data, family = binomial(link = link),
-                                    start = start, ...)
+  fit <- stats::glm(formula,
+                    data = data,
+                    family = stats::binomial(link = link),
+                    start = start, ...)
   if(!is.null(start))
     class(fit) <- c(paste0("glm_start", start_type), class(fit))
   fit <- estimate_maxprob(fit = fit, formula = formula, data = data,
@@ -41,10 +43,12 @@ estimate_addreg <- function(formula, data, start = NULL, start_type = "",
 
 # (5) Logistic model, for comparison only
 estimate_logistic <- function(formula, data, ...) {
-  fit <- stats::glm(formula, data = data, family = stats::binomial(link = "logit"),
+  fit <- stats::glm(formula, data = data,
+                    family = stats::binomial(link = "logit"),
                     ...)
   class(fit) <- c("logistic", class(fit))
-  fit <- estimate_maxprob(fit = fit, formula = formula, data = data, link = "logit")
+  fit <- estimate_maxprob(fit = fit, formula = formula,
+                          data = data, link = "logit")
   return(fit)
 }
 
@@ -64,6 +68,6 @@ estimate_logistic <- function(formula, data, ...) {
 conv.test <- function (theta1, theta2, epsilon)
 {
   diffvec <- theta1 - theta2
-  diff <- sqrt(sum(diffvec^2))/sqrt(sum(theta1^2))
+  diff <- sqrt(sum(diffvec^2)) / sqrt(sum(theta1^2))
   (diff < epsilon)
 }
