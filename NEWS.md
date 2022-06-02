@@ -1,4 +1,4 @@
-# risks 0.3.0 (not released)
+# risks 0.3.0
 
 * **Breaking changes:**
   + Rename `approach = "glm_start"` to `"glm_startp"` (for **P**oisson).
@@ -17,6 +17,13 @@
   + `approach = "glm_startd"`, using the case duplication-based 
     coefficients as starting values for binomial models. 
   + `rr_rd_mantel_haenszel()`: New function for comparison purposes.
+* Changes to parameters:
+  + `approach = "auto"`, the default, now attempts model fitting in this order 
+    of priority: `approach = "glm"`; `approach = "glm_startp"` (for risk ratios
+    only); `approach = "margstd_delta"`. If all fail, the user
+    is shown the error messages from a plain logistic model.
+  + Bootstrap repeats (`bootrepeats`) for `approach = "margstd_boot"` now 
+    default to `1000`.
 * Bug fixes:
   + `summary.robpoisson()`: Fix sandwich standard errors. `tidy()` output was
     correct.
