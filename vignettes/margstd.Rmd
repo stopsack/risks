@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 
 # The basics
 
-Marginal standardization, `approach = "margstd"`, makes use of the good convergence properties of the logit link, which is also guaranteed to result in probabilities within (0; 1). 
+Marginal standardization, `approach = "margstd_delta"` and `approach = "margstd_boot"`, makes use of the good convergence properties of the logit link, which is also guaranteed to result in probabilities within (0; 1). 
 
-After fitting a logistic model, predicted probabilities for each observation are obtained for the levels of the exposure variable. Risk ratios and risk differences are calculated by contrasting the predicted probabilities as ratios or differences. Standard errors and confidence intervals are obtained via bootstrapping the entire procedure. 
+After fitting a logistic model, predicted probabilities for each observation are obtained for the levels of the exposure variable. Risk ratios and risk differences are calculated by contrasting the predicted probabilities as ratios or differences. Standard errors and confidence intervals are obtained via the delta method or via bootstrapping the entire procedure. 
 
 We use the same example data as in the [Get Started vignette](risks.html#an-example-cohort-study).
 
@@ -36,12 +36,12 @@ dat <- tibble::tibble(
                rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 ```
 
-We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time specifying `approach = "margstd"`:
+We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time specifying `approach = "margstd_delta"`:
 
 ```{r margstd}
 fit_margstd <- riskdiff(formula = death ~ stage + receptor, data = dat, 
-                        approach = "margstd")
-summary(fit_margstd, bootrepeats = 500)
+                        approach = "margstd_delta")
+summary(fit_margstd)
 ```
 
 Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death, adjusting for hormone receptor status (with slightly different bootstrapped 95% confidence intervals).
@@ -51,25 +51,25 @@ Note that coefficients and standard errors are only estimated for the exposure v
 
 # Choice of exposure variable
 
-Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model. In addition, in order to derive contrasts, continuous exposures have to be evaluated at discrete levels.
+Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model.
 
-* By default, the first categorical right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, `ordered`, and `character` are taken to represent categorical variables, as are variables of the type `numeric` with only two levels (e.g., `0` and `1`).
+* By default, the first right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, `ordered`, and `character` are taken to represent categorical variables.
 * Using `variable =`, a different variable can be specified.
-* Using `at =`, levels for contrasts and the order of levels can be specified. The first level is used as the reference with a risk ratio of 1 or a risk difference of 0. The option `at =` is required for continuous variables or `numeric` variables with more than two levels. A warning will be shown for continuous values if the requested levels exceed the range of data (extrapolation).
+* Using `at =`, levels for contrasts and the order of levels can be specified. The first level is used as the reference with a risk ratio of 1 or a risk difference of 0. A warning will be shown for continuous values if the requested levels exceed the range of data (extrapolation).
 
 
 Requesting estimates for a different exposure variable, using `variable = "receptor"`:
 
 ```{r margstd2}
 fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
-                         approach = "margstd", variable = "receptor")
-summary(fit_margstd2, bootrepeats = 500)
+                         approach = "margstd_delta", variable = "receptor")
+summary(fit_margstd2)
 ```
 
 
 # Bootstrap confidence intervals
 
-Marginal standardization does not rely on analytical standard error formulae or the delta method. Instead, parametric bootstrapping is used: given the initial maximum-likelihood estimates of the coefficients and the observed predictors, the outcome vector is predicted from a binomial distribution. The model is fit again using the predicted outcomes and observed predictors. Repeating this process generates the empirical distribution of the coefficients. 
+Marginal standardization cannot rely on analytical standard error formulae. One approach (`"margstd_delta"`) is the delta method. Alternatively, (parametric) bootstrapping (`"margstd_boot"`) can be used: given the initial maximum-likelihood estimates of the coefficients and the observed predictors, the outcome vector is predicted from a binomial distribution. The model is fit again using the predicted outcomes and observed predictors. Repeating this process generates the empirical distribution of the coefficients. 
 
 Confidence intervals for coefficients are calculated based on BC~a~ confidence intervals for parametric bootstrapping (Efron B, Narasimhan B. The Automatic Construction of Bootstrap Confidence Intervals. [J Comput Graph Stat 2020;29(3):608-619](https://doi.org/10.1080/10618600.2020.1714633)).
 
@@ -81,7 +81,11 @@ For comparison purposes, alternative approaches to bootstrapping and confidence 
 When using `tidy()` to access model results, the parameter `bootverbose = TRUE` will add bootstrapping parameters and properties to tibble
 
 ```{r margstd_bootverbose}
-tidy(fit_margstd2, bootverbose = TRUE) %>%
+fit_margstd3 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+                         approach = "margstd_boot")
+summary(fit_margstd3)
+
+tidy(fit_margstd3, bootverbose = TRUE) %>%
   select(-statistic, -p.value)  # allow the other columns to get printed instead
 ```
 
@@ -92,6 +96,6 @@ tidy(fit_margstd2, bootverbose = TRUE) %>%
 
 # Bootstrap repeats
 
-The default are (currently) only 200 bootstrap repeats to reduce initial computation time. If the calculation of BC~a~ confidence intervals fails with an error, and for final, precise estimates, the number of repeats should be increased to >>1000. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`. 
+The default are (currently) only 1000 bootstrap repeats to reduce initial computation time. If the calculation of BC~a~ confidence intervals fails with an error, and for final, precise estimates, the number of repeats should be increased to >>1000. Use the option `bootrepeats =` in `summary()`, `tidy()`, or `confint()`. 
 
 For reproducibility, a seed should be set (e.g., `set.seed(123)`).

@@ -6,19 +6,23 @@
 #' risk ratio and risk difference models.
 #'
 #' In cohort studies with a binary outcome, risk ratios and risk differences
-#' are typically more appropriate to report than odds ratios from logistic regression,
-#' yet such models have historically been difficult to implement in standard software.
+#' are typically more appropriate to report than odds ratios from logistic
+#' regression, yet such models have historically been difficult to implement in
+#' standard software.
 #'
 #' The risks package selects an efficient way to fit risk ratio or
-#' risk difference models successfully, which will converge whenever logistic models converge.
-#' Optionally, a specific approach to model fitting can also be requested.
-#' Implemented are Poisson models with robust covariance, binomial models,
-#' binomial models aided in convergence by starting values obtained
-#' through Poisson models, binomial models fitted via
-#' combinatorial expectation maximization (optionally also with Poisson starting values),
-#' and estimates obtained via marginal standardization after logistic regression.
+#' risk difference models successfully, which will converge whenever logistic
+#' models converge. Optionally, a specific approach to model fitting can also be
+#' requested. Implemented are Poisson models with robust covariance, binomial
+#' models, logistic models with case duplication, binomial models aided in
+#' convergence by starting values obtained through Poisson models or
+#' logistic models with case duplication, binomial models fitted via
+#' combinatorial expectation maximization (optionally also with Poisson starting
+#' values), and estimates obtained via marginal standardization after logistic
+#' regression with bootstrapped or delta method for confidence intervals.
 #'
-#' Adjusting for covariates (e.g., confounders) in the model specification (\code{formula =}) is possible.
+#' Adjusting for covariates (e.g., confounders) in the model specification
+#' (\code{formula =}) is possible.
 #'
 #' @import stats
 #' @import addreg
@@ -39,27 +43,33 @@
 #'   \url{https://stopsack.github.io/risks}) for details.
 #'
 #'   * \code{"glm"} Binomial model.
-#'   * \code{"glm_start"} Binomial model with starting values from Poisson model.
+#'   * \code{"glm_startp"} Binomial model with starting values from Poisson model.
+#'   * \code{"glm_startd"} Binomial model with starting values from logistic
+#'     model with case duplication.
 #'   * \code{"robpoisson"} Poisson model with robust covariance.
+#'   * \code{"duplicate"} Logistic model with duplication of cases. Only
+#'     available in \code{riskratio()}.
 #'   * \code{"glm_cem"} Binomial model fitted with combinatorial expectation
 #'     maximization.
-#'   * \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
-#'   * \code{"margstd"} Marginal standardization after logistic model.
+#'   * \code{"glm_cem_startp"} As \code{glm_cem}, with Poisson starting values.
+#'   * \code{"margstd_boot"} Marginal standardization after logistic model,
+#'     bootstrap standard errors/confidence intervals.
+#'   * \code{"margstd_delta"} Marginal standardization after logistic model,
+#'     delta method standard errors/confidence intervals.
 #'   * \code{"logistic"} For comparison only: the logistic model. Only available
 #'     in \code{riskratio()}.
-#' @param variable Optional: exposure variable to use for marginal standardization.
-#'   If \code{variable} is not provided and marginal standardization is
-#'   attempted, then the first binary or categorical variable in the model
+#' @param variable Optional: exposure variable to use for marginal
+#'   standardization. If \code{variable} is not provided and marginal
+#'   standardization is attempted, then the first variable in the model
 #'   is used as the exposure. Levels are determined automatically for
-#'   variables types \code{logical}, \code{character}, \code{factor},
-#'   and \code{numeric} (only if no more than 2 levels for the latter);
-#'   otherwise levels must be supplied via \code{at =}.
+#'   variables types \code{logical}, \code{character}, \code{factor} and can
+#'   optionally be supplied via \code{at =}.
 #' @param at Optional: Levels of exposure variable \code{variable} for marginal
-#'   standardization. \code{at =} determines the levels at which contrasts of the exposure
-#'   are to be assessed. The level listed first is used as the reference.
-#'   Levels must exist in the data for character, factor or ordered factor
-#'   variables. For numeric variables, levels that do not exist in the data
-#'   can be interpolations or extrapolations; if levels exceed the
+#'   standardization. \code{at =} determines the levels at which contrasts of
+#'   the exposure are to be assessed. The level listed first is used as the
+#'   reference. Levels must exist in the data for character, factor or ordered
+#'   factor variables. For numeric variables, levels that do not exist in the
+#'   data can be interpolations or extrapolations; if levels exceed the
 #'   extremes of the data (extrapolation), a warning will be displayed.
 #' @param ... Optional: Further arguments passed to fitting functions
 #'   (\code{glm}, \code{logbin}, or \code{addreg}).
@@ -75,6 +85,11 @@
 #'   studies with binary data. Am J Epidemiol 2004;159:702-706.
 #'   (Poisson model with robust/sandwich standard errors;
 #'   \code{approach = "robpoisson"})
+#' @references Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC,
+#'   Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in
+#'   case-cohort designs: hypertension and cardiovascular mortality.
+#'   Stat Med 1993;12:1733–45; (Logistic model with case duplication and
+#'   cluster-robust standard errors, \code{approach = "duplicate"}).
 #' @references Donoghoe MW, Marschner IC. logbin: An R Package for
 #'   Relative Risk Regression Using the Log-Binomial Model.
 #'   J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
@@ -87,31 +102,39 @@
 #' @references Localio AR, Margolis DJ, Berlin JA.
 #'   Relative risks and confidence intervals were easily computed
 #'   indirectly from multivariable logistic regression.
-#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
-#'   logistic model; \code{approach = "margstd"})
+#'   J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting
+#'   a logistic model; \code{approach = "margstd_boot"})
 #'
 #' @export
-#' @return Fitted model. This object can be passed on to post-processing functions:
-#'   * \code{\link[risks]{summary.risks}}: an overview of results (risks-specific S3 methods:
-#'     \code{\link[risks]{summary.robpoisson}}, \code{\link[risks]{summary.margstd}}).
-#'   * \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence intervals.
+#' @return Fitted model. This object can be passed on to post-processing
+#'   functions:
+#'   * \code{\link[risks]{summary.risks}}: an overview of results
+#'     (risks-specific S3 methods: \code{\link[risks]{summary.robpoisson}},
+#'     \code{\link[risks]{summary.margstd_boot}},
+#'     \code{\link[risks]{summary.margstd_delta}}).
+#'   * \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence
+#'     intervals.
 #'
 #'   Standard post-processing functions can also be used:
 #'
 #'   * \code{\link[stats]{coef}}: a vector of coefficients.
-#'   * \code{\link[stats]{confint}}: a matrix of confidence intervals (risks-specific S3 methods:
-#'     \code{\link[risks]{confint.robpoisson}}, \code{\link[risks]{confint.margstd}}).
-#'   * \code{\link[stats]{predict.glm}(type = "response")}: fitted values (predictions).
+#'   * \code{\link[stats]{confint}}: a matrix of confidence intervals
+#'      (risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
+#'      \code{\link[risks]{confint.margstd_boot}},
+#'      \code{\link[risks]{confint.margstd_delta}}).
+#'   * \code{\link[stats]{predict.glm}(type = "response")}: fitted values
+#'     (predictions).
 #'   * \code{\link[stats]{residuals}}: residuals.
 #'
 #'   If model fitting using all possible approaches was requested via
 #'   \code{approach = "all"}, then their results can be retrieved from the
-#'   list \code{all_models} in the returned object (e.g., \code{fit$all_models[[1]]},
-#'   \code{fit$all_models[[2]]}, etc.).
+#'   list \code{all_models} in the returned object (e.g.,
+#'   \code{fit$all_models[[1]]}, \code{fit$all_models[[2]]}, etc.).
 #' @describeIn riskratio Fit risk ratio models
 #'
 #' @examples
-#' # Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
+#' # Newman SC. Biostatistical methods in epidemiology.
+#' # New York, NY: Wiley, 2001, table 5.3
 #' library(tibble)  # used to set up example data
 #' dat <- tibble(
 #'   death    = c(rep(1, 54), rep(0, 138)),
@@ -131,193 +154,230 @@
 #' fit_rd
 #' summary(fit_rd)
 riskratio <- function(formula, data,
-                      approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                   "glm_cem", "glm_cem_start", "margstd", "logistic"),
+                      approach = c("auto", "all", "robpoisson", "duplicate",
+                                   "glm", "glm_startp", "glm_startd", "glm_cem",
+                                   "glm_cem_startp",
+                                   "margstd_boot", "margstd_delta",
+                                   "logistic"),
                       variable = NULL, at = NULL, ...) {
-  estimate_risk(formula = formula, data = data, estimate = "rr",
+  estimate_risk(formula = formula, data = data, estimand = "rr",
                 approach = approach, variable = variable, at = at, ...)
 }
 
 #' @describeIn riskratio Fit risk difference models
 #' @export
 riskdiff <- function(formula, data,
-                     approach = c("auto", "all", "robpoisson", "glm", "glm_start",
-                                  "glm_cem", "glm_cem_start", "margstd"),
+                     approach = c("auto", "all", "robpoisson", "glm",
+                                  "glm_startp",
+                                  "glm_cem", "glm_cem_startp",
+                                  "margstd_boot", "margstd_delta"),
                      variable = NULL, at = NULL, ...) {
-  estimate_risk(formula = formula, data = data, estimate = "rd",
+  estimate_risk(formula = formula, data = data, estimand = "rd",
                 approach = approach, variable = variable, at = at, ...)
 }
 
 # Workhorse for riskratio and riskdiff
 estimate_risk <- function(formula, data,
-                          estimate = c("rr", "rd"),
-                          approach = c("auto", "all", "robpoisson", "glm",
-                                       "glm_start", "glm_cem", "glm_cem_start",
-                                       "margstd", "logistic"),
+                          estimand = c("rr", "rd"),
+                          approach,
                           variable = NULL,
                           at = NULL,
                           ...) {
   implausible <- 0.99999
-  link <- switch(EXPR = estimate[1], rr = "log", rd = "identity")
-  if(is.null(link))
-    stop(paste0("Unknown estimate '", estimate,
-                "'. Possible are 'rr', relative risks; 'rd', risk differences."))
-  if(!(approach[1] %in% c("auto", "all", "robpoisson", "glm", "glm_start",
-                          "glm_cem", "glm_cem_start", "margstd", "logistic")))
-    stop(paste0("Approach '", approach[1], "' is not implemented."))
+  estimand <- match.arg(estimand)
+  link <- switch(EXPR = estimand[1], rr = "log", rd = "identity")
+  if(link == "log")
+    possible_approaches <- as.character(as.list(
+      args(risks::riskratio))$approach)[-1]
+  else
+    possible_approaches <- as.character(as.list(
+      args(risks::riskdiff))$approach)[-1]
+  if(!(approach[1] %in% possible_approaches))
+    stop(paste0("Approach '", approach[1], "' is not implemented. ",
+                "Available are: ",
+                paste(possible_approaches, sep = ", ", collapse = ", "), "."))
 
-  fit <- switch(EXPR = approach[1],
-                # Automated model fitting
-                auto = {
-                  # 1) try regular GLM with Fisher scoring
-                  fit_glm <- possibly_estimate_glm(formula = formula, data = data,
-                                                                   link = link, ...)
-                  if(fit_glm$converged == TRUE &
-                     fit_glm$maxprob < implausible &
-                     fit_glm$boundary == FALSE)
-                    return(fit_glm)
+  fit <- switch(
+    EXPR = approach[1],
+    # Automated model fitting
+    auto = {
+      # 1) try regular GLM with Fisher scoring
+      fit_glm <- possibly_estimate_glm(formula = formula, data = data,
+                                       link = link, ...)
+      if(fit_glm$converged == TRUE &
+         fit_glm$maxprob < implausible &
+         fit_glm$boundary == FALSE)
+        return(fit_glm)
 
-                  # 2) try GLM with starting values from Poisson
-                  fit_poisson <- possibly_estimate_poisson(formula = formula,
-                                                           data = data, link = link,
+      # 2) try GLM with starting values from Poisson for RRs only
+      if(link == "log") {
+        fit_poisson <- possibly_estimate_poisson(formula = formula,
+                                                 data = data,
+                                                 link = link,
+                                                 ...)
+        if(fit_poisson$converged == TRUE) {
+          fit_glm_start <- possibly_estimate_glm_startp(
+            formula = formula,
+            data = data,
+            link = link,
+            start = coef(fit_poisson),
+            start_type = "p",
+            ...)
+          if(fit_glm_start$converged == TRUE &
+             fit_glm_start$maxprob < implausible  &
+             fit_glm_start$boundary == FALSE)
+            return(fit_glm_start)
+        }
+      }
+
+      # 3) Try marginal standardization after logistic model
+      fit_margstd_delta <- possibly_estimate_margstd_delta(formula = formula,
+                                                           data = data,
+                                                           estimand = estimand,
                                                            ...)
-                  if(fit_poisson$converged == TRUE) {
-                    fit_glm_start <- possibly_estimate_glm(formula = formula, data = data,
-                                                           link = link,
-                                                           start = coef(fit_poisson),
-                                                           ...)
-                    if(fit_glm_start$converged == TRUE &
-                       fit_glm_start$maxprob < implausible  &
-                       fit_glm_start$boundary == FALSE)
-                      return(fit_glm_start)
-                  }
+      if(fit_margstd_delta$converged == TRUE &
+         fit_margstd_delta$maxprob < implausible &
+         fit_margstd_delta$boundary == FALSE)
+        return(fit_margstd_delta)
 
-                  # 3) try GLM fitted via CEM
-                  if(link == "log")
-                    fit_glm_cem <- possibly_estimate_logbin(formula = formula, data = data, ...)
-                  else
-                    fit_glm_cem <- possibly_estimate_addreg(formula = formula, data = data, ...)
+      # 4) Check if a logistic model can be fitted
+      res <- stats::glm(formula = formula,
+                        data = data,
+                        family = stats::binomial(link = "logit"))
+      # Typically, execution will stop with a non-converged logistic model.
+      # If, surprisingly, only a logistic model converges, return an error.
+      stop(paste("No model besides the logistic model converged and had",
+                 "within-range predicted probabilities of < 1."))
+    },
 
-                  if(fit_glm_cem$converged == TRUE &
-                     fit_glm_cem$maxprob < implausible  &
-                     fit_glm_cem$boundary == FALSE)
-                    return(fit_glm_cem)
+    # All models requested to fit
+    all  = {
+      fit1 <- possibly_estimate_poisson(formula = formula, data = data,
+                                        link = link, ...)
 
-                  # 4) Try marginal standardization after logistic model
-                  fit_margstd <- possibly_estimate_margstd(formula = formula,
-                                                                           data = data,
-                                                                           estimate = estimate,
-                                                                           ...)
-                  if(fit_margstd$converged == TRUE &
-                     fit_margstd$maxprob < implausible &
-                     fit_margstd$boundary == FALSE)
-                    return(fit_margstd)
+      fit2 <- possibly_estimate_glm(formula = formula, data = data,
+                                    link = link, ...)
 
-                  # 5) If 1-4 do not work, return at least the Poisson model
-                  if(fit_poisson$converged == TRUE &
-                     fit_poisson$maxprob < implausible &
-                     fit_margstd$boundary == FALSE) {
-                    warning("Only the Poisson model converged")
-                    return(fit_poisson)
-                  }
+      if(!is.null(coef(fit1)))  # attempt only if Poisson converged
+        fit3 <- possibly_estimate_glm_startp(formula = formula, data = data,
+                                             link = link, start = coef(fit1),
+                                             start_type = "p",
+                                             ...)
+      else  # make possibly_estimate_glm return a non-converged object
+        fit3 <- possibly_estimate_glm_startp(formula = "nonsense",
+                                             data = "nodata",
+                                             start_type = "p")
 
-                  stop("No model converged or had within-range predicted probabilities of < 1.")
-                },
+      if(link == "log")
+        fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
+      else
+        fit4 <- possibly_estimate_addreg(formula = formula, data = data, ...)
 
-                # All models requested to fit
-                all  = {
-                  fit1 <- possibly_estimate_poisson(formula = formula, data = data,
-                                                                    link = link, ...)
+      if(link == "log") {
+        if(!is.null(coef(fit1))) # attempt only if Poisson converged
+          fit5 <- possibly_estimate_logbin(formula = formula, data = data,
+                                           start = coef(fit1), ...)
+        else
+          fit5 <- possibly_estimate_logbin(formula = "nonsense",
+                                           data = "nodata")
+        if(fit5$converged == FALSE)
+          fit5$risks_start = "_start"
+      } else {
+        if(!is.null(coef(fit1))) # attempt only if Poisson converged
+          fit5 <- possibly_estimate_addreg(formula = formula, data = data,
+                                           start = coef(fit1), ...)
+        else
+          fit5 <- possibly_estimate_addreg(formula = "nonsense",
+                                           data = "nodata")
+        if(fit5$converged == FALSE)
+          fit5$risks_start = "_start"
+      }
 
-                  fit2 <- possibly_estimate_glm(formula = formula, data = data,
-                                                                link = link, ...)
+      fit6 <- possibly_estimate_margstd_boot(formula = formula, data = data,
+                                             estimand = estimand,
+                                             variable = variable, at = at,
+                                             ...)
 
-                  if(!is.null(coef(fit1)))  # attempt only if Poisson converged
-                    fit3 <- possibly_estimate_glm(formula = formula, data = data,
-                                                                  link = link, start = coef(fit1),
-                                                                  ...)
-                  else  # make possibly_estimate_glm return a non-converged object
-                    fit3 <- possibly_estimate_glm(formula = "nonsense", data = "nodata")
+      fit7 <- possibly_estimate_margstd_delta(formula = formula, data = data,
+                                              estimand = estimand,
+                                              variable = variable, at = at,
+                                              ...)
 
-                  if(link == "log")
-                    fit4 <- possibly_estimate_logbin(formula = formula, data = data, ...)
-                  else
-                    fit4 <- possibly_estimate_addreg(formula = formula, data = data, ...)
+      # If RR requested, add on case-duplication model and, for comparison,
+      # the plain logistic model
+      if(estimand == "rr") {
+        fit8 <- possibly_estimate_logistic(formula = formula, data = data,
+                                           ...)
+        fit9 <- possibly_estimate_duplicate(formula = formula, data = data,
+                                            ...)
 
-                  if(link == "log") {
-                      if(!is.null(coef(fit1))) # attempt only if Poisson converged
-                        fit5 <- possibly_estimate_logbin(formula = formula, data = data,
-                                                         start = coef(fit1), ...)
-                      else
-                        fit5 <- possibly_estimate_logbin(formula = "nonsense", data = "nodata")
-                      if(fit5$converged == FALSE)
-                        fit5$risks_start = "_start"
-                  } else {
-                      if(!is.null(coef(fit1))) # attempt only if Poisson converged
-                        fit5 <- possibly_estimate_addreg(formula = formula, data = data,
-                                                         start = coef(fit1), ...)
-                      else
-                        fit5 <- possibly_estimate_addreg(formula = "nonsense", data = "nodata")
-                      if(fit5$converged == FALSE)
-                        fit5$risks_start = "_start"
-                  }
+        if(!is.null(coef(fit9)))  # attempt only if 'duplicate' converged
+          fit10 <- possibly_estimate_glm_startd(formula = formula, data = data,
+                                                link = link, start = coef(fit9),
+                                                start_type = "d",
+                                                ...)
+        else  # make possibly_estimate_glm return a non-converged object
+          fit10 <- possibly_estimate_glm_startd(formula = "nonsense",
+                                                data = "nodata",
+                                                start_type = "d")
 
-                  fit6 <- possibly_estimate_margstd(formula = formula, data = data,
-                                                                    estimate = estimate,
-                                                                    variable = variable, at = at,
-                                                                    ...)
+        fit1$all_models = list(
+          robpoisson = fit1, glm = fit2, glm_startp = fit3, glm_cem = fit4,
+          glm_cem_startp = fit5, margstd_boot = fit6, margstd_delta = fit7,
+          logistic = fit8, duplicate = fit9, glm_startd = fit10)
+      } else
+        fit1$all_models = list(
+          robpoisson = fit1, glm = fit2, glm_start = fit3, glm_cem = fit4,
+          glm_cem_startp = fit5, margstd_boot = fit6, margstd_delta = fit7)
+      fit1
+    },
 
-                  # If RR requested, add on plain logistic model for comparison
-                  if(estimate[1] == "rr") {
-                    fit7 <- possibly_estimate_logistic(formula = formula, data = data,
-                                                                       ...)
-
-                    fit1$all_models = list(
-                      model1 = fit1, model2 = fit2, model3 = fit3, model4 = fit4,
-                      model5 = fit5, model6 = fit6, model7 = fit7)
-                  } else
-                    fit1$all_models = list(
-                      model1 = fit1, model2 = fit2, model3 = fit3, model4 = fit4,
-                      model5 = fit5, model6 = fit6)
-                  fit1
-                },
-
-                # Specific models that were directly requested
-                robpoisson = estimate_poisson(formula = formula, data = data,
-                                                              link = link, ...),
-                glm        = estimate_glm(formula = formula, data = data,
-                                                          link = link, ...),
-                glm_start  = {
-                  fit_poisson <- estimate_poisson(formula = formula, data = data,
-                                                  link = link, ...)
-                  estimate_glm(formula = formula, data = data, link = link,
-                               start = coef(fit_poisson), ...)
-                },
-                glm_cem    = {
-                  if(link == "log")
-                    estimate_logbin(formula = formula, data = data, ...)
-                  else
-                    estimate_addreg(formula = formula, data = data, ...)
-                },
-                glm_cem_start = {
-                  fit_poisson <- estimate_poisson(formula = formula, data = data, link = link, ...)
-                  if(link == "log")
-                    estimate_logbin(formula = formula, data = data, start = coef(fit_poisson), ...)
-                  else
-                    estimate_addreg(formula = formula, data = data, start = coef(fit_poisson), ...)
-                },
-                margstd    = estimate_margstd(formula = formula, data = data,
-                                                              estimate = estimate,
-                                                              variable = variable, at = at,
-                                                              ...),
-                logistic = {
-                  if(estimate[1] == "rd")
-                    stop(paste0("Odds difference models are not implemented.\n",
-                    "Further reading: Wacholder S. The Case-Control Study ",
-                    "as Data Missing by Design: Estimating Risk Differences. ",
-                    "Epidemiology 1996;7:144-150."))
-                  estimate_logistic(formula = formula, data = data,
-                                                    ...)
-                })
+    # Specific models that were directly requested
+    robpoisson = estimate_poisson(formula = formula, data = data,
+                                  link = link, ...),
+    duplicate = estimate_duplicate(formula = formula, data = data,
+                                   ...),
+    glm        = estimate_glm(formula = formula, data = data,
+                              link = link, ...),
+    glm_startp  = {
+      fit_poisson <- estimate_poisson(formula = formula, data = data,
+                                      link = link, ...)
+      estimate_glm(formula = formula, data = data, link = link,
+                   start = coef(fit_poisson), start_type = "p", ...)
+    },
+    glm_startd  = {
+      fit_duplicate <- estimate_duplicate(formula = formula, data = data, ...)
+      estimate_glm(formula = formula, data = data, link = link,
+                   start = coef(fit_duplicate), start_type = "d", ...)
+    },
+    glm_cem    = {
+      if(link == "log")
+        estimate_logbin(formula = formula, data = data, ...)
+      else
+        estimate_addreg(formula = formula, data = data, ...)
+    },
+    glm_cem_startp = {
+      fit_poisson <- estimate_poisson(formula = formula,
+                                      data = data, link = link, ...)
+      if(link == "log")
+        estimate_logbin(formula = formula,
+                        data = data, start = coef(fit_poisson),
+                        start_type = "p", ...)
+      else
+        estimate_addreg(formula = formula,
+                        data = data, start = coef(fit_poisson),
+                        start_type = "p", ...)
+    },
+    margstd_boot = estimate_margstd_boot(formula = formula, data = data,
+                                         estimand = estimand,
+                                         variable = variable, at = at,
+                                         ...),
+    margstd_delta = estimate_margstd_delta(formula = formula, data = data,
+                                           estimand = estimand,
+                                           variable = variable, at = at,
+                                           ...),
+    logistic   = estimate_logistic(formula = formula, data = data,
+                                   ...)
+  )
   return(fit)
 }

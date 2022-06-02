@@ -1,21 +1,33 @@
-# Helper functions for estimate_risk(approach = "robpoisson") and
-# the use of Poisson models in approach = "auto" or approach = "all"
+# Helper functions for estimate_risk(approach = "duplicate") and
+# the use of case duplication in approach = "auto" or approach = "all"
 
 #' @import stats
 
-# estimate_poisson: internal, fitting the Poisson model
-estimate_poisson <- function(formula, data, link, ...) {
-  fit <- eval(substitute(stats::glm(formula = formula, family = poisson(link = link),
+# estimate_duplicate: internal, fitting a logistic model with case duplication
+# (Miettinen/Schouten approach to directly estimating relative risks)
+estimate_duplicate <- function(formula, data, ...) {
+  yvar <- as.character(all.vars(formula)[1])
+  data <- data %>%
+    dplyr::mutate(.clusterid = dplyr::row_number())
+  data <- dplyr::bind_rows(data,
+                           data %>%
+                             dplyr::rename(outc = dplyr::one_of(!!yvar)) %>%
+                             dplyr::filter(.data$outc == 1) %>%
+                             dplyr::mutate(outc = 0) %>%
+                             dplyr::rename(!!yvar := .data$outc))
+  fit <- eval(substitute(stats::glm(formula = formula,
+                                    family = binomial(link = "logit"),
                                     data = data)))
-  class(fit) <- c("robpoisson", class(fit))
-  fit <- estimate_maxprob(fit = fit, formula = formula, data = data, link = link)
+  class(fit) <- c("duplicate", class(fit))
+  fit <- estimate_maxprob(fit = fit, formula = formula, data = data,
+                          link = "logit")
   return(fit)
 }
 
 
-#' Robust confidence intervals for Poisson model
+#' Clustering-corrected confidence intervals for case duplication model
 #'
-#' Estimate confidence intervals for the Poisson model
+#' Estimate confidence intervals for the case duplication model
 #' with robust/sandwich/empirical covariance structure.
 #'
 #' @param object Fitted model
@@ -24,7 +36,7 @@ estimate_poisson <- function(formula, data, link, ...) {
 #' @param ... Additional arguments, not used
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
-confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
+confint.duplicate <- function(object, parm = NULL, level = 0.95, ...) {
   # modified after stats:::confint.default()
   cf <- coef(object)
   pnames <- names(cf)
@@ -38,28 +50,26 @@ confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
                "%")
   fac <- qnorm(a)
   ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
-  # Robust covariance, but not the HC3.
-  # Poisson with HC0 is probably already too conservative compared to binomial model.
-  # Cannot use the following line because vcovHC calls summary.robpoisson(),
-  # where we already estimate sandwich SEs...
-  #ses <- sqrt(diag(sandwich::vcovHC(object, type = "HC0")))
+  # Robust covariance accounting for clustering
   obj_sandwich <- object
   class(obj_sandwich) <- "glm"
-  ses <- sqrt(diag(sandwich::sandwich(x = obj_sandwich,
-                                      bread. = sandwich::bread(obj_sandwich),
-                                      meat. = sandwich::meatHC(obj_sandwich,
-                                                               type = "HC0"))))
+  ses <- sqrt(diag(sandwich::sandwich(
+    x = obj_sandwich,
+    bread. = sandwich::bread(obj_sandwich),
+    meat. = sandwich::meatCL(obj_sandwich,
+                             type = "HC0",
+                             cluster = object$data$.clusterid))))
   ci[] <- cf[parm] + ses %o% fac
   return(ci)
 }
 
 
-#' Summary for Poisson model with robust covariance
+#' Summary for logistic model with case duplication and cluster-robust covariance
 #'
-#' Summarize results from fitting a Poisson model with
-#' robust/empirical/sandwich covariance.
+#' Summarize results from fitting a logistic model with case duplication and
+#' cluster-robust covariance.
 #' The output is the same as for a regular \code{summary(glm(...))},
-#' except for using robust standard errors.
+#' except for using cluster-robust standard errors.
 #'
 #' @param object Model
 #' @param dispersion Not used
@@ -67,9 +77,9 @@ confint.robpoisson <- function(object, parm = NULL, level = 0.95, ...) {
 #' @param symbolic.cor Not used
 #' @param ... Other arguments, not used
 #' @export
-summary.robpoisson <- function(object, dispersion = NULL, correlation = FALSE,
-                                symbolic.cor = FALSE, ...) {
-  # a modification of summary.glm(), calling risks_meat() to estimate covariance
+summary.duplicate <- function(object, dispersion = NULL, correlation = FALSE,
+                              symbolic.cor = FALSE, ...) {
+  # a modification of summary.glm()
   est.disp <- FALSE
   df.r <- object$df.residual
   if (is.null(dispersion))
@@ -94,14 +104,16 @@ summary.robpoisson <- function(object, dispersion = NULL, correlation = FALSE,
       stop("lm object does not have a proper 'qr' component.\n Rank zero or should not have used lm(.., qr=FALSE).")
     coef.p <- object$coefficients[Qr$pivot[p1]]
     ###### changes here #######
-    # needed to avoid recursive calls
-    # of summary.robpoisson() within sandwich::bread.glm():
+    # covmat.unscaled <- sandwich::vcovCL(object, type = "HC0",
+    #                                     cluster = object$data$.clusterid)
     obj_sandwich <- object
     class(obj_sandwich) <- "glm"
     covmat.unscaled <- sandwich::sandwich(
       x = obj_sandwich,
       bread. = sandwich::bread(x = obj_sandwich),
-      meat. = sandwich::meatHC(x = obj_sandwich, type = "HC0"))
+      meat. = sandwich::meatCL(x = obj_sandwich,
+                               type = "HC0",
+                               cluster = object$data$.clusterid))
     ###### end changes ########
     covmat <- dispersion * covmat.unscaled
     var.cf <- diag(covmat)
@@ -148,5 +160,3 @@ summary.robpoisson <- function(object, dispersion = NULL, correlation = FALSE,
   class(ans) <- "summary.glm"
   return(ans)
 }
-
-

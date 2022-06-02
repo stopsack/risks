@@ -1,111 +1,64 @@
-# Helper functions for marginal standardization after
+# Helper functions for marginal standardization with bootstrapping after
 # fitting a logistic regression model
 
+#' @importFrom dplyr %>%
+#' @importFrom rlang .data
 # Fit logistic model, obtained marginal predictions, generate contrasts
-# For better performance than with `::`, import a few functions for eststd()
-#' @importFrom stats predict glm binomial
-#' @importFrom tibble tibble
-#' @importFrom dplyr mutate
-#' @importFrom purrr %>% map map_dbl
-#' @importFrom rlang .data :=
-eststd <- function(x, data, predictor, levels, estimate) {
-  mdl <- glm(formula = x$formula, family = binomial(link = "logit"),
-             data = data)
-  results <- tibble(term = levels) %>%
-    mutate(data = map(.x = .data$term,
-                      .f = ~mutate(.data = data,
-                                   !!!predictor := .x)),
-           response = map(.x = data,
-                          .f = ~predict(object = mdl,
-                                        newdata = .x,
-                                        type = "response")),
-           means = map_dbl(.x = .data$response, .f = mean))
-  if(estimate == "rr")
-    res <- log(results$means / results$means[1])
-  if(estimate == "rd")
-    res <- results$means - results$means[1]
-  names(res) <- paste0(predictor, results$term)
+fit_and_predict <- function(data, predictor, margstd_levels = NULL,
+                            estimand, formula) {
+  if(!is.null(margstd_levels)) {  # categorical predictors
+    fit <- stats::glm(formula = formula, data = data,
+                      family = binomial(link = "logit"))
+    data_rep <- data[rep(seq_len(nrow(data)), times = length(margstd_levels)), ]
+    data_rep[, predictor] <- rep(margstd_levels, each = nrow(data))
+    res <- tapply(X = predict(fit, newdata = data_rep, type = "response"),
+                  INDEX = data_rep[, predictor],
+                  FUN = mean)
+    if(estimand == "rd")
+      res <- res - res[1]
+    else
+      res <- log(res / res[1])
+    names(res) <- paste0(predictor, margstd_levels)
+  } else {  # continuous predictors: average marginal effect
+    fit <- glm(formula = formula, data = data,
+               family = binomial(link = "logit"))
+    delta <- sd(data[, predictor]) / 1000
+    newdata <- data
+    newdata[, predictor] <- newdata[, predictor] + delta
+    pred1 <- predict(fit, type = "response")
+    pred2 <- predict(fit, newdata = newdata,
+                     type = "response")
+    if(estimand == "rd")
+      res <- mean((pred2 - pred1) / delta)
+    else
+      res <- mean(log(pred2 / pred1) / delta)
+    names(res) <- predictor
+  }
   return(res)
 }
 
+
 # Main function for marginal standardization
-estimate_margstd <- function(
+estimate_margstd_boot <- function(
   formula,
   data,
-  estimate   = c("rr", "rd"),
-  variable   = NULL,    # where to standardize;
-  # default: 1st binary var/categorical var/numeric var w/2 levels
-  at         = NULL) {  # level of variable to standardize at)
+  estimand   = c("rr", "rd"),
+  variable   = NULL,    # where to standardize; default: 1st variable
+  at         = NULL) {  # levels of variable to standardize at
   fit <- stats::glm(formula = formula, family = binomial(link = "logit"),
                     data = data)
-
-  # find variable to standardize over
-  if(!is.null(variable)) {
-    if(!(variable %in% names(fit$model)[2:length(names(fit$model))]))
-      stop(paste0("Variable '", variable, "' is not part of the model."))
-    if(!(class(fit$model[[variable]])[1] %in%
-         c("character", "factor", "ordered", "logical")))
-      if(length(unique(fit$model[[variable]])) > 2 & is.null(at))
-        stop(paste0("Variable '", variable, "' is not a factor, ordered ",
-                    " factor, logical, character, or a numeric with 2 levels, ",
-                    "and no values to standardize at are given via 'at ='."))
-    predictor <- variable
-  } else {
-    model_vars <- tibble::tibble(vars = names(fit$model)) %>%
-      dplyr::mutate(
-        type    = purrr::map_chr(.x = .data$vars,
-                                 .f = ~class(fit$model %>%
-                                               dplyr::pull(.x))[1]),
-        nlevels = purrr::map_int(.x = .data$vars,
-                                 .f = ~length(unique(fit$model %>%
-                                                       dplyr::pull(.x))))) %>%
-      dplyr::slice(-1) %>%
-      dplyr::filter(.data$type %in% c("character", "factor",
-                                      "logical", "ordered") |
-                      (.data$type %in% c("numeric", "integer") &
-                         nlevels == 2)) %>%
-      dplyr::slice(1)
-
-    if(nrow(model_vars) > 0)
-      predictor <- model_vars$vars
-    else
-      stop(paste("No exposure variable identified that is a factor, ordered",
-                 "factor, logical, character, or numeric with 2 levels."))
-  }
-
-  # find levels to standardize at
-  if(!is.null(at)) {
-    if(length(at) < 2)
-      stop("Because 'at' has less than 2 levels, contrasts cannot be estimated.")
-    if(class(fit$model %>% dplyr::pull(predictor)) %in%
-       c("character", "factor", "ordered", "logical") &
-       sum(at %in% unique(fit$model %>% dplyr::pull(predictor))) != length(at))
-      stop(paste0("Some of the levels, specificied via 'at =', ",
-                  "of the non-numeric variable '",
-                  predictor,
-                  "' were not found in the model data."))
-    if(class(fit$model %>% dplyr::pull(predictor)) == "numeric")
-      if(min(fit$model %>% dplyr::pull(predictor)) > min(at) |
-         max(fit$model %>% dplyr::pull(predictor)) < max(at))
-        warning(paste0("Numeric levels provided via 'at = ", at,
-                       "' will lead to out-of-range predictions ",
-                       "for the variable '", predictor, "'."))
-    levels <- at
-  } else {
-    if(!is.null(fit$xlevels) & predictor %in% names(fit$xlevels))
-      # retain level ordering as in model
-      levels <- fit$xlevels[[predictor]]
-    else  # if "hidden" categorical, use level orderings as in data
-      levels <- unique(fit$model %>% dplyr::pull(predictor))
-  }
-
-  eststd <- eststd(x = fit, data = data, predictor = predictor, levels = levels,
-                   estimate = estimate[1])
-
+  exposure <- find_margstd_exposure(fit = fit,
+                                    variable = variable,
+                                    at = at)
+  eststd <- fit_and_predict(data = as.data.frame(data),
+                            predictor = exposure$predictor,
+                            margstd_levels = exposure$margstd_levels,
+                            formula = fit$formula,
+                            estimand = estimand[1])
   newfit <- list(coefficients      = eststd,
-                 estimate          = estimate[1],
-                 margstd_predictor = predictor,
-                 margstd_levels    = levels,
+                 estimand          = estimand[1],
+                 margstd_predictor = exposure$predictor,
+                 margstd_levels    = exposure$margstd_levels,
                  rank              = 1)
   newfit <- append(newfit, fit[c("residuals", "fitted.values", "weights",
                                  "prior.weights", "family", "deviance", "aic",
@@ -114,7 +67,7 @@ estimate_margstd <- function(
                                  "model", "call", "formula", "terms", "data",
                                  "offset", "control", "method", "xlevels",
                                  "qr")])
-  class(newfit) <- c("margstd", "glm", "lm")
+  class(newfit) <- c("margstd_boot", "glm", "lm")
   newfit <- estimate_maxprob(fit = newfit, formula = formula,
                              data = data, link = "logit")
   return(newfit)
@@ -123,18 +76,18 @@ estimate_margstd <- function(
 # Nonparametric bootstrapping
 boot_eststd_nonpar <- function(object, bootrepeats) {
   bootfn <- function(data, index, fit, ...) {
-    eststd(x = fit, data = data[index, ], ...)
+    fit_and_predict(data = data[index, ], formula = fit$formula, ...)
   }
 
-  boot::boot(data = object$data,
+  boot::boot(data = as.data.frame(object$data),
              statistic = bootfn,
              R = bootrepeats,
              fit = stats::glm(formula = object$formula,
                               family = binomial(link = "logit"),
                               data = object$data),
              predictor = object$margstd_predictor,
-             levels = object$margstd_levels,
-             estimate = object$estimate[1])
+             margstd_levels = object$margstd_levels,
+             estimand = object$estimand[1])
 }
 
 # BCa bootstrap confidence intervals after nonparametric bootstrapping
@@ -147,10 +100,16 @@ bootci_nonpar <- function(boot.out, conf, parameters) {
     return(res)
   }
 
-  dplyr::bind_rows(
-    c(conf.low = NA, conf.high = NA),
-    purrr::map_dfr(.x = 2:parameters,
-                   .f = getbcaci_nonpar, boot.out = boot.out, conf = conf))
+  if(parameters > 1) {
+    dplyr::bind_rows(
+      c(conf.low = NA, conf.high = NA),
+      purrr::map_dfr(.x = 2:parameters,
+                     .f = getbcaci_nonpar, boot.out = boot.out, conf = conf))
+  } else {
+    tibble::as_tibble(t(getbcaci_nonpar(boot.out = boot.out,
+                                        conf = conf,
+                                        index = 1)))
+  }
 }
 
 #' @importFrom rlang :=
@@ -158,11 +117,11 @@ bootci_nonpar <- function(boot.out, conf, parameters) {
 boot_eststd_norm <- function(object, bootrepeats) {
   mainfit <- stats::glm(formula = object$formula,
                         family = binomial(link = "logit"),
-                        data = object$data)
+                        data = as.data.frame(object$data))
   yvar <- all.vars(object$formula)[1]
 
   bootfn <- function(data, fitformula, ...) {
-    eststd(x = fitformula, data = data, ...)
+    fit_and_predict(data = data, formula = fitformula$formula, ...)
   }
 
   # Parametric resampling function
@@ -172,7 +131,7 @@ boot_eststd_norm <- function(object, bootrepeats) {
                                             prob = mle))
   }
 
-  boot::boot(data = object$data,
+  boot::boot(data = as.data.frame(object$data),
              statistic = bootfn,
              R = bootrepeats,
              sim = "parametric",
@@ -180,8 +139,8 @@ boot_eststd_norm <- function(object, bootrepeats) {
              mle = predict(mainfit, type = "response"),
              fitformula = list(formula = object$formula),
              predictor = object$margstd_predictor,
-             levels = object$margstd_levels,
-             estimate = object$estimate[1])
+             margstd_levels = object$margstd_levels,
+             estimand = object$estimand[1])
 }
 
 # Normal bootstrap confidence intervals after parametric bootstrapping
@@ -194,10 +153,16 @@ bootci_norm <- function(boot.out, conf, parameters) {
     return(res)
   }
 
+  if(parameters > 1) {
   dplyr::bind_rows(
     c(conf.low = NA, conf.high = NA),
     purrr::map_dfr(.x = 2:parameters,
                    .f = getbootci_norm, boot.out = boot.out, conf = conf))
+  } else {
+    tibble::as_tibble(t(getbootci_norm(boot.out = boot.out,
+                                       conf = conf,
+                                       index = 1)))
+  }
 }
 
 # Parametric bootstrapping for use with bcaboot::bcapar()
@@ -214,16 +179,27 @@ boot_eststd_bcapar <- function(object, bootrepeats, vars) {
   beta_star <- apply(y_star, 2, function(y) {
     boot_data <- glm_model$data
     boot_data[, yvar] <- y
-    eststd(x = object, data = boot_data,
-           predictor = object$margstd_predictor,
-           levels = object$margstd_levels,
-           estimate = object$estimate[1])
+    fit_and_predict(data = boot_data,
+                    predictor = object$margstd_predictor,
+                    margstd_levels = object$margstd_levels,
+                    estimand = object$estimand[1],
+                    formula = object$formula)
   })
-  list(theta = eststd(x = object, data = object$model,  # $data includes NA
-                      predictor = object$margstd_predictor,
-                      levels = object$margstd_levels,
-                      estimate = object$estimate[1])[vars],
-       theta_star = beta_star[vars, ],
+  # fit_and_predict() gives a numeric vector, not an array, for continuous vars
+  if(class(beta_star)[1] == "numeric") {
+    beta_star <- array(data = beta_star,
+                       dim = c(1, length(beta_star)),
+                       dimnames = list(object$margstd_predictor))
+    theta_star <- beta_star
+  } else {
+    theta_star <- beta_star[vars, ]
+  }
+  list(theta = fit_and_predict(data = object$model,  # $data includes NA
+                               predictor = object$margstd_predictor,
+                               margstd_levels = object$margstd_levels,
+                               estimand = object$estimand[1],
+                               formula = object$formula)[vars],
+       theta_star = theta_star,
        suff_stat = t(y_star) %*% model.matrix(glm_model))
 }
 
@@ -237,14 +213,22 @@ bootci_bcapar <- function(boot_out, level, parameters) {
     names(res) <- c("conf.low", "conf.high", "jacksd.low", "jacksd.high")
     return(res)
   }
-
-  dplyr::bind_rows(
-    c(conf.low = NA, conf.high = NA),
-    purrr::map_dfr(.x = 2:parameters,
-                   .f = ~getbootci_bcapar(theta      = boot_out$theta[.x],
-                                          theta_star = boot_out$theta_star[.x, ],
-                                          suff_stat  = boot_out$suff_stat,
-                                          alpha      = (1 - level) / 2)))
+  if(parameters > 1) {  # categorical variables with reference level
+    dplyr::bind_rows(
+      c(conf.low = NA, conf.high = NA),
+      purrr::map_dfr(
+        .x = 2:parameters,
+        .f = ~getbootci_bcapar(theta      = boot_out$theta[.x],
+                               theta_star = boot_out$theta_star[.x, ],
+                               suff_stat  = boot_out$suff_stat,
+                               alpha      = (1 - level) / 2)))
+  } else {  # continuous variables with a single parameter, no reference
+    tibble::as_tibble(t((
+      getbootci_bcapar(theta      = boot_out$theta[1],
+                       theta_star = as.numeric(boot_out$theta_star),
+                       suff_stat  = boot_out$suff_stat,
+                       alpha      = (1 - level) / 2))))
+  }
 }
 
 #' Bootstrap confidence intervals
@@ -255,8 +239,7 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #' @param object Model fitted through marginal standardization
 #' @param parm Not used, for compatibility
 #' @param level Confidence level, defaults to 0.95.
-#' @param bootrepeats Bootstrap repeats. Defaults to 200.
-#'   Strongly recommend >1000.
+#' @param bootrepeats Bootstrap repeats. Defaults to 1000. Consider increasing.
 #' @param bootci Type of bootstrap confidence interval:
 #'
 #'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
@@ -274,17 +257,19 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
-confint.margstd <- function(object, parm = NULL,
-                            level = 0.95,
-                            bootrepeats = 200,
-                            bootci = c("bca", "normal", "nonpar"),
-                            jacksd = FALSE,
-                            ...) {
+confint.margstd_boot <- function(object,
+                                 parm = NULL,
+                                 level = 0.95,
+                                 bootrepeats = 1000,
+                                 bootci = c("bca", "normal", "nonpar"),
+                                 jacksd = FALSE,
+                                 ...) {
   cf <- coef(object)
   pnames <- names(cf)
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- paste0(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
+               "%")
   ci <- array(NA, dim = c(length(pnames), 2L), dimnames = list(pnames, pct))
 
   switch(EXPR = match.arg(bootci),
@@ -309,7 +294,7 @@ confint.margstd <- function(object, parm = NULL,
                                           bootrepeats = bootrepeats,
                                           vars = pnames)
            ci_all <- bootci_bcapar(boot_out = boot_out, level = level,
-                                 parameters = length(pnames))
+                                   parameters = length(pnames))
            if(jacksd == FALSE) {
              ci[] <- ci_all[, c("conf.low", "conf.high")] %>%
                as.matrix()
@@ -324,8 +309,8 @@ confint.margstd <- function(object, parm = NULL,
   return(ci)
 }
 
-# Bootstrapped standard errors, required by summary.margstd()
-margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
+# Bootstrapped standard errors, required by summary.margstd_boot()
+margstd_boot_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
   switch(
     EXPR = bootci,
     normal = {
@@ -341,7 +326,8 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
       myboot <- boot_eststd_nonpar(object = object, bootrepeats = bootreps)
 
       tibble::tibble(estimate = coef(object),
-                     std.error = base::apply(myboot$t, MARGIN = 2, FUN = sd)) %>%
+                     std.error = base::apply(myboot$t,
+                                             MARGIN = 2, FUN = sd)) %>%
         dplyr::bind_cols(bootci_nonpar(boot.out = myboot, conf = level,
                                        parameters = length(coef(object))))
     },
@@ -355,7 +341,7 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
         dplyr::bind_cols(
           bootci_bcapar(
             boot_out = boot_out, level = level,
-            parameters = length(coef(object)))[, c("conf.low", "conf.high")])
+            parameters = length(coef(object))))
     })
 }
 
@@ -366,8 +352,8 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
 #' @param correlation Not used
 #' @param symbolic.cor Not used
 #' @param level Confidence level, defaults to \code{0.95}.
-#' @param bootrepeats Bootstrap repeats for standard errors. Defaults to 200.
-#'          Strongly recommend >1000.
+#' @param bootrepeats Bootstrap repeats for standard errors. Defaults to 1000.
+#'  Consider increasing.
 #' @param bootci Type of bootstrap confidence interval:
 #'
 #'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
@@ -384,10 +370,11 @@ margstd_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
 #' @return Model summary (list)
 #' @return
 #' @export
-summary.margstd <- function(object, dispersion = NULL,
-                            correlation = FALSE, symbolic.cor = FALSE,
-                            level = 0.95, bootrepeats = 200,
-                            bootci = c("bca", "normal",  "nonpar"), ...) {
+summary.margstd_boot <- function(object, dispersion = NULL,
+                                 correlation = FALSE, symbolic.cor = FALSE,
+                                 level = 0.95,
+                                 bootrepeats = 1000,
+                                 bootci = c("bca", "normal",  "nonpar"), ...) {
   est.disp <- FALSE
   df.r <- object$df.residual
   if (is.null(dispersion))
@@ -411,11 +398,10 @@ summary.margstd <- function(object, dispersion = NULL,
     if(is.null(Qr))
       stop(paste("lm object does not have a proper 'qr' component.\n",
                  "Rank zero or should not have used lm(.., qr=FALSE)."))
-    #coef.p <- object$coefficients[Qr$pivot[p1]]
     coef.p <- object$coefficients
-    stderror <- margstd_stderror(object = object, level = level,
-                                 bootreps = bootrepeats,
-                                 bootci = match.arg(bootci), ...)
+    stderror <- margstd_boot_stderror(object = object, level = level,
+                                      bootreps = bootrepeats,
+                                      bootci = match.arg(bootci), ...)
     s.err <- stderror$std.error
     tvalue <- coef.p/s.err
     dn <- c("Estimate", "Std. Error")
@@ -450,8 +436,8 @@ summary.margstd <- function(object, dispersion = NULL,
              coefficients = coef.table, aliased = aliased,
              dispersion = dispersion, df = c(object$rank, df.r, df.f),
              conf.int = stderror, level = level,
-             margstd.bootrepeats = bootrepeats,
-             margstd.bootci = match.arg(bootci)))
+             margstd_boot.bootrepeats = bootrepeats,
+             margstd_boot.bootci = match.arg(bootci)))
   class(ans) <- "summary.glm"
   return(ans)
 }

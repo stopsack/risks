@@ -16,20 +16,23 @@ knitr::opts_chunk$set(
 
 # Implemented model types
 
-The risks package implements all major regression models that have been proposed for relative risks and risk differences. By default (`approach = "auto"`), `riskratio()` and `riskdiff()` estimate the most efficient valid model that converges; in more numerically challenging cases, they default to computationally less efficient models while ensuring that a valid result is returned.
+The risks package implements all major regression models that have been proposed for relative risks and risk differences. By default (`approach = "auto"`), `riskratio()` and `riskdiff()` estimate the most efficient valid model that converges; in more numerically challenging cases, they default to marginal standardization, which does not return parameters for covariates.
 
 The following models are implemented in the risks package:
 
 #^1^ | `approach =`| RR  | RD  | Model                       | Reference
 --|-------------|-----|-----|-----------------------------|----------------------------------
 1 | `glm`       | `riskratio` | `riskdiff` | Binomial model with a log or identity link | Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. [Am J Epidemiol 1986;123:174-184](https://www.ncbi.nlm.nih.gov/pubmed/3509965).
-2 | `glm_start` | `riskratio` | `riskdiff` | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).
-3 | `glm_cem`   | `riskratio` | --- | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).
-3 | `glm_cem`   | --- | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
-4 | `margstd`   | `riskratio` | `riskdiff` | Marginally standardized estimates using binomial models with a logit link (logistic model) with bias-corrected accelerated (BC~a~) confidence intervals from parametric bootstrapping (see [Marginal standardization](margstd.html)). | This package. \ For marginal standardization with *nonparametric* bootstrapping, see: Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803).
+2 | `glm_startp` | `riskratio` | `riskdiff` | Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model | Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. [Am J Epidemiol 2005;162:199-200](https://www.ncbi.nlm.nih.gov/pubmed/15987728).
+3 | `margstd_delta` | `riskratio` | `riskdiff` | Marginally standardized estimates using binomial models with a logit link (logistic model) with standard errors calculated via the delta method. | This package.
+-- | `margstd_boot`   | `riskratio` | `riskdiff` | Marginally standardized estimates using binomial models with a logit link (logistic model) with bias-corrected accelerated (BC~a~) confidence intervals from parametric bootstrapping (see [Marginal standardization](margstd.html)). | This package. \ For marginal standardization with *nonparametric* bootstrapping, see: Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. [J Clin Epidemiol 2007;60(9):874-82](https://www.ncbi.nlm.nih.gov/pubmed/17689803).
+-- | `glm_cem`   | `riskratio` | --- | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).
+-- | `glm_cem`   | --- | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
 --| `robpoisson` | `riskratio` | `riskdiff` | Log-linear (Poisson) model with robust/sandwich/empirical standard errors | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)
+--| `duplicate` | `riskratio` | `riskdiff` | Case-duplication approach, fitting a logistic model with cluster-robust standard errors | Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC, Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in case-cohort designs: hypertension and cardiovascular mortality. [Stat Med 1993;12:1733–45](https://pubmed.ncbi.nlm.nih.gov/8248665).
+--| `glm_startd` | `riskratio` | --- | Binomial model with a log link, convergence-assisted by starting values from case-duplication logistic model | This package.
 --| `logistic`   | `riskratio`, for comparison only  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
-^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting.
+^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting (`glm_startp`: only for RR).
 
 Which model was fitted is always indicated in the first line of the output of `summary()` and in the `model` column of `tidy()`. In methods sections of manuscripts, the approach can be described in detail as follows: "Risk ratios (or risk differences) were obtained via (method listed in the first line of model `summary.risks(...)`) using the `risks` R package (reference to this package and/or the article listed in the column 'reference')."
 
@@ -59,15 +62,17 @@ dat <- tibble::tibble(
 We then select a binomial model with starting values from the Poisson model:
 
 ```{r selectapproach}
-riskratio(formula = death ~ stage + receptor, data = dat, 
-          approach = "glm_start")
+riskratio(formula = death ~ stage + receptor, 
+          data = dat, 
+          approach = "glm_startp")
 ```
 
 \
 However, the binomial model without starting values does not converge:
 
 ```{r selectapproach2, error = TRUE}
-riskratio(formula = death ~ stage + receptor, data = dat, 
+riskratio(formula = death ~ stage + receptor, 
+          data = dat, 
           approach = "glm")
 ```
 
@@ -78,7 +83,8 @@ riskratio(formula = death ~ stage + receptor, data = dat,
 With `approach = "all"`, all model types listed in the tables are fitted. The fitted object, *e.g.*, `fit`, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of `summary(fit)`:
 
 ```{r allmodels}
-fit_all <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+fit_all <- riskratio(formula = death ~ stage + receptor, 
+                    data = dat, 
                     approach = "all")
 summary(fit_all)
 ```
@@ -88,6 +94,6 @@ Individual models can be accessed as `fit$all_models[[1]]` through `fit$all_mode
 
 ```{r allmodels2}
 tidy(fit_all) %>%
-  select(-statistic) %>%
-  print(n = 25)
+  select(-statistic, -p.value) %>%
+  print(n = 50)
 ```

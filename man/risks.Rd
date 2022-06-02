@@ -17,9 +17,15 @@ models using regression.
 
 \code{\link[risks]{summary.risks}}: Summarize fitted model.
 
-\code{\link[risks]{tidy.risks}}: Tibble (data frame) of parameters, coefficients, standard errors, confidence intervals.
+\code{\link[risks]{tidy.risks}}: Tibble (data frame) of parameters,
+coefficients, standard errors, confidence intervals.
 
-\code{\link[risks]{confint.robpoisson}}, \code{\link[risks]{confint.margstd}}: Confidence intervals. (Standard confidence intervals for generalized linear models are used for other models.)
+\code{\link[risks]{confint.robpoisson}},
+\code{\link[risks]{confint.duplicate}},
+\code{\link[risks]{confint.margstd_boot}},
+\code{\link[risks]{confint.margstd_delta}}: Confidence intervals. (Standard
+confidence intervals for generalized linear models are used for other
+models.)
 }
 
 \seealso{

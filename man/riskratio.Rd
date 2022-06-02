@@ -8,8 +8,9 @@
 riskratio(
   formula,
   data,
-  approach = c("auto", "all", "robpoisson", "glm", "glm_start", "glm_cem",
-    "glm_cem_start", "margstd", "logistic"),
+  approach = c("auto", "all", "robpoisson", "duplicate", "glm", "glm_startp",
+    "glm_startd", "glm_cem", "glm_cem_startp", "margstd_boot", "margstd_delta",
+    "logistic"),
   variable = NULL,
   at = NULL,
   ...
@@ -18,8 +19,8 @@ riskratio(
 riskdiff(
   formula,
   data,
-  approach = c("auto", "all", "robpoisson", "glm", "glm_start", "glm_cem",
-    "glm_cem_start", "margstd"),
+  approach = c("auto", "all", "robpoisson", "glm", "glm_startp", "glm_cem",
+    "glm_cem_startp", "margstd_boot", "margstd_delta"),
   variable = NULL,
   at = NULL,
   ...
@@ -45,75 +46,92 @@ See full documentation (currently at
 \url{https://stopsack.github.io/risks}) for details.
 \itemize{
 \item \code{"glm"} Binomial model.
-\item \code{"glm_start"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startp"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startd"} Binomial model with starting values from logistic
+model with case duplication.
 \item \code{"robpoisson"} Poisson model with robust covariance.
+\item \code{"duplicate"} Logistic model with duplication of cases. Only
+available in \code{riskratio()}.
 \item \code{"glm_cem"} Binomial model fitted with combinatorial expectation
 maximization.
-\item \code{"glm_cem_start"} As \code{glm_cem}, with Poisson starting values.
-\item \code{"margstd"} Marginal standardization after logistic model.
+\item \code{"glm_cem_startp"} As \code{glm_cem}, with Poisson starting values.
+\item \code{"margstd_boot"} Marginal standardization after logistic model,
+bootstrap standard errors/confidence intervals.
+\item \code{"margstd_delta"} Marginal standardization after logistic model,
+delta method standard errors/confidence intervals.
 \item \code{"logistic"} For comparison only: the logistic model. Only available
 in \code{riskratio()}.
 }}
 
-\item{variable}{Optional: exposure variable to use for marginal standardization.
-If \code{variable} is not provided and marginal standardization is
-attempted, then the first binary or categorical variable in the model
+\item{variable}{Optional: exposure variable to use for marginal
+standardization. If \code{variable} is not provided and marginal
+standardization is attempted, then the first variable in the model
 is used as the exposure. Levels are determined automatically for
-variables types \code{logical}, \code{character}, \code{factor},
-and \code{numeric} (only if no more than 2 levels for the latter);
-otherwise levels must be supplied via \code{at =}.}
+variables types \code{logical}, \code{character}, \code{factor} and can
+optionally be supplied via \code{at =}.}
 
 \item{at}{Optional: Levels of exposure variable \code{variable} for marginal
-standardization. \code{at =} determines the levels at which contrasts of the exposure
-are to be assessed. The level listed first is used as the reference.
-Levels must exist in the data for character, factor or ordered factor
-variables. For numeric variables, levels that do not exist in the data
-can be interpolations or extrapolations; if levels exceed the
+standardization. \code{at =} determines the levels at which contrasts of
+the exposure are to be assessed. The level listed first is used as the
+reference. Levels must exist in the data for character, factor or ordered
+factor variables. For numeric variables, levels that do not exist in the
+data can be interpolations or extrapolations; if levels exceed the
 extremes of the data (extrapolation), a warning will be displayed.}
 
 \item{...}{Optional: Further arguments passed to fitting functions
 (\code{glm}, \code{logbin}, or \code{addreg}).}
 }
 \value{
-Fitted model. This object can be passed on to post-processing functions:
+Fitted model. This object can be passed on to post-processing
+functions:
 \itemize{
-\item \code{\link[risks]{summary.risks}}: an overview of results (risks-specific S3 methods:
-\code{\link[risks]{summary.robpoisson}}, \code{\link[risks]{summary.margstd}}).
-\item \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence intervals.
+\item \code{\link[risks]{summary.risks}}: an overview of results
+(risks-specific S3 methods: \code{\link[risks]{summary.robpoisson}},
+\code{\link[risks]{summary.margstd_boot}},
+\code{\link[risks]{summary.margstd_delta}}).
+\item \code{\link[risks]{tidy.risks}}: a tibble of coefficients and confidence
+intervals.
 }
 
 Standard post-processing functions can also be used:
 \itemize{
 \item \code{\link[stats]{coef}}: a vector of coefficients.
-\item \code{\link[stats]{confint}}: a matrix of confidence intervals (risks-specific S3 methods:
-\code{\link[risks]{confint.robpoisson}}, \code{\link[risks]{confint.margstd}}).
-\item \code{\link[stats]{predict.glm}(type = "response")}: fitted values (predictions).
+\item \code{\link[stats]{confint}}: a matrix of confidence intervals
+(risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
+\code{\link[risks]{confint.margstd_boot}},
+\code{\link[risks]{confint.margstd_delta}}).
+\item \code{\link[stats]{predict.glm}(type = "response")}: fitted values
+(predictions).
 \item \code{\link[stats]{residuals}}: residuals.
 }
 
 If model fitting using all possible approaches was requested via
 \code{approach = "all"}, then their results can be retrieved from the
-list \code{all_models} in the returned object (e.g., \code{fit$all_models[[1]]},
-\code{fit$all_models[[2]]}, etc.).
+list \code{all_models} in the returned object (e.g.,
+\code{fit$all_models[[1]]}, \code{fit$all_models[[2]]}, etc.).
 }
 \description{
 \code{riskratio} and \code{riskdiff} provide a flexible interface to fitting
 risk ratio and risk difference models.
 
 In cohort studies with a binary outcome, risk ratios and risk differences
-are typically more appropriate to report than odds ratios from logistic regression,
-yet such models have historically been difficult to implement in standard software.
+are typically more appropriate to report than odds ratios from logistic
+regression, yet such models have historically been difficult to implement in
+standard software.
 
 The risks package selects an efficient way to fit risk ratio or
-risk difference models successfully, which will converge whenever logistic models converge.
-Optionally, a specific approach to model fitting can also be requested.
-Implemented are Poisson models with robust covariance, binomial models,
-binomial models aided in convergence by starting values obtained
-through Poisson models, binomial models fitted via
-combinatorial expectation maximization (optionally also with Poisson starting values),
-and estimates obtained via marginal standardization after logistic regression.
+risk difference models successfully, which will converge whenever logistic
+models converge. Optionally, a specific approach to model fitting can also be
+requested. Implemented are Poisson models with robust covariance, binomial
+models, logistic models with case duplication, binomial models aided in
+convergence by starting values obtained through Poisson models or
+logistic models with case duplication, binomial models fitted via
+combinatorial expectation maximization (optionally also with Poisson starting
+values), and estimates obtained via marginal standardization after logistic
+regression with bootstrapped or delta method for confidence intervals.
 
-Adjusting for covariates (e.g., confounders) in the model specification (\code{formula =}) is possible.
+Adjusting for covariates (e.g., confounders) in the model specification
+(\code{formula =}) is possible.
 }
 \section{Functions}{
 \itemize{
@@ -123,7 +141,8 @@ Adjusting for covariates (e.g., confounders) in the model specification (\code{f
 }}
 
 \examples{
-# Newman SC. Biostatistical methods in epidemiology. New York, NY: Wiley, 2001, table 5.3
+# Newman SC. Biostatistical methods in epidemiology.
+# New York, NY: Wiley, 2001, table 5.3
 library(tibble)  # used to set up example data
 dat <- tibble(
   death    = c(rep(1, 54), rep(0, 138)),
@@ -158,6 +177,12 @@ studies with binary data. Am J Epidemiol 2004;159:702-706.
 (Poisson model with robust/sandwich standard errors;
 \code{approach = "robpoisson"})
 
+Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC,
+Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in
+case-cohort designs: hypertension and cardiovascular mortality.
+Stat Med 1993;12:1733–45; (Logistic model with case duplication and
+cluster-robust standard errors, \code{approach = "duplicate"}).
+
 Donoghoe MW, Marschner IC. logbin: An R Package for
 Relative Risk Regression Using the Log-Binomial Model.
 J Stat Softw 2018;86(9). (Log-binomial models fitted via combinatorial
@@ -172,6 +197,6 @@ fitted via combinatorial expectation maximization;
 Localio AR, Margolis DJ, Berlin JA.
 Relative risks and confidence intervals were easily computed
 indirectly from multivariable logistic regression.
-J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting a
-logistic model; \code{approach = "margstd"})
+J Clin Epidemiol 2007;60(9):874-82. (Marginal standardization after fitting
+a logistic model; \code{approach = "margstd_boot"})
 }

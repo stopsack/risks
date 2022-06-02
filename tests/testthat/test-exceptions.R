@@ -21,25 +21,25 @@ test_that("nothing works", {
   expect_error(suppressWarnings(print(riskratio(formula = death ~
                                                   stage + receptor,
                                                 data = dat[1:50,]))),
-               "No model converged")
+               "No model")
   expect_equal(return_failure(family = "poisson",
                               classname = "robpoisson")$converged,
                FALSE)
   expect_error(suppressWarnings(print(riskratio(formula = death ~ stage + receptor,
                                                 data = dat[55:75, ],
                                                 approach = "all"))),
-               "No model converged")
+               "No model")
   expect_error(suppressWarnings(print(summary(riskratio(formula = death ~ receptor + stage,
                                                         data = dat[55:75, ],
                                                         approach = "all")))),
-               "No model converged")
+               "No model")
 })
 
 test_that("bad parameter values are caught", {
   expect_error(estimate_risk(formula = death ~ stage + receptor,
-                             estimate = "NONSENSE",
+                             estimand = "NONSENSE",
                              data = dat),
-               "Unknown estimate")
+               "should be one of")
   expect_error(riskratio(formula = death ~ stage + receptor,
                          approach = "NONSENSE",
                          data = dat),
@@ -47,32 +47,28 @@ test_that("bad parameter values are caught", {
   expect_error(riskdiff(formula = death ~ stage + receptor,
                          approach = "logistic",
                          data = dat),
-               "Wacholder")
+               "Approach 'logistic' is not implemented")
   expect_warning(tidy(riskdiff(formula = death ~ stage + receptor, data = dat),
                       exponentiate = TRUE),
                  "model did not use a log or logit link")
   expect_error(riskratio(formula = death ~ stage + receptor, data = dat,
-                         approach = "margstd", variable = "NONSENSE"),
+                         approach = "margstd_boot", variable = "NONSENSE"),
                "Variable 'NONSENSE' is not part of the model")
   expect_error(riskratio(formula = death ~ stage + receptor,
-                         approach = "margstd", at = "NONSENSE",
+                         approach = "margstd_boot", at = "NONSENSE",
                          data = dat),
-               "Because 'at' has less than 2 levels")
+               "'at' has fewer than 2 levels. Contrasts cannot be estimated.")
   expect_error(riskratio(formula = death ~ stage + receptor,
-                         approach = "margstd", at = c("NONSENSE1", "2"),
+                         approach = "margstd_boot", at = c("NONSENSE1", "2"),
                          data = dat),
                "Some of the levels, specificied via 'at ='")
-  expect_error(riskratio(formula = death ~ rand, data = dat,
-                         approach = "margstd", variable = "rand"),
-               "Variable 'rand' is not a factor, ")
-  expect_error(riskratio(formula = death ~ rand, data = dat,
-                         approach = "margstd"),
-               "No exposure variable identified")
   expect_warning(riskratio(formula = death ~ rand, data = dat,
-                           approach = "margstd", variable = "rand",
+                           approach = "margstd_boot", variable = "rand",
                            at = c(-1, 1)),
                  "out-of-range predictions for the variable 'rand'.")
-  # implicit binary variable passes:
-  expect_output(print(riskratio(death ~ bin, data = dat, approach = "margstd")),
-                "bin2")
+
+  expect_error(riskratio(formula = death ~ rand, data = dat,
+                         approach = "margstd_delta",
+                         at = c(-1, 1)),
+               "Levels for marginal standardization")
 })
