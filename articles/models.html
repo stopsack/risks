@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/risks.html">Get started</a>
 </li>
@@ -50,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/stopsack/risks/">
+  <a href="https://github.com/stopsack/risks/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -91,17 +87,17 @@
       <h1 data-toc-skip>Models and model comparisons</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/stopsack/risks/blob/master/vignettes/models.Rmd"><code>vignettes/models.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stopsack/risks/blob/HEAD/vignettes/models.Rmd" class="external-link"><code>vignettes/models.Rmd</code></a></small>
       <div class="hidden name"><code>models.Rmd</code></div>
 
     </div>
 
     
     
-<div id="implemented-model-types" class="section level1">
-<h1 class="hasAnchor">
-<a href="#implemented-model-types" class="anchor"></a>Implemented model types</h1>
-<p>The risks package implements all major regression models that have been proposed for relative risks and risk differences. By default (<code>approach = "auto"</code>), <code><a href="../reference/riskratio.html">riskratio()</a></code> and <code><a href="../reference/riskratio.html">riskdiff()</a></code> estimate the most efficient valid model that converges; in more numerically challenging cases, they default to computationally less efficient models while ensuring that a valid result is returned.</p>
+<div class="section level2">
+<h2 id="implemented-model-types">Implemented model types<a class="anchor" aria-label="anchor" href="#implemented-model-types"></a>
+</h2>
+<p>The risks package implements all major regression models that have been proposed for relative risks and risk differences. By default (<code>approach = "auto"</code>), <code><a href="../reference/riskratio.html">riskratio()</a></code> and <code><a href="../reference/riskratio.html">riskdiff()</a></code> estimate the most efficient valid model that converges; in more numerically challenging cases, they default to marginal standardization, which does not return parameters for covariates.</p>
 <p>The following models are implemented in the risks package:</p>
 <table class="table">
 <colgroup>
@@ -128,50 +124,74 @@
 <td><code>riskratio</code></td>
 <td><code>riskdiff</code></td>
 <td>Binomial model with a log or identity link</td>
-<td>Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/3509965">Am J Epidemiol 1986;123:174-184</a>.</td>
+<td>Wacholder S. Binomial regression in GLIM: Estimating risk ratios and risk differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/3509965" class="external-link">Am J Epidemiol 1986;123:174-184</a>.</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td><code>glm_start</code></td>
+<td><code>glm_startp</code></td>
 <td><code>riskratio</code></td>
 <td><code>riskdiff</code></td>
 <td>Binomial model with a log or identity link, convergence-assisted by starting values from Poisson model</td>
-<td>Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15987728">Am J Epidemiol 2005;162:199-200</a>.</td>
+<td>Spiegelman D, Hertzmark E. Easy SAS calculations for risk or prevalence ratios and differences. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15987728" class="external-link">Am J Epidemiol 2005;162:199-200</a>.</td>
 </tr>
 <tr class="odd">
 <td>3</td>
+<td><code>margstd_delta</code></td>
+<td><code>riskratio</code></td>
+<td><code>riskdiff</code></td>
+<td>Marginally standardized estimates using binomial models with a logit link (logistic model) with standard errors calculated via the delta method.</td>
+<td>This package.</td>
+</tr>
+<tr class="even">
+<td>–</td>
+<td><code>margstd_boot</code></td>
+<td><code>riskratio</code></td>
+<td><code>riskdiff</code></td>
+<td>Marginally standardized estimates using binomial models with a logit link (logistic model) with bias-corrected accelerated (BC<sub>a</sub>) confidence intervals from parametric bootstrapping (see <a href="margstd.html">Marginal standardization</a>).</td>
+<td>This package.  For marginal standardization with <em>nonparametric</em> bootstrapping, see: Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. <a href="https://www.ncbi.nlm.nih.gov/pubmed/17689803" class="external-link">J Clin Epidemiol 2007;60(9):874-82</a>.</td>
+</tr>
+<tr class="odd">
+<td>–</td>
 <td><code>glm_cem</code></td>
 <td><code>riskratio</code></td>
 <td>—</td>
 <td>Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring</td>
-<td>Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. <a href="http://dx.doi.org/10.18637/jss.v086.i09">J Stat Softw 2018;86(9)</a>.</td>
+<td>Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. <a href="http://dx.doi.org/10.18637/jss.v086.i09" class="external-link">J Stat Softw 2018;86(9)</a>.</td>
 </tr>
 <tr class="even">
-<td>3</td>
+<td>–</td>
 <td><code>glm_cem</code></td>
 <td>—</td>
 <td><code>riskdiff</code></td>
 <td>Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring</td>
-<td>Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. <a href="https://doi.org/10.1016/j.csda.2014.06.019">Comput Stat Data Anal 2014;80:184-96</a>.</td>
+<td>Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. <a href="https://doi.org/10.1016/j.csda.2014.06.019" class="external-link">Comput Stat Data Anal 2014;80:184-96</a>.</td>
 </tr>
 <tr class="odd">
-<td>4</td>
-<td><code>margstd</code></td>
-<td><code>riskratio</code></td>
-<td><code>riskdiff</code></td>
-<td>Marginally standardized estimates using binomial models with a logit link (logistic model) with bias-corrected accelerated (BC<sub>a</sub>) confidence intervals from parametric bootstrapping (see <a href="margstd.html">Marginal standardization</a>).</td>
-<td>This package.  For marginal standardization with <em>nonparametric</em> bootstrapping, see: Localio AR, Margolis DJ, Berlin JA. Relative risks and confidence intervals were easily computed indirectly from multivariable logistic regression. <a href="https://www.ncbi.nlm.nih.gov/pubmed/17689803">J Clin Epidemiol 2007;60(9):874-82</a>.</td>
-</tr>
-<tr class="even">
 <td>–</td>
 <td><code>robpoisson</code></td>
 <td><code>riskratio</code></td>
 <td><code>riskdiff</code></td>
 <td>Log-linear (Poisson) model with robust/sandwich/empirical standard errors</td>
-<td>Zou G. A modified Poisson regression approach to prospective studies with binary data. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15033648">Am J Epidemiol 2004;159(7):702-6</a>
+<td>Zou G. A modified Poisson regression approach to prospective studies with binary data. <a href="https://www.ncbi.nlm.nih.gov/pubmed/15033648" class="external-link">Am J Epidemiol 2004;159(7):702-6</a>
 </td>
 </tr>
+<tr class="even">
+<td>–</td>
+<td><code>duplicate</code></td>
+<td><code>riskratio</code></td>
+<td><code>riskdiff</code></td>
+<td>Case-duplication approach, fitting a logistic model with cluster-robust standard errors</td>
+<td>Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC, Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in case-cohort designs: hypertension and cardiovascular mortality. <a href="https://pubmed.ncbi.nlm.nih.gov/8248665" class="external-link">Stat Med 1993;12:1733–45</a>.</td>
+</tr>
 <tr class="odd">
+<td>–</td>
+<td><code>glm_startd</code></td>
+<td><code>riskratio</code></td>
+<td>—</td>
+<td>Binomial model with a log link, convergence-assisted by starting values from case-duplication logistic model</td>
+<td>This package.</td>
+</tr>
+<tr class="even">
 <td>–</td>
 <td><code>logistic</code></td>
 <td>
@@ -182,33 +202,34 @@
 </tr>
 </tbody>
 </table>
-<p><sup>1</sup> Indicates the priority with which the default modelling strategy (<code>approach = "auto"</code>) attempts model fitting.</p>
-<p>Which model was fitted is always indicated in the first line of the output of <code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code> and in the <code>model</code> column of <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>. In methods sections of manuscripts, the approach can be described in detail as follows: “Risk ratios (or risk differences) were obtained via (method listed in the first line of model <code><a href="../reference/summary.risks.html">summary.risks(...)</a></code>) using the <code>risks</code> R package (reference to this package and/or the article listed in the column ‘reference’).”</p>
-<p>For example: “Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the <code>risks</code> R package (<a href="https://stopsack.github.io/risks" class="uri">https://stopsack.github.io/risks</a>).”</p>
+<p><sup>1</sup> Indicates the priority with which the default modelling strategy (<code>approach = "auto"</code>) attempts model fitting (<code>glm_startp</code>: only for RR).</p>
+<p>Which model was fitted is always indicated in the first line of the output of <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> and in the <code>model</code> column of <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>. In methods sections of manuscripts, the approach can be described in detail as follows: “Risk ratios (or risk differences) were obtained via (method listed in the first line of model <code>summary.risks(...)</code>) using the <code>risks</code> R package (reference to this package and/or the article listed in the column ‘reference’).”</p>
+<p>For example: “Risk ratios were obtained from binomial models with a log link, convergence-assisted by Poisson models (ref. Spiegelman and Hertzmark, AJE 2005), using the <code>risks</code> R package (<a href="https://stopsack.github.io/risks" class="external-link uri">https://stopsack.github.io/risks</a>).”</p>
 </div>
-<div id="model-choice" class="section level1">
-<h1 class="hasAnchor">
-<a href="#model-choice" class="anchor"></a>Model choice</h1>
+<div class="section level2">
+<h2 id="model-choice">Model choice<a class="anchor" aria-label="anchor" href="#model-choice"></a>
+</h2>
 <p>By default, automatic model fitting according to the priority listed in the table above is attempted. Alternatively, any of the options listed under <code>approach =</code> in the table can be requested directly. However, unlike with <code>approach = "auto"</code> (the default), the selected model may not converge.</p>
 <p>We load the same example data as in the <a href="risks.html#an-example-cohort-study">Get Started vignette</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://stopsack.github.io/risks">risks</a></span><span class="op">)</span>  <span class="co"># provides riskratio(), riskdiff(), postestimation functions</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>  <span class="co"># For data handling</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span>  <span class="co"># For tidy() model summaries</span>
-<span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
-  death    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">54</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">138</span><span class="op">)</span><span class="op">)</span>,
-  stage    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">7</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">26</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">21</span><span class="op">)</span>,
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">60</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">70</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>,
-  receptor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">5</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">17</span><span class="op">)</span>,
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">12</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">50</span><span class="op">)</span>,
-               <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">13</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">57</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stopsack.github.io/risks" class="external-link">risks</a></span><span class="op">)</span>  <span class="co"># provides riskratio(), riskdiff(), postestimation functions</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>  <span class="co"># For data handling</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/" class="external-link">broom</a></span><span class="op">)</span>  <span class="co"># For tidy() model summaries</span>
+<span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>
+  death    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">54</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">138</span><span class="op">)</span><span class="op">)</span>,
+  stage    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">7</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">26</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">21</span><span class="op">)</span>,
+               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">60</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">70</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>,
+  receptor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">5</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">17</span><span class="op">)</span>,
+               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">12</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">50</span><span class="op">)</span>,
+               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">13</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">57</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>We then select a binomial model with starting values from the Poisson model:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>, 
-          approach <span class="op">=</span> <span class="st">"glm_start"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, 
+          data <span class="op">=</span> <span class="va">dat</span>, 
+          approach <span class="op">=</span> <span class="st">"glm_startp"</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Risk ratio model</span>
-<span class="co">#&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "log"), </span>
+<span class="co">#&gt; Call:  stats::glm(formula = death ~ stage + receptor, family = stats::binomial(link = "log"), </span>
 <span class="co">#&gt;     data = dat, start = "(from Poisson model)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients:</span>
@@ -221,16 +242,18 @@
 <p><br>
 However, the binomial model without starting values does not converge:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>, 
+<code class="sourceCode R"><span class="fu"><a href="../reference/riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, 
+          data <span class="op">=</span> <span class="va">dat</span>, 
           approach <span class="op">=</span> <span class="st">"glm"</span><span class="op">)</span>
 <span class="co">#&gt; Error: no valid set of coefficients has been found: please supply starting values</span></code></pre></div>
 </div>
-<div id="model-comparisons" class="section level1">
-<h1 class="hasAnchor">
-<a href="#model-comparisons" class="anchor"></a>Model comparisons</h1>
-<p>With <code>approach = "all"</code>, all model types listed in the tables are fitted. The fitted object, <em>e.g.</em>, <code>fit</code>, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of <code><a href="https://rdrr.io/r/base/summary.html">summary(fit)</a></code>:</p>
+<div class="section level2">
+<h2 id="model-comparisons">Model comparisons<a class="anchor" aria-label="anchor" href="#model-comparisons"></a>
+</h2>
+<p>With <code>approach = "all"</code>, all model types listed in the tables are fitted. The fitted object, <em>e.g.</em>, <code>fit</code>, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of <code>summary(fit)</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">fit_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/riskratio.html">riskdiff</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>, 
+<code class="sourceCode R"><span class="va">fit_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, 
+                    data <span class="op">=</span> <span class="va">dat</span>, 
                     approach <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span>
 <span class="co">#&gt; Loading required package: doParallel</span>
 <span class="co">#&gt; Loading required package: foreach</span>
@@ -249,81 +272,96 @@ However, the binomial model without starting values does not converge:</p>
 <span class="co">#&gt; The following objects are masked from 'package:numDeriv':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     grad, hessian</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">fit_all</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_all</span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; All fitted models:</span>
-<span class="co">#&gt;          Model Converged Max.prob.</span>
-<span class="co">#&gt; 1   robpoisson      TRUE 0.7907040</span>
-<span class="co">#&gt; 2          glm      TRUE 0.8173940</span>
-<span class="co">#&gt; 3    glm_start      TRUE 0.8173882</span>
-<span class="co">#&gt; 4       addreg      TRUE 0.8173957</span>
-<span class="co">#&gt; 5 addreg_start      TRUE 0.8173957</span>
-<span class="co">#&gt; 6      margstd      TRUE 0.8158560</span>
+<span class="co">#&gt;            Model Converged Max.prob.</span>
+<span class="co">#&gt; 1     robpoisson      TRUE 0.9052473</span>
+<span class="co">#&gt; 2            glm     FALSE        NA</span>
+<span class="co">#&gt; 3     glm_startp      TRUE 0.8702313</span>
+<span class="co">#&gt; 4         logbin      TRUE 0.8702292</span>
+<span class="co">#&gt; 5   logbin_start      TRUE 0.8702294</span>
+<span class="co">#&gt; 6   margstd_boot      TRUE 0.8158560</span>
+<span class="co">#&gt; 7  margstd_delta      TRUE 0.8158560</span>
+<span class="co">#&gt; 8       logistic      TRUE 0.8158560</span>
+<span class="co">#&gt; 9      duplicate      TRUE 0.4785245</span>
+<span class="co">#&gt; 10    glm_startd      TRUE 0.8702318</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Risk difference model, fitted as Poisson model with robust covariance (robpoisson).</span>
+<span class="co">#&gt; Risk ratio model, fitted as Poisson model with robust covariance (robpoisson).</span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = poisson(link = "identity"), </span>
+<span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = poisson(link = "log"), </span>
 <span class="co">#&gt;     data = dat, start = "(no starting values)")</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
-<span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
-<span class="co">#&gt; -1.2575  -0.6870  -0.4147   0.2260   1.7546  </span>
+<span class="co">#&gt;      Min        1Q    Median        3Q       Max  </span>
+<span class="co">#&gt; -1.34555  -0.68794  -0.43330   0.09792   1.70862  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Coefficients:</span>
 <span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="co">#&gt; (Intercept)     0.08600    0.03871   2.222 0.026292 *  </span>
-<span class="co">#&gt; stageStage II   0.14998    0.06474   2.317 0.020519 *  </span>
-<span class="co">#&gt; stageStage III  0.56505    0.16482   3.428 0.000607 ***</span>
-<span class="co">#&gt; receptorLow     0.13965    0.09602   1.454 0.145866    </span>
+<span class="co">#&gt; (Intercept)     -2.3658     0.3602  -6.569 5.08e-11 ***</span>
+<span class="co">#&gt; stageStage II    0.9246     0.3932   2.351   0.0187 *  </span>
+<span class="co">#&gt; stageStage III   1.7772     0.3855   4.610 4.03e-06 ***</span>
+<span class="co">#&gt; receptorLow      0.4891     0.2129   2.297   0.0216 *  </span>
 <span class="co">#&gt; ---</span>
 <span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; (Dispersion parameter for poisson family taken to be 1)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     Null deviance: 137.00  on 191  degrees of freedom</span>
-<span class="co">#&gt; Residual deviance: 110.57  on 188  degrees of freedom</span>
-<span class="co">#&gt; AIC: 226.57</span>
+<span class="co">#&gt; Residual deviance: 110.29  on 188  degrees of freedom</span>
+<span class="co">#&gt; AIC: 226.29</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Number of Fisher Scoring iterations: 5</span>
+<span class="co">#&gt; Number of Fisher Scoring iterations: 6</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; Confidence intervals for coefficients: (normality-based)</span>
-<span class="co">#&gt;                      2.5 %    97.5 %</span>
-<span class="co">#&gt; (Intercept)     0.01013792 0.1618699</span>
-<span class="co">#&gt; stageStage II   0.02309478 0.2768559</span>
-<span class="co">#&gt; stageStage III  0.24200852 0.8880958</span>
-<span class="co">#&gt; receptorLow    -0.04855731 0.3278532</span></code></pre></div>
+<span class="co">#&gt; Confidence intervals for coefficients: (robust)</span>
+<span class="co">#&gt;                      2.5 %     97.5 %</span>
+<span class="co">#&gt; (Intercept)    -3.07172916 -1.6599084</span>
+<span class="co">#&gt; stageStage II   0.15386831  1.6952382</span>
+<span class="co">#&gt; stageStage III  1.02161187  2.5328206</span>
+<span class="co">#&gt; receptorLow     0.07183369  0.9062773</span></code></pre></div>
 <p><br>
-Individual models can be accessed as <code>fit$all_models[[1]]</code> through <code>fit$all_models[[6]]</code> (or <code>[[7]]</code> if fitting a risk ratio model). <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> shows coefficients and confidence intervals from all models that converged:</p>
+Individual models can be accessed as <code>fit$all_models[[1]]</code> through <code>fit$all_models[[6]]</code> (or <code>[[7]]</code> if fitting a risk ratio model). <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> shows coefficients and confidence intervals from all models that converged:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">fit_all</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">statistic</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">25</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 23 x 7</span>
-<span class="co">#&gt;    term           estimate std.error   p.value conf.low conf.high model       </span>
-<span class="co">#&gt;    &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;       </span>
-<span class="co">#&gt;  1 (Intercept)      0.0860    0.0387   2.63e-2  0.0122      0.160 robpoisson  </span>
-<span class="co">#&gt;  2 stageStage II    0.150     0.0647   2.05e-2  0.0366      0.263 robpoisson  </span>
-<span class="co">#&gt;  3 stageStage III   0.565     0.165    6.07e-4  0.377       0.753 robpoisson  </span>
-<span class="co">#&gt;  4 receptorLow      0.140     0.0960   1.46e-1 -0.00878     0.288 robpoisson  </span>
-<span class="co">#&gt;  5 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm         </span>
-<span class="co">#&gt;  6 stageStage II    0.149     0.0576   9.53e-3  0.0364      0.262 glm         </span>
-<span class="co">#&gt;  7 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm         </span>
-<span class="co">#&gt;  8 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm         </span>
-<span class="co">#&gt;  9 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 glm_start   </span>
-<span class="co">#&gt; 10 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 glm_start   </span>
-<span class="co">#&gt; 11 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 glm_start   </span>
-<span class="co">#&gt; 12 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 glm_start   </span>
-<span class="co">#&gt; 13 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg      </span>
-<span class="co">#&gt; 14 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg      </span>
-<span class="co">#&gt; 15 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg      </span>
-<span class="co">#&gt; 16 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg      </span>
-<span class="co">#&gt; 17 (Intercept)      0.0838    0.0363   2.11e-2  0.0126      0.155 addreg_start</span>
-<span class="co">#&gt; 18 stageStage II    0.149     0.0576   9.52e-3  0.0364      0.262 addreg_start</span>
-<span class="co">#&gt; 19 stageStage III   0.572     0.0947   1.52e-9  0.387       0.758 addreg_start</span>
-<span class="co">#&gt; 20 receptorLow      0.161     0.0759   3.35e-2  0.0126      0.310 addreg_start</span>
-<span class="co">#&gt; 21 stageStage I     0         0      NaN       NA          NA     margstd     </span>
-<span class="co">#&gt; 22 stageStage II    0.163     0.0588   5.57e-3  0.0334      0.274 margstd     </span>
-<span class="co">#&gt; 23 stageStage III   0.571     0.105    5.36e-8  0.419       0.799 margstd</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_all</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">statistic</span>, <span class="op">-</span><span class="va">p.value</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 34 × 6</span></span>
+<span class="co">#&gt;    term           estimate std.error conf.low conf.high model        </span>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> (Intercept)      -<span style="color: #BB0000;">2.37</span>      0.360  -<span style="color: #BB0000;">3.07</span>      -<span style="color: #BB0000;">1.66</span>  robpoisson   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> stageStage II     0.925     0.393   0.154      1.70  robpoisson   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> stageStage III    1.78      0.386   1.02       2.53  robpoisson   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> receptorLow       0.489     0.213   0.071<span style="text-decoration: underline;">8</span>     0.906 robpoisson   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> (Intercept)      -<span style="color: #BB0000;">2.35</span>      0.360  -<span style="color: #BB0000;">3.06</span>      -<span style="color: #BB0000;">1.65</span>  glm_startp   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> stageStage II     0.931     0.393   0.161      1.70  glm_startp   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> stageStage III    1.77      0.385   1.01       2.52  glm_startp   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> receptorLow       0.444     0.197   0.057<span style="text-decoration: underline;">8</span>     0.829 glm_startp   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> (Intercept)      -<span style="color: #BB0000;">2.35</span>      0.360  -<span style="color: #BB0000;">3.06</span>      -<span style="color: #BB0000;">1.65</span>  logbin       </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> stageStage II     0.931     0.393   0.161      1.70  logbin       </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">11</span> stageStage III    1.77      0.385   1.01       2.52  logbin       </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">12</span> receptorLow       0.444     0.197   0.057<span style="text-decoration: underline;">8</span>     0.829 logbin       </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">13</span> (Intercept)      -<span style="color: #BB0000;">2.35</span>      0.360  -<span style="color: #BB0000;">3.06</span>      -<span style="color: #BB0000;">1.65</span>  logbin_start </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">14</span> stageStage II     0.931     0.393   0.161      1.70  logbin_start </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">15</span> stageStage III    1.77      0.385   1.01       2.52  logbin_start </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">16</span> receptorLow       0.444     0.197   0.057<span style="text-decoration: underline;">8</span>     0.829 logbin_start </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">17</span> stageStage I      0         0      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>     margstd_boot </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">18</span> stageStage II     0.899     0.671   0.234      2.40  margstd_boot </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">19</span> stageStage III    1.81      0.672   1.29       3.18  margstd_boot </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">20</span> stageStage I      0         0       0          0     margstd_delta</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">21</span> stageStage II     0.899     0.387   0.140      1.66  margstd_delta</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">22</span> stageStage III    1.81      0.378   1.07       2.55  margstd_delta</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">23</span> (Intercept)      -<span style="color: #BB0000;">2.37</span>      0.420  -<span style="color: #BB0000;">3.19</span>      -<span style="color: #BB0000;">1.54</span>  logistic     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">24</span> stageStage II     1.13      0.466   0.222      2.05  logistic     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">25</span> stageStage III    2.94      0.586   1.79       4.08  logistic     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">26</span> receptorLow       0.920     0.395   0.145      1.69  logistic     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">27</span> (Intercept)      -<span style="color: #BB0000;">2.37</span>      0.362  -<span style="color: #BB0000;">3.08</span>      -<span style="color: #BB0000;">1.66</span>  duplicate    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">28</span> stageStage II     0.923     0.395   0.149      1.70  duplicate    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">29</span> stageStage III    1.78      0.385   1.03       2.54  duplicate    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">30</span> receptorLow       0.504     0.224   0.064<span style="text-decoration: underline;">7</span>     0.944 duplicate    </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">31</span> (Intercept)      -<span style="color: #BB0000;">2.35</span>      0.360  -<span style="color: #BB0000;">3.06</span>      -<span style="color: #BB0000;">1.65</span>  glm_startd   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">32</span> stageStage II     0.931     0.393   0.161      1.70  glm_startd   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">33</span> stageStage III    1.77      0.385   1.01       2.52  glm_startd   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">34</span> receptorLow       0.444     0.197   0.057<span style="text-decoration: underline;">8</span>     0.829 glm_startd</span></code></pre></div>
 </div>
   </div>
 
@@ -338,11 +376,13 @@ Individual models can be accessed as <code>fit$all_models[[1]]</code> through <c
 
 
       <footer><div class="copyright">
-  <p>Developed by Konrad Stopsack, Travis Gerke.</p>
+  <p></p>
+<p>Developed by Konrad Stopsack, Travis Gerke.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
@@ -350,6 +390,8 @@ Individual models can be accessed as <code>fit$all_models[[1]]</code> through <c
 
   
 
+
+  
 
   </body>
 </html>
