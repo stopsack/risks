@@ -8,7 +8,7 @@
   object,
   parm = NULL,
   level = 0.95,
-  bootrepeats = 200,
+  bootrepeats = 1000,
   bootci = c("bca", "normal", "nonpar"),
   jacksd = FALSE,
   ...
@@ -21,8 +21,7 @@
 
 \item{level}{Confidence level, defaults to 0.95.}
 
-\item{bootrepeats}{Bootstrap repeats. Defaults to 200.
-Strongly recommend >1000.}
+\item{bootrepeats}{Bootstrap repeats. Defaults to 1000. Consider increasing.}
 
 \item{bootci}{Type of bootstrap confidence interval:
 \itemize{

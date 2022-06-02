@@ -10,7 +10,7 @@
   correlation = FALSE,
   symbolic.cor = FALSE,
   level = 0.95,
-  bootrepeats = 200,
+  bootrepeats = 1000,
   bootci = c("bca", "normal", "nonpar"),
   ...
 )
@@ -26,8 +26,8 @@
 
 \item{level}{Confidence level, defaults to \code{0.95}.}
 
-\item{bootrepeats}{Bootstrap repeats for standard errors. Defaults to 200.
-Strongly recommend >1000.}
+\item{bootrepeats}{Bootstrap repeats for standard errors. Defaults to 1000.
+Consider increasing.}
 
 \item{bootci}{Type of bootstrap confidence interval:
 \itemize{

@@ -239,8 +239,7 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #' @param object Model fitted through marginal standardization
 #' @param parm Not used, for compatibility
 #' @param level Confidence level, defaults to 0.95.
-#' @param bootrepeats Bootstrap repeats. Defaults to 200.
-#'   Strongly recommend >1000.
+#' @param bootrepeats Bootstrap repeats. Defaults to 1000. Consider increasing.
 #' @param bootci Type of bootstrap confidence interval:
 #'
 #'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
@@ -258,12 +257,13 @@ bootci_bcapar <- function(boot_out, level, parameters) {
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
-confint.margstd_boot <- function(object, parm = NULL,
-                            level = 0.95,
-                            bootrepeats = 200,
-                            bootci = c("bca", "normal", "nonpar"),
-                            jacksd = FALSE,
-                            ...) {
+confint.margstd_boot <- function(object,
+                                 parm = NULL,
+                                 level = 0.95,
+                                 bootrepeats = 1000,
+                                 bootci = c("bca", "normal", "nonpar"),
+                                 jacksd = FALSE,
+                                 ...) {
   cf <- coef(object)
   pnames <- names(cf)
   a <- (1 - level)/2
@@ -352,8 +352,8 @@ margstd_boot_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
 #' @param correlation Not used
 #' @param symbolic.cor Not used
 #' @param level Confidence level, defaults to \code{0.95}.
-#' @param bootrepeats Bootstrap repeats for standard errors. Defaults to 200.
-#'          Strongly recommend >1000.
+#' @param bootrepeats Bootstrap repeats for standard errors. Defaults to 1000.
+#'  Consider increasing.
 #' @param bootci Type of bootstrap confidence interval:
 #'
 #'   * \code{"bca"} Default. Parametric BCa (bias-corrected accelerated)
@@ -372,7 +372,8 @@ margstd_boot_stderror <- function(object, level = 0.95, bootreps, bootci, ...) {
 #' @export
 summary.margstd_boot <- function(object, dispersion = NULL,
                                  correlation = FALSE, symbolic.cor = FALSE,
-                                 level = 0.95, bootrepeats = 200,
+                                 level = 0.95,
+                                 bootrepeats = 1000,
                                  bootci = c("bca", "normal",  "nonpar"), ...) {
   est.disp <- FALSE
   df.r <- object$df.residual
