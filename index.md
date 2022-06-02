@@ -41,13 +41,10 @@ programming skills, including in R.
 The `risks` package fills this gap by providing a user-friendly approach
 that makes obtaining adjusted risk ratios and risk differences as simple
 as fitting a logistic regression model. No advanced programming or
-biostatistics skills are required. Built-in routines automatically
-switch to more computationally demanding model fitting approaches if
-simple binomial models have convergence issues, making `risks` return
-valid estimates whenever the data would allow for fitting a logistic
-model. At the same time, several options for customization of model
-fitting and reporting as well as comparisons between different
-approaches are provided (see [Get started](articles/risks.html)).
+biostatistics skills are required. `risks` returns valid estimates whenever the 
+data would allow for fitting a logistic model. At the same time, several options 
+for customization of model fitting and reporting as well as comparisons between 
+different approaches are provided (see [Get started](articles/risks.html)).
 
 Five different approaches are implemented 
 (see [Models and model comparisons](articles/models.html)): 
