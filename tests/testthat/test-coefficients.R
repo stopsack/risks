@@ -139,4 +139,10 @@ test_that("Continuous and implicit binary variables pass in marg std", {
   expect_output(print(riskratio(death ~ cont,
                                 data = dat, approach = "margstd_delta")),
                 "cont")
+
+  # specific levels for continuous variable pass in margstd_BOOT:
+  expect_output(print(riskratio(death ~ receptor,
+                                at = c("High", "Low"),
+                                data = dat, approach = "margstd_delta")),
+                "Low")
 })

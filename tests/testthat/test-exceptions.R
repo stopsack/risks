@@ -21,18 +21,18 @@ test_that("nothing works", {
   expect_error(suppressWarnings(print(riskratio(formula = death ~
                                                   stage + receptor,
                                                 data = dat[1:50,]))),
-               "No model converged")
+               "No model")
   expect_equal(return_failure(family = "poisson",
                               classname = "robpoisson")$converged,
                FALSE)
   expect_error(suppressWarnings(print(riskratio(formula = death ~ stage + receptor,
                                                 data = dat[55:75, ],
                                                 approach = "all"))),
-               "No model converged")
+               "No model")
   expect_error(suppressWarnings(print(summary(riskratio(formula = death ~ receptor + stage,
                                                         data = dat[55:75, ],
                                                         approach = "all")))),
-               "No model converged")
+               "No model")
 })
 
 test_that("bad parameter values are caught", {
@@ -66,4 +66,9 @@ test_that("bad parameter values are caught", {
                            approach = "margstd_boot", variable = "rand",
                            at = c(-1, 1)),
                  "out-of-range predictions for the variable 'rand'.")
+
+  expect_error(riskratio(formula = death ~ rand, data = dat,
+                         approach = "margstd_delta",
+                         at = c(-1, 1)),
+               "Levels for marginal standardization")
 })
