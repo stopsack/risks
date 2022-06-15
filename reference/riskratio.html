@@ -129,8 +129,12 @@ regression with bootstrapped or delta method for confidence intervals.</p>
     <h2>Arguments</h2>
     <dl><dt>formula</dt>
 <dd><p>A formula object of the form <code>response ~ predictors</code>.</p></dd>
+
+
 <dt>data</dt>
 <dd><p>A <code>tibble</code> or <code>data.frame</code> object.</p></dd>
+
+
 <dt>approach</dt>
 <dd><p>Optional: Method for model fitting.</p><ul><li><p><code>"auto"</code> (default) is recommended; it selects the most efficient
 approach that converges and ensures that predicted probabilities are
@@ -157,6 +161,8 @@ delta method standard errors/confidence intervals.</p></li>
 <li><p><code>"logistic"</code> For comparison only: the logistic model. Only available
 in <code>riskratio()</code>.</p></li>
 </ul></dd>
+
+
 <dt>variable</dt>
 <dd><p>Optional: exposure variable to use for marginal
 standardization. If <code>variable</code> is not provided and marginal
@@ -164,6 +170,8 @@ standardization is attempted, then the first variable in the model
 is used as the exposure. Levels are determined automatically for
 variables types <code>logical</code>, <code>character</code>, <code>factor</code> and can
 optionally be supplied via <code>at =</code>.</p></dd>
+
+
 <dt>at</dt>
 <dd><p>Optional: Levels of exposure variable <code>variable</code> for marginal
 standardization. <code>at =</code> determines the levels at which contrasts of
@@ -172,13 +180,18 @@ reference. Levels must exist in the data for character, factor or ordered
 factor variables. For numeric variables, levels that do not exist in the
 data can be interpolations or extrapolations; if levels exceed the
 extremes of the data (extrapolation), a warning will be displayed.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Optional: Further arguments passed to fitting functions
 (<code>glm</code>, <code>logbin</code>, or <code>addreg</code>).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Fitted model. This object can be passed on to post-processing
+    
+
+<p>Fitted model. This object can be passed on to post-processing
 functions:</p><ul><li><p><code><a href="summary.risks.html">summary.risks</a></code>: an overview of results
 (risks-specific S3 methods: <code><a href="summary.robpoisson.html">summary.robpoisson</a></code>,
 <code><a href="summary.margstd_boot.html">summary.margstd_boot</a></code>,
@@ -364,7 +377,7 @@ a logistic model; <code>approach = "margstd_boot"</code>)</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

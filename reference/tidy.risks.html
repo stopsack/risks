@@ -91,15 +91,23 @@ and p-values. A column with the type of model fitted is added.</p>
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p>Model</p></dd>
+
+
 <dt>conf.int</dt>
 <dd><p>Show confidence intervals?</p></dd>
+
+
 <dt>conf.level</dt>
 <dd><p>Optional. Confidence level. Defaults to <code>0.95</code>.</p></dd>
+
+
 <dt>bootrepeats</dt>
 <dd><p>Optional. Number of bootstrap repeats.
 Applicable to models fitted via marginal standardization and bootstrapping
 (<code>approach = "margstd_boot"</code>). Defaults to 200. Strongly recommended
 to increase repeats to &gt;1000.</p></dd>
+
+
 <dt>bootci</dt>
 <dd><p>Optional and applicable for <code>approach = "margstd_boot"</code>
 only. Type of bootstrap confidence interval:</p><ul><li><p><code>"bca"</code> Default. Parametric BCa (bias-corrected accelerated)
@@ -111,25 +119,36 @@ may result in invalid results for ratios.</p></li>
 which should be used with caution because of the risk
 of sparse-data bias with non-parametric bootstrapping.</p></li>
 </ul></dd>
+
+
 <dt>bootverbose</dt>
 <dd><p>Optional. Add values of <code>bootrepeats</code> and
 <code>bootci</code> parameters and the jackknife-based Monte-Carlo error for the
 confidence limits (only for <code>type = "bca"</code>) to the returned tibble?
 Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt>exponentiate</dt>
 <dd><p>Optional. Exponentiate coefficients and confidence
 limits? Defaults to FALSE. Setting <code>exponentiate = TRUE</code> is useful for
 relative risk models (log links).</p></dd>
+
+
 <dt>default</dt>
 <dd><p>Use default, normality-based confidence intervals?
 Defaults to TRUE. With <code>default = FALSE</code>, for binomial models only,
 profile likelihood-based confidence intervals can be calculated.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Passed on</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>tibble</p>
+    
+
+<p>tibble</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -168,9 +187,9 @@ column of the tibble includes the name of the model. See examples.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   term           estimate std.error statistic   p.value conf.low conf.high model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I      0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>   <span style="color: #949494;"> </span>     <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>    marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.899     0.413      2.17   2.96<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>    0.172      1.78 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.81      0.412      4.40   1.11<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span>    1.11       2.66 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I      0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.899     0.437      2.06   3.96<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>   0.097<span style="text-decoration: underline;">2</span>      1.75 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.81      0.431      4.20   2.66<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span>   1.05        2.59 marg…</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Multiple types of models fitted:</span></span>
 <span class="r-in"><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>,</span>
@@ -221,7 +240,7 @@ column of the tibble includes the name of the model. See examples.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

@@ -87,12 +87,20 @@ based on parametric bootstrapping.</p>
     <h2>Arguments</h2>
     <dl><dt>object</dt>
 <dd><p>Model fitted through marginal standardization</p></dd>
+
+
 <dt>parm</dt>
 <dd><p>Not used, for compatibility</p></dd>
+
+
 <dt>level</dt>
 <dd><p>Confidence level, defaults to 0.95.</p></dd>
+
+
 <dt>bootrepeats</dt>
 <dd><p>Bootstrap repeats. Defaults to 1000. Consider increasing.</p></dd>
+
+
 <dt>bootci</dt>
 <dd><p>Type of bootstrap confidence interval:</p><ul><li><p><code>"bca"</code> Default. Parametric BCa (bias-corrected accelerated)
 confidence intervals.</p></li>
@@ -103,15 +111,22 @@ may result in invalid results for ratios.</p></li>
 which should be used with caution because of the risk
 of sparse-data bias with non-parametric bootstrapping.</p></li>
 </ul></dd>
+
+
 <dt>jacksd</dt>
 <dd><p>Return jackknife Monte-Carlo error for the confidence limits?
 Only functional with BCa confidence intervals. Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Not used</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Matrix: First column, lower bound; second column, upper bound.</p>
+    
+
+<p>Matrix: First column, lower bound; second column, upper bound.</p>
     </div>
 
   </div>
@@ -126,7 +141,7 @@ Only functional with BCa confidence intervals. Defaults to <code>FALSE</code>.</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer></div>

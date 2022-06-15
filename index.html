@@ -104,7 +104,7 @@
 <p>The <code>risks</code> package fits regression models for risk ratios (RR) and risk differences (RD). For brevity, the package refers to “risk,” but “prevalence” can be substituted throughout.</p>
 <p>What is the association between an exposure (men/women, age in years, or underweight/lean/overweight/obese) and the risk of a binary outcome (dead/alive, disease/healthy), perhaps adjusting for confounders (smoker/nonsmoker, years of education)? For such binary outcomes, many studies default to reporting odds ratios (OR). Yet outside of case-control studies, odds ratios are unnecessary to report. Risk ratios and risk differences have more intuitive interpretations. Additionally, when the outcome is not rare, odds ratios are significant overestimates for risk ratios. Despite these drawbacks, odds ratios are often simply reported because they are easily obtained from logistic regression models. Obtaining risk ratios or risk differences, especially after adjusting for covariates (<em>e.g.,</em> confounders) has been quite challenging and often required more advanced biostatistics and programming skills, including in R.</p>
 <p>The <code>risks</code> package fills this gap by providing a user-friendly approach that makes obtaining adjusted risk ratios and risk differences as simple as fitting a logistic regression model. No advanced programming or biostatistics skills are required. <code>risks</code> returns valid estimates whenever the data would allow for fitting a logistic model. At the same time, several options for customization of model fitting and reporting as well as comparisons between different approaches are provided (see <a href="articles/risks.html">Get started</a>).</p>
-<p>Five different approaches are implemented (see <a href="articles/models.html">Models and model comparisons</a>): Poisson models with robust covariance, binomial models aided in convergence by starting values obtained through Poisson models, binomial models fitted via combinatorial expectation maximization instead of Fisher scoring (optionally also with Poisson starting values), and marginal standardization after fitting logistic models (see <a href="articles/margstd.html">Marginal standardization</a> for details).</p>
+<p>Eight different approaches are implemented (see <a href="articles/models.html">Models and model comparisons</a>).</p>
 </div>
 <div class="section level1">
 <h1 id="further-reading">Further reading<a class="anchor" aria-label="anchor" href="#further-reading"></a>
@@ -169,7 +169,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
       </footer>
