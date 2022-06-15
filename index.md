@@ -46,14 +46,8 @@ data would allow for fitting a logistic model. At the same time, several options
 for customization of model fitting and reporting as well as comparisons between 
 different approaches are provided (see [Get started](articles/risks.html)).
 
-Five different approaches are implemented 
-(see [Models and model comparisons](articles/models.html)): 
-Poisson models with robust covariance,
-binomial models aided in convergence by starting values obtained through
-Poisson models, binomial models fitted via combinatorial expectation
-maximization instead of Fisher scoring (optionally also with Poisson
-starting values), and marginal standardization after fitting logistic
-models (see [Marginal standardization](articles/margstd.html) for details).
+Eight different approaches are implemented 
+(see [Models and model comparisons](articles/models.html)).
 
 # Further reading
 
