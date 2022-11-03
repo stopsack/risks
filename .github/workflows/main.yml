@@ -27,12 +27,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@master #ffe45a39586f073cc2e9af79c4ba563b657dc6e3
+        uses: r-lib/actions/setup-r@HEAD
         with:
           r-version: ${{ matrix.r-version }}
 
       - name: Set up pandoc
-        uses: r-lib/actions/setup-pandoc@master
+        uses: r-lib/actions/setup-pandoc@HEAD
         if: matrix.config.image == null
 
       - name: Install remotes
