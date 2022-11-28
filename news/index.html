@@ -66,11 +66,13 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.0" id="risks-030">risks 0.3.0<a class="anchor" aria-label="anchor" href="#risks-030"></a></h2>
 <ul><li>
-<strong>Breaking changes:</strong><ul><li>Rename <code>approach = "glm_start"</code> to <code>"glm_startp"</code> (for <strong>P</strong>oisson).</li>
+<strong>Breaking changes:</strong>
+<ul><li>Rename <code>approach = "glm_start"</code> to <code>"glm_startp"</code> (for <strong>P</strong>oisson).</li>
 <li>Rename <code>approach = "margstd"</code> to <code>"margstd_boot"</code>.</li>
 <li>For consistency with other approaches, no longer treat numeric variables with only two levels (e.g., <code>1</code> and <code>2</code>) as categorical in <code>approach = "margstd_boot"</code>.</li>
 </ul></li>
-<li>New estimators:<ul><li>
+<li>New estimators:
+<ul><li>
 <code>approach = "margstd_delta"</code>, marginal standardization after fitting a logistic model with standard errors via the delta method.</li>
 <li>
 <code>approach = "margstd_boot"</code> now also implements average marginal effects to handle continuous exposures.</li>
@@ -81,13 +83,17 @@
 <li>
 <code><a href="../reference/rr_rd_mantel_haenszel.html">rr_rd_mantel_haenszel()</a></code>: New function for comparison purposes.</li>
 </ul></li>
-<li>Changes to parameters:<ul><li>
+<li>Changes to parameters:
+<ul><li>
 <code>approach = "auto"</code>, the default, now attempts model fitting in this order of priority: <code>approach = "glm"</code>; <code>approach = "glm_startp"</code> (for risk ratios only); <code>approach = "margstd_delta"</code>. If all fail, the user is shown the error messages from a plain logistic model.</li>
 <li>Bootstrap repeats (<code>bootrepeats</code>) for <code>approach = "margstd_boot"</code> now default to <code>1000</code>.</li>
 </ul></li>
-<li>Bug fixes:<ul><li>
-<code><a href="../reference/summary.robpoisson.html">summary.robpoisson()</a></code>: Fix sandwich standard errors. <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> output was correct.</li></ul></li>
-<li>Programming changes:<ul><li>Do not attach the logbin package to the namespace; export <code>logbin::conv.test()</code> on its behalf. Move MASS package (needed only for testthat) to <code>Suggests</code>.</li>
+<li>Bug fixes:
+<ul><li>
+<code><a href="../reference/summary.robpoisson.html">summary.robpoisson()</a></code>: Fix sandwich standard errors. <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> output was correct.</li>
+</ul></li>
+<li>Programming changes:
+<ul><li>Do not attach the logbin package to the namespace; export <code>logbin::conv.test()</code> on its behalf. Move MASS package (needed only for testthat) to <code>Suggests</code>.</li>
 <li>Remove usage of unexported functions from <code>stats</code>.</li>
 <li>For <code>approach = "margstd_boot"</code>, avoid two rounds of bootstrap for standard error and confidence intervals separately. Rewrite internal fitting function <code>fit_and_predict()</code>, replacing <code>eststd()</code>. Overall, bootstrapping is more than two times faster now.</li>
 </ul></li>
@@ -109,7 +115,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="risks-020">risks 0.2.0<a class="anchor" aria-label="anchor" href="#risks-020"></a></h2>
-<ul><li>Expand bootstrapping options after marginal standardization:<ul><li>Parametric BCa bootstrap confidence intervals via the <a href="https://cran.r-project.org/web/packages/bcaboot/" class="external-link">bcaboot package</a> are the new default.</li>
+<ul><li>Expand bootstrapping options after marginal standardization:
+<ul><li>Parametric BCa bootstrap confidence intervals via the <a href="https://cran.r-project.org/web/packages/bcaboot/" class="external-link">bcaboot package</a> are the new default.</li>
 <li>Parametric normality-based intervals are a backup.</li>
 <li>Non-parametric bootstrapping with BCa intervals is retained as an option for completeness.</li>
 </ul></li>
@@ -118,7 +125,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="risks-010">risks 0.1.0<a class="anchor" aria-label="anchor" href="#risks-010"></a></h2>
-<ul><li>First release</li></ul></div>
+<ul><li>First release</li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -133,7 +141,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
