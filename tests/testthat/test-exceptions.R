@@ -69,6 +69,6 @@ test_that("bad parameter values are caught", {
 
   expect_error(riskratio(formula = death ~ rand, data = dat,
                          approach = "margstd_delta",
-                         at = c(-1, 1)),
+                         at = c(0.1, 0.3)),
                "Levels for marginal standardization")
 })
