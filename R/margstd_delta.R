@@ -25,7 +25,7 @@ estimate_margstd_delta <- function(
         dplyr::mutate(
           expos = relevel(factor(.data$expos),
                           ref = exposure$margstd_levels[1])) %>%
-        dplyr::rename(!!exposure$predictor := .data$expos)
+        dplyr::rename(!!exposure$predictor := "expos")
       fit <- stats::glm(
         formula = formula,
         family = binomial(link = "logit"),
@@ -40,7 +40,7 @@ estimate_margstd_delta <- function(
     if(!is.null(exposure$margstd_levels))
       stop(paste(
         "Levels for marginal standardization for a continuous",
-        "exposure are not supposed with approach = 'margstd_delta'.",
+        "exposure are not supported with approach = 'margstd_delta'.",
         "Use approach = 'margstd_boot'."))
   }
 
@@ -112,7 +112,7 @@ estimate_margstd_delta <- function(
       term = exposure$predictor) %>%
       dplyr::mutate(
         dplyr::across(
-          .cols = c(.data$estimate, .data$std.error),
+          .cols = c("estimate", "std.error"),
           .fns = ~. / delta))
   }
 
@@ -196,7 +196,6 @@ confint.margstd_delta <- function(
 #' @param ... Not used
 #'
 #' @return Model summary (list)
-#' @return
 #' @export
 summary.margstd_delta <- function(
     object,

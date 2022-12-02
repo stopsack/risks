@@ -45,8 +45,6 @@ of sparse-data bias with non-parametric bootstrapping.
 }
 \value{
 Model summary (list)
-
-
 }
 \description{
 Summary for models using marginal standardization

@@ -436,7 +436,7 @@ print.summary.risks <- function(x, ...) {
                 "nonpar" = "nonparametric BCa")[x$margstd_boot.bootci],
               " bootstrap repeats)\n"))
     ci <- x$conf.int %>%
-      dplyr::select(.data$conf.low, .data$conf.high) %>%
+      dplyr::select("conf.low", "conf.high") %>%
       as.matrix()
     a <- (1 - x$level) / 2
     a <- c(a, 1 - a)
@@ -447,7 +447,7 @@ print.summary.risks <- function(x, ...) {
                                               scientific = FALSE, digits = 3),
                                        "%")))
     ci[] <- x$conf.int %>%
-      dplyr::select(.data$conf.low, .data$conf.high) %>%
+      dplyr::select("conf.low", "conf.high") %>%
       as.matrix()
     print(ci)
   }

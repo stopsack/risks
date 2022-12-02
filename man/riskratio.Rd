@@ -135,11 +135,11 @@ Adjusting for covariates (e.g., confounders) in the model specification
 }
 \section{Functions}{
 \itemize{
-\item \code{riskratio}: Fit risk ratio models
+\item \code{riskratio()}: Fit risk ratio models
 
-\item \code{riskdiff}: Fit risk difference models
+\item \code{riskdiff()}: Fit risk difference models
+
 }}
-
 \examples{
 # Newman SC. Biostatistical methods in epidemiology.
 # New York, NY: Wiley, 2001, table 5.3
