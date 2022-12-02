@@ -6,7 +6,7 @@
 fit_and_predict <- function(
     data,
     predictor,
-    margstd_levels = NULL,
+    margstd_levels,
     estimand,
     formula) {
   if(!is.null(margstd_levels)) {  # categorical predictors
@@ -14,10 +14,9 @@ fit_and_predict <- function(
       formula = formula,
       data = data,
       family = binomial(link = "logit"))
-    data_rep <- data[
-      rep(
-        seq_len(nrow(data)),
-        times = length(margstd_levels)), ]
+    data_rep <- data[rep(
+      x = seq_len(nrow(data)),
+      times = length(margstd_levels)), ]
     data_rep[, predictor] <- rep(
       x = margstd_levels,
       each = nrow(data))
@@ -28,11 +27,12 @@ fit_and_predict <- function(
         type = "response"),
       INDEX = data_rep[, predictor],
       FUN = mean)
+    res <- res[as.character(margstd_levels)]
     if(estimand == "rd")
       res <- res - res[1]
     else
       res <- log(res / res[1])
-    names(res) <- paste0(predictor, margstd_levels)
+    names(res) <- paste0(predictor, names(res))
   } else {  # continuous predictors: average marginal effect
     fit <- glm(
       formula = formula,
