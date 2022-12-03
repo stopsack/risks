@@ -261,7 +261,7 @@ boot_eststd_bcapar <- function(
     })
 
   # fit_and_predict() gives a numeric vector, not an array, for continuous vars
-  if(class(beta_star)[1] == "numeric") {
+  if(inherits(x = beta_star, what = "numeric", which = TRUE) == 1) {
     beta_star <- array(
       data = beta_star,
       dim = c(1, length(beta_star)),
