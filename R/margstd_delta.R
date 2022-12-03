@@ -44,6 +44,13 @@ estimate_margstd_delta <- function(
         "Use approach = 'margstd_boot'."))
   }
 
+  if(exposure$interaction)
+    warning(paste0(
+      "The formula appears to contain an interaction term involving the ",
+      "exposure variable '", exposure$predictor, "'. ",
+      'Such terms may not have a marginal interpretation with approach = ',
+      '"margstd_delta". Consider using: approach = "margstd_boot".'))
+
   n <- nrow(model.matrix(fit))
   Nvec <- matrix(
     data = rep(c(1 / n, 0, 0, 1 / n), each = n),

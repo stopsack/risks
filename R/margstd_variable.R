@@ -65,8 +65,31 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
     }
     all_levels <- margstd_levels
   }
-  list(predictor = predictor,
-       categorical = model_vars$categorical[1],
-       margstd_levels = margstd_levels,
-       all_levels = all_levels)
+
+  # Find interaction terms. First, replace "(" in "factor(x)", then regex ":"
+  predictor_replaced <- gsub(
+    pattern = "\\(|\\)",
+    replacement =  "",
+    x = predictor)
+  names_effects <- gsub(
+    pattern = "\\(|\\)",
+    replacement =  "",
+    x = names(fit$effects))
+
+  list(
+    predictor = predictor,
+    categorical = model_vars$categorical[1],
+    margstd_levels = margstd_levels,
+    all_levels = all_levels,
+    interaction = any(
+      grepl(
+        pattern = ":",
+        x = grep(
+          pattern = paste0("^", predictor_replaced),
+          x = names_effects,
+          value = TRUE))) |
+      any(grepl(
+        pattern = paste0(":", predictor_replaced),
+        x = names_effects,
+        fixed = TRUE)))
 }
