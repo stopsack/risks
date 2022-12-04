@@ -22,19 +22,19 @@ RoxygenNote: 7.1.2
 URL: https://stopsack.github.io/risks
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
+    addreg,
     covr,
     knitr,
+    logbin,
     MASS,
     rmarkdown,
     testthat
 Imports: 
-    addreg,
     boot,
     bcaboot,
     broom,
     dplyr,
     lifecycle,
-    logbin,
     purrr,
     rlang,
     sandwich,

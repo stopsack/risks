@@ -2,11 +2,7 @@
 # via regular Fisher scoring (stats::glm)
 # via combinatorial expectation maximization (logbin::logbin and addreg::addreg)
 # via logit link--the logistic model just for comparison
-
 #' @import stats
-#' @import addreg
-#' @importFrom logbin logbin
-
 
 # (2) Binomial
 estimate_glm <- function(formula, data, link, start = NULL, start_type = "",

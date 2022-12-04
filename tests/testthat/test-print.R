@@ -22,8 +22,6 @@ test_that("printing functions give output", {
                               approach = "robpoisson")
   fit_logistic <- riskratio(formula = death ~ stage + receptor, data = dat,
                             approach = "logistic")
-  fit_addreg <- riskdiff(formula = death ~ stage + receptor, data = dat,
-                         approach = "glm_cem")
   expect_output(print.summary.risks(summary(fit_all)), "All fitted models")
   expect_output(print.risks(fit_risks), "Risk ratio model")
   expect_output(print.risks(fit_risks), "(from Poisson model)")
@@ -44,6 +42,11 @@ test_that("printing functions give output", {
                 "poisson")
   expect_output(print(summary(fit_logistic)),
                 "logistic model")
-  expect_output(print(summary(fit_addreg)),
-                "addreg::addreg")
+
+  if(requireNamespace("addreg", quietly = TRUE)) {
+    fit_addreg <- riskdiff(formula = death ~ stage + receptor, data = dat,
+                           approach = "glm_cem")
+    expect_output(print(summary(fit_addreg)),
+                  "addreg::addreg")
+  }
 })

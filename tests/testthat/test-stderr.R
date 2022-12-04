@@ -19,10 +19,6 @@ test_that("Standard errors for RR(receptorLow) are the same", {
                              approach = "robpoisson")
   rr_duplicate  <- riskratio(formula = death ~ receptor, data = dat,
                              approach = "duplicate")
-  rr_cem        <- riskratio(formula = death ~ receptor, data = dat,
-                             approach = "glm_cem")
-  rr_cem_startp  <- riskratio(formula = death ~ receptor, data = dat,
-                             approach = "glm_cem_startp")
   rr_margstd_boot <- riskratio(formula = death ~ receptor, data = dat,
                                approach = "margstd_boot")
   rr_margstd_delta <- riskratio(formula = death ~ receptor, data = dat,
@@ -46,12 +42,6 @@ test_that("Standard errors for RR(receptorLow) are the same", {
   expect_equal(se_glm, summary(rr_duplicate)$coefficients["receptorLow",
                                                           "Std. Error"],
                tolerance = tol)
-  expect_equal(se_glm, summary(rr_cem)$coefficients["receptorLow",
-                                                    "Std. Error"],
-               tolerance = tol)
-  expect_equal(se_glm, summary(rr_cem_startp)$coefficients["receptorLow",
-                                                          "Std. Error"],
-               tolerance = tol)
   expect_equal(se_glm, summary(rr_margstd_boot,
                                bootrepeats = 500)$coefficients["receptorLow",
                                                                "Std. Error"],
@@ -62,6 +52,18 @@ test_that("Standard errors for RR(receptorLow) are the same", {
   expect_equal(se_glm, rr_mh,
                tolerance = tol)
 
+  if(requireNamespace("logbin", quietly = TRUE)) {
+    rr_cem        <- riskratio(formula = death ~ receptor, data = dat,
+                               approach = "glm_cem")
+    rr_cem_startp <- riskratio(formula = death ~ receptor, data = dat,
+                               approach = "glm_cem_startp")
+    expect_equal(se_glm, summary(rr_cem)$coefficients["receptorLow",
+                                                      "Std. Error"],
+                 tolerance = tol)
+    expect_equal(se_glm, summary(rr_cem_startp)$coefficients["receptorLow",
+                                                             "Std. Error"],
+                 tolerance = tol)
+  }
 })
 
 test_that("Standard errors for RD(receptorLow) are the same", {
@@ -79,10 +81,6 @@ test_that("Standard errors for RD(receptorLow) are the same", {
                             approach = "glm_startp")
   rd_robpoisson <- riskdiff(formula = death ~ receptor, data = dat,
                             approach = "robpoisson")
-  rd_cem        <- riskdiff(formula = death ~ receptor, data = dat,
-                            approach = "glm_cem")
-  rd_cem_startp <- riskdiff(formula = death ~ receptor, data = dat,
-                            approach = "glm_cem_startp")
   rd_margstd_boot <- riskdiff(formula = death ~ receptor, data = dat,
                             approach = "margstd_boot")
   sum_margstd_boot <- summary(rd_margstd_boot, bootrepeats = 500)
@@ -102,12 +100,6 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   expect_equal(se_glm, summary(rd_robpoisson)$coefficients["receptorLow",
                                                            "Std. Error"],
                tolerance = tol)
-  expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",
-                                                    "Std. Error"],
-               tolerance = tol)
-  expect_equal(se_glm, summary(rd_cem_startp)$coefficients["receptorLow",
-                                                          "Std. Error"],
-               tolerance = tol)
   expect_equal(se_glm, sum_margstd_boot$coefficients["receptorLow", "Std. Error"],
                tolerance = 0.03)
   expect_output(print(sum_margstd_boot), "Confidence intervals for coefficients")
@@ -116,6 +108,19 @@ test_that("Standard errors for RD(receptorLow) are the same", {
   expect_output(print(sum_margstd_delta), "Confidence intervals for coefficients")
   expect_equal(se_glm, rd_mh,
                tolerance = tol)
+
+  if(requireNamespace("addreg", quietly = TRUE)) {
+    rd_cem        <- riskdiff(formula = death ~ receptor, data = dat,
+                              approach = "glm_cem")
+    rd_cem_startp <- riskdiff(formula = death ~ receptor, data = dat,
+                              approach = "glm_cem_startp")
+    expect_equal(se_glm, summary(rd_cem)$coefficients["receptorLow",
+                                                      "Std. Error"],
+                 tolerance = tol)
+    expect_equal(se_glm, summary(rd_cem_startp)$coefficients["receptorLow",
+                                                             "Std. Error"],
+                 tolerance = tol)
+  }
 })
 
 

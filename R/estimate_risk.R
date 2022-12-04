@@ -25,8 +25,6 @@
 #' (\code{formula =}) is possible.
 #'
 #' @import stats
-#' @import addreg
-#' @importFrom logbin logbin
 #'
 #' @param formula A formula object of the form \code{response ~ predictors}.
 #' @param data A \code{tibble} or \code{data.frame} object.
@@ -351,22 +349,44 @@ estimate_risk <- function(formula, data,
                    start = coef(fit_duplicate), start_type = "d", ...)
     },
     glm_cem    = {
-      if(link == "log")
+      if(link == "log") {
+        if(!requireNamespace("logbin", quietly = TRUE))
+          stop(paste(
+            "For this approach, the 'logbin' package must be installed:",
+            'install.packages("logbin")'),
+            call. = FALSE)
         estimate_logbin(formula = formula, data = data, ...)
-      else
+      } else {
+        if(!requireNamespace("addreg", quietly = TRUE))
+          stop(paste(
+            "For this approach, the 'addreg' package must be installed:",
+            'install.packages("addreg")'),
+            call. = FALSE)
         estimate_addreg(formula = formula, data = data, ...)
+      }
     },
     glm_cem_startp = {
       fit_poisson <- estimate_poisson(formula = formula,
                                       data = data, link = link, ...)
-      if(link == "log")
+      if(link == "log") {
+        if(!requireNamespace("logbin", quietly = TRUE))
+          stop(paste(
+            "For this approach, the 'logbin' package must be installed:",
+            'install.packages("logbin")'),
+            call. = FALSE)
         estimate_logbin(formula = formula,
                         data = data, start = coef(fit_poisson),
                         start_type = "p", ...)
-      else
+      } else {
+        if(!requireNamespace("addreg", quietly = TRUE))
+          stop(paste(
+            "For this approach, the 'addreg' package must be installed:",
+            'install.packages("addreg")'),
+            call. = FALSE)
         estimate_addreg(formula = formula,
                         data = data, start = coef(fit_poisson),
                         start_type = "p", ...)
+      }
     },
     margstd_boot = estimate_margstd_boot(formula = formula, data = data,
                                          estimand = estimand,
