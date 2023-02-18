@@ -23,7 +23,7 @@ test_that("tidy(risk*(...), approach = 'all') returns 9 ratio, 7 diff models (ca
   expect_equal(length(unique(broom::tidy(fit_rd)$model)),
                5 + 2 * requireNamespace("addreg", quietly = TRUE))
 
-  expect_equal(nrow(tidy(riskratio(formula = death ~ stage + receptor,
+  expect_equal(nrow(broom::tidy(riskratio(formula = death ~ stage + receptor,
                                    data = dat, approach = "glm_startp"),
                          bootverbose = TRUE)),
                4)  # coefs from glm_start
@@ -49,7 +49,7 @@ test_that("tidy(risk*(...), approach = 'all') returns 10 ratio, 7 diff models (c
   expect_equal(length(unique(broom::tidy(fit_rd)$model)),
                5 + 2 * requireNamespace("addreg", quietly = TRUE))
 
-  expect_equal(nrow(tidy(riskratio(formula = death ~ cont,
+  expect_equal(nrow(broom::tidy(riskratio(formula = death ~ cont,
                                    data = dat, approach = "glm_startp"),
                          bootverbose = TRUE)),
                2)  # 2 coefs from glm_start with Poisson: intercept and 'cont'

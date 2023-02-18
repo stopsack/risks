@@ -4,7 +4,7 @@
 \alias{tidy.risks}
 \title{Tidy model summaries for risks models}
 \usage{
-\method{tidy}{risks}(
+tidy.risks(
   x,
   conf.int = TRUE,
   conf.level = 0.95,
@@ -70,6 +70,7 @@ to parameters for all models at once, in one tibble. The last
 column of the tibble includes the name of the model. See examples.
 }
 \examples{
+if(require("broom")) {
 # Define example data
 library(broom)  # provides tidy() function
 dat <- tibble::tibble(
@@ -93,4 +94,5 @@ tidy(fit_rr, bootrepeats = 1000)
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
                     approach = "all")
 tidy(fit_rr)
+}
 }

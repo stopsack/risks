@@ -48,7 +48,7 @@ test_that("bad parameter values are caught", {
                          approach = "logistic",
                          data = dat),
                "Approach 'logistic' is not implemented")
-  expect_warning(tidy(riskdiff(formula = death ~ stage + receptor, data = dat),
+  expect_warning(broom::tidy(riskdiff(formula = death ~ stage + receptor, data = dat),
                       exponentiate = TRUE),
                  "model did not use a log or logit link")
   expect_error(riskratio(formula = death ~ stage + receptor, data = dat,
