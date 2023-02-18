@@ -34,12 +34,10 @@ Imports:
     boot,
     bcaboot,
     dplyr,
-    lifecycle,
     purrr,
     rlang,
     sandwich,
     stats,
     tibble,
     tidyr
-RdMacros: lifecycle
 VignetteBuilder: knitr
