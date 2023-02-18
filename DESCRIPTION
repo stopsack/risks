@@ -23,7 +23,6 @@ URL: https://stopsack.github.io/risks
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
     addreg,
-    broom,
     covr,
     knitr,
     logbin,
@@ -33,6 +32,7 @@ Suggests:
 Imports: 
     boot,
     bcaboot,
+    broom,
     dplyr,
     purrr,
     rlang,

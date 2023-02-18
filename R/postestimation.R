@@ -126,6 +126,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' to parameters for all models at once, in one tibble. The last
 #' column of the tibble includes the name of the model. See examples.
 #'
+#' @import broom
+#'
 #' @param x Model
 #' @param conf.int Show confidence intervals?
 #' @param conf.level Optional. Confidence level. Defaults to \code{0.95}.
@@ -161,7 +163,6 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' @export
 #'
 #' @examples
-#' if(require("broom")) {
 #' # Define example data
 #' library(broom)  # provides tidy() function
 #' dat <- tibble::tibble(
@@ -185,7 +186,6 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
 #'                     approach = "all")
 #' tidy(fit_rr)
-#' }
 tidy.risks <- function(
   x,
   conf.int     = TRUE,

@@ -22,7 +22,7 @@
 #' -22. Risk differences: formulae 15-18, -19, -21.
 #'
 #' @return
-#' Tibble in \code{tidy} format with
+#' Tibble in \code{\link[broom]{tidy}} format with
 #' * \code{term} the (non-reference) exposure levels
 #' * \code{estimate} Risk ratio (on log scale) or risk difference
 #' * \code{std.error}, \code{conf.low}, and \code{conf.high}  Square-root of M-H

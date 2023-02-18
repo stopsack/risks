@@ -31,7 +31,7 @@ difference. Defaults to \code{"rr"}.}
 \item{conf.level}{Optional. Confidence level. Defaults to \code{0.95}.}
 }
 \value{
-Tibble in \code{tidy} format with
+Tibble in \code{\link[broom]{tidy}} format with
 \itemize{
 \item \code{term} the (non-reference) exposure levels
 \item \code{estimate} Risk ratio (on log scale) or risk difference
