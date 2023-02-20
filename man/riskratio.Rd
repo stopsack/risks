@@ -41,12 +41,13 @@ the model via all implemented approaches to allow for comparisons.
 }
 
 The other options allow for directly selecting a fitting approach,
-some of which may not converge or yield out-of-range predicted probabilities.
-See full documentation (currently at
+some of which may not converge or yield out-of-range predicted
+probabilities. See full documentation (currently at
 \url{https://stopsack.github.io/risks}) for details.
 \itemize{
 \item \code{"glm"} Binomial model.
-\item \code{"glm_startp"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startp"} Binomial model with starting values from Poisson
+model.
 \item \code{"glm_startd"} Binomial model with starting values from logistic
 model with case duplication.
 \item \code{"robpoisson"} Poisson model with robust covariance.
@@ -145,12 +146,15 @@ Adjusting for covariates (e.g., confounders) in the model specification
 # New York, NY: Wiley, 2001, table 5.3
 library(tibble)  # used to set up example data
 dat <- tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+  death = c(
+    rep(1, 54), rep(0, 138)),
+  stage = c(
+    rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
+    rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
+  receptor = c(
+    rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
+    rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
+    rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
 
 # Risk ratio model
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
