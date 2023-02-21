@@ -1,14 +1,9 @@
 context("summary(), standard errors")
 
-test_that("Standard errors for RR(receptorLow) are the same", {
-  dat <- data.frame(
-    death    = c(rep(1, 54), rep(0, 138)),
-    stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-                 rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-    receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-                 rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-                 rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)
+dat <- breastcancer
 
+test_that("Standard errors for RR(receptorLow) are the same", {
   rr_glm        <- riskratio(formula = death ~ receptor, data = dat,
                              approach = "glm")
   rr_glm_startp  <- riskratio(formula = death ~ receptor, data = dat,
@@ -67,14 +62,6 @@ test_that("Standard errors for RR(receptorLow) are the same", {
 })
 
 test_that("Standard errors for RD(receptorLow) are the same", {
-  dat <- data.frame(
-    death    = c(rep(1, 54), rep(0, 138)),
-    stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-                 rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-    receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-                 rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-                 rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
-
   rd_glm        <- riskdiff(formula = death ~ receptor, data = dat,
                             approach = "glm")
   rd_glm_startp <- riskdiff(formula = death ~ receptor, data = dat,
@@ -125,14 +112,7 @@ test_that("Standard errors for RD(receptorLow) are the same", {
 
 
 test_that("Standard errors work with continuous exposure, margstd", {
-  dat <- data.frame(
-    death    = c(rep(1, 54), rep(0, 138)),
-    stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-                 rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-    receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-                 rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-                 rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)),
-    cont     = runif(n = 192, min = -1, max = 1))
+  dat$cont <- runif(n = 192, min = -1, max = 1)
 
   expect_output(print(summary(riskratio(death ~ cont + receptor,
                                 data = dat, approach = "margstd_boot"))),

@@ -1,14 +1,9 @@
 context("exception handling")
 
-dat <- data.frame(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)),
-  rand     = runif(n = 192, min = 0, max = 1),
-  bin      = rep(1:2, n = 96))
+data(breastcancer)
+dat <- breastcancer
+dat$rand <- runif(n = 192, min = 0, max = 1)
+dat$bin <- rep(1:2, times = 96)
 
 test_that("approach = 'auto' handles difficult data", {
   expect_output(suppressWarnings(print(summary(riskratio(formula = death ~

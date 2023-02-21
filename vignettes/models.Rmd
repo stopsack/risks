@@ -50,20 +50,14 @@ We load the same example data as in the [Get Started vignette](risks.html#an-exa
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 library(dplyr)  # For data handling
 library(broom)  # For tidy() model summaries
-dat <- tibble::tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)
 ```
 
 We then select a binomial model with starting values from the Poisson model:
 
 ```{r selectapproach}
 riskratio(formula = death ~ stage + receptor, 
-          data = dat, 
+          data = breastcancer, 
           approach = "glm_startp")
 ```
 
@@ -72,7 +66,7 @@ However, the binomial model without starting values does not converge:
 
 ```{r selectapproach2, error = TRUE}
 riskratio(formula = death ~ stage + receptor, 
-          data = dat, 
+          data = breastcancer, 
           approach = "glm")
 ```
 
@@ -84,8 +78,8 @@ With `approach = "all"`, all model types listed in the tables are fitted. The fi
 
 ```{r allmodels}
 fit_all <- riskratio(formula = death ~ stage + receptor, 
-                    data = dat, 
-                    approach = "all")
+                     data = breastcancer, 
+                     approach = "all")
 summary(fit_all)
 ```
 
