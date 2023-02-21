@@ -4,7 +4,8 @@ estimate_margstd_delta <- function(
     data,
     estimand   = c("rr", "rd"),
     variable = NULL,
-    at = NULL) {
+    at = NULL,
+    interaction_warning = TRUE) {
   estimand <- match.arg(estimand)
   fit <- stats::glm(
     formula = formula,
@@ -44,7 +45,7 @@ estimate_margstd_delta <- function(
         "Use approach = 'margstd_boot'."))
   }
 
-  if(exposure$interaction)
+  if(exposure$interaction & interaction_warning)
     warning(paste0(
       "The formula appears to contain an interaction term involving the ",
       "exposure variable '", exposure$predictor, "'. ",

@@ -244,6 +244,7 @@ estimate_risk <- function(
         estimand = estimand,
         variable = variable,
         at = at,
+        interaction_warning = FALSE,
         ...)
       if(fit$converged == TRUE &
          fit$maxprob < implausible &
@@ -318,6 +319,7 @@ estimate_risk <- function(
         estimand = estimand,
         variable = variable,
         at = at,
+        interaction_warning = FALSE,
         ...)
       if(fit_margstd_delta$converged == TRUE &
          fit_margstd_delta$maxprob < implausible &
