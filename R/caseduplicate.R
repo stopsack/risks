@@ -14,7 +14,7 @@ estimate_duplicate <- function(formula, data, ...) {
                              dplyr::rename(outc = dplyr::one_of(!!yvar)) %>%
                              dplyr::filter(.data$outc == 1) %>%
                              dplyr::mutate(outc = 0) %>%
-                             dplyr::rename(!!yvar := .data$outc))
+                             dplyr::rename(!!yvar := "outc"))
   fit <- eval(substitute(stats::glm(formula = formula,
                                     family = binomial(link = "logit"),
                                     data = data)))

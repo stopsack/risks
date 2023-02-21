@@ -25,26 +25,16 @@ remotes::install_github("stopsack/risks")
 
 # An example cohort study
 
-We define a cohort of women with breast cancer, as used by Spiegelman and Hertzmark ([Am J Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland ([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
+We use a cohort of women with breast cancer, as used by Spiegelman and Hertzmark ([Am J Epidemiol 2005](https://pubmed.ncbi.nlm.nih.gov/15987728)) and Greenland ([Am J Epidemiol 2004](https://pubmed.ncbi.nlm.nih.gov/15286014)). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
 
 ```{r load, message = FALSE}
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 library(dplyr)  # For data handling
 library(broom)  # For tidy() model summaries
 
-# Sample data originally from:
-# Newman SC. Biostatistical methods in epidemiology. 
-# New York, NY: Wiley, 2001, table 5.3
-dat <- tibble::tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)  # Load sample data
 
-# Display the sample data
-dat %>% 
+breastcancer %>%  # Display the sample data
   group_by(receptor, stage) %>% 
   summarize(deaths = sum(death), total = n(), risk = deaths/total)
 ```
@@ -52,10 +42,10 @@ dat %>%
 
 # Adjusted risk ratios
 
-The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` need to be supplied:
+The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. As customary in R, log(RR) is returned; see below for how to obtain exponentiated values. No options for model `family` or `link` need to be supplied:
 
 ```{r basic}
-fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = breastcancer)
 summary(fit_rr)
 ```
 
@@ -65,7 +55,7 @@ summary(fit_rr)
 To obtain risk differences, use `riskdiff`, which has the same syntax:
 
 ```{r basic2}
-fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
+fit_rd <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
 summary(fit_rd)
 ```
 

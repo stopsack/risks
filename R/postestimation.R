@@ -32,17 +32,17 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
   if (conf.int) {
     # Start change here
     # Use cluster-robust CIs for case duplication model
-    if("duplicate" %in% class(x))
+    if(inherits(x = x, what = "duplicate"))
       CI <- suppressMessages(confint.duplicate(x, level = conf.level, ...))
     # Use robust CIs for the robpoisson model
-    if("robpoisson" %in% class(x))
+    if(inherits(x = x, what = "robpoisson"))
       CI <- suppressMessages(confint.robpoisson(x, level = conf.level, ...))
     # Use delta method CIs for margstd_delta
-    if("margstd_delta" %in% class(x))
+    if(inherits(x = x, what = "margstd_delta"))
       CI <- suppressMessages(confint.margstd_delta(x, level = conf.level, ...))
     # Non-BCa CIs do not have estimates of jackknife standard errors
     bca_jacksd <- tibble::tibble(jacksd.low = NA, jacksd.high = NA)
-    if(("margstd_boot" %in% class(x))) {
+    if(inherits(x = x, what = "margstd_boot")) {
       if(is.null(confint_from_summary)) {
         # Used only with tidy() calls after approach = "all"
         CI <- suppressMessages(confint.margstd_boot(x, level = conf.level,
@@ -65,23 +65,37 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
     }
     # Use normality-based confidence intervals in general:
     if(default == TRUE &
-       !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
-       !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x)))
+       !inherits(
+         x = x,
+         what = c(
+           "margstd_boot",
+           "margstd_delta",
+           "robpoisson",
+           "duplicate")))
       CI <- suppressMessages(stats::confint.default(x, level = conf.level))
     # profile-likelihood based confidence intervals; this may fail:
     if(default == FALSE &
-       !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
-       !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x)))
+       !inherits(
+         x = x,
+         what = c(
+           "margstd_boot",
+           "margstd_delta",
+           "robpoisson",
+           "duplicate")))
       CI <- suppressMessages(stats::confint(x, level = conf.level))
     p <- x$rank
-    if (!is.null(p) && !is.null(x$qr) &
-        !("margstd_boot" %in% class(x)) & !("margstd_delta" %in% class(x)) &
-        !("robpoisson" %in% class(x)) & !("duplicate" %in% class(x))) {
-      # End change
+    if(!is.null(p) && !is.null(x$qr) &
+       !inherits(
+         x = x,
+         what = c(
+           "margstd_boot",
+           "margstd_delta",
+           "robpoisson",
+           "duplicate"))) {
       piv <- x$qr$pivot[seq_len(p)]
       CI <- CI[piv, , drop = FALSE]
     }
-    if(class(CI)[1] == "numeric")
+    if(inherits(x = CI, what = "numeric", which = TRUE) == 1)
       CI <- as.data.frame(t(CI))
     colnames(CI) <- c("conf.low", "conf.high")
     rownames(CI) <- NULL
@@ -89,7 +103,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
   }
   ret$estimate <- trans(ret$estimate)
   if(bootverbose == TRUE) {
-    if(!"margstd_boot" %in% class(x)) {
+    if(!inherits(x = x, what = "margstd_boot")) {
       bootreps <- NA_real_
       bootci <- NA_character_
     }
@@ -385,7 +399,7 @@ print.summary.risks <- function(x, ...) {
   cat(x$modeldescr)
 
   # Call regular print.summary.*()
-  if("addreg" %in% class(x)) {
+  if(inherits(x = x, what = "addreg")) {
     addreg::print.summary.addreg(x, ...)
   } else {
     x_print <- x
@@ -396,39 +410,49 @@ print.summary.risks <- function(x, ...) {
   # Print confidence intervals
   if(x$print_confint == TRUE &   # addreg and logbin use standard CIs
      (x$confint_default == TRUE |
-      "addreg" %in% class(x$object) |
-      "logbin" %in% class(x$object)) &
-     !("margstd_boot" %in% class(x$object)) &
-     !("margstd_delta" %in% class(x$object)) &
-     !("duplicate" %in% class(x$object)) &
-     !("robpoisson" %in% class(x$object))) {
+      inherits(
+        x = x$object,
+        what = c("addreg", "logbin"))) &
+      !inherits(
+        x = x$object,
+        what = c(
+          "margstd_boot",
+          "margstd_delta",
+          "duplicate",
+          "robpoisson"))) {
     cat("Confidence intervals for coefficients: (normality-based)\n")
     print(confint.default(x$object, ...))
   }
   if(x$print_confint == TRUE &
-     "robpoisson" %in% class(x$object)) {
+     inherits(x = x$object, what = "robpoisson")) {
     cat("Confidence intervals for coefficients: (robust)\n")
     print(confint(x$object, ...))
   }
   if(x$print_confint == TRUE &
-     "duplicate" %in% class(x$object)) {
+     inherits(x = x$object, what = "duplicate")) {
     cat("Confidence intervals for coefficients: (cluster-robust)\n")
     print(confint(x$object, ...))
   }
   if(x$print_confint == TRUE &
-     "margstd_delta" %in% class(x$object)) {
+     inherits(x = x$object, what = "margstd_delta")) {
     cat("Confidence intervals for coefficients: (delta method)\n")
     print(confint(x$object, ...))
   }
   if(x$print_confint == TRUE &
      x$confint_default == FALSE &
-     sum(c("margstd_boot", "margstd_delta",
-           "addreg", "logbin") %in% class(x$object)) == 0) {
+     !inherits(
+       x = x$object,
+       what = c(
+         "margstd_boot",
+         "margstd_delta",
+         "addreg",
+         "logbin"))) {
     cat("Confidence intervals for coefficients: (profiling-based)\n")
     print(confint(x$object, ...))
   }
 
-  if(x$print_confint == TRUE & "margstd_boot" %in% class(x$object)) {
+  if(x$print_confint == TRUE &
+     inherits(x = x$object, what = "margstd_boot")) {
     # retrieve CIs that were generated when bootstrapping SEs for model summary
     cat(paste0("Confidence intervals for coefficients: (",
               x$margstd_boot.bootrepeats, " ",
@@ -436,7 +460,7 @@ print.summary.risks <- function(x, ...) {
                 "nonpar" = "nonparametric BCa")[x$margstd_boot.bootci],
               " bootstrap repeats)\n"))
     ci <- x$conf.int %>%
-      dplyr::select(.data$conf.low, .data$conf.high) %>%
+      dplyr::select("conf.low", "conf.high") %>%
       as.matrix()
     a <- (1 - x$level) / 2
     a <- c(a, 1 - a)
@@ -447,7 +471,7 @@ print.summary.risks <- function(x, ...) {
                                               scientific = FALSE, digits = 3),
                                        "%")))
     ci[] <- x$conf.int %>%
-      dplyr::select(.data$conf.low, .data$conf.high) %>%
+      dplyr::select("conf.low", "conf.high") %>%
       as.matrix()
     print(ci)
   }

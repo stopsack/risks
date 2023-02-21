@@ -28,8 +28,6 @@
 }
 \value{
 Model summary (list)
-
-
 }
 \description{
 Summary for models using marginal standardization with delta method SEs

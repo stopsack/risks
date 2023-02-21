@@ -10,7 +10,7 @@ riskratio(
   data,
   approach = c("auto", "all", "robpoisson", "duplicate", "glm", "glm_startp",
     "glm_startd", "glm_cem", "glm_cem_startp", "margstd_boot", "margstd_delta",
-    "logistic"),
+    "logistic", "legacy"),
   variable = NULL,
   at = NULL,
   ...
@@ -20,7 +20,7 @@ riskdiff(
   formula,
   data,
   approach = c("auto", "all", "robpoisson", "glm", "glm_startp", "glm_cem",
-    "glm_cem_startp", "margstd_boot", "margstd_delta"),
+    "glm_cem_startp", "margstd_boot", "margstd_delta", "legacy"),
   variable = NULL,
   at = NULL,
   ...
@@ -33,20 +33,24 @@ riskdiff(
 
 \item{approach}{Optional: Method for model fitting.
 \itemize{
-\item \code{"auto"} (default) is recommended; it selects the most efficient
-approach that converges and ensures that predicted probabilities are
-within range (< 1; see Details).
+\item \code{"auto"} (default) is recommended; it will return results of
+\code{"margstd_delta"} unless interaction terms between exposure and
+confounders are included. This these cases, results from
+\code{"margstd_boot"} are returned.
 \item \code{"all"} will attempt to fit
 the model via all implemented approaches to allow for comparisons.
+\item \code{"legacy"} selects the most efficient approach that converges and
+ensures that predicted probabilities are within range (< 1).
 }
 
 The other options allow for directly selecting a fitting approach,
-some of which may not converge or yield out-of-range predicted probabilities.
-See full documentation (currently at
+some of which may not converge or yield out-of-range predicted
+probabilities. See full documentation (currently at
 \url{https://stopsack.github.io/risks}) for details.
 \itemize{
 \item \code{"glm"} Binomial model.
-\item \code{"glm_startp"} Binomial model with starting values from Poisson model.
+\item \code{"glm_startp"} Binomial model with starting values from Poisson
+model.
 \item \code{"glm_startd"} Binomial model with starting values from logistic
 model with case duplication.
 \item \code{"robpoisson"} Poisson model with robust covariance.
@@ -135,30 +139,22 @@ Adjusting for covariates (e.g., confounders) in the model specification
 }
 \section{Functions}{
 \itemize{
-\item \code{riskratio}: Fit risk ratio models
+\item \code{riskratio()}: Fit risk ratio models
 
-\item \code{riskdiff}: Fit risk difference models
+\item \code{riskdiff()}: Fit risk difference models
+
 }}
-
 \examples{
-# Newman SC. Biostatistical methods in epidemiology.
-# New York, NY: Wiley, 2001, table 5.3
-library(tibble)  # used to set up example data
-dat <- tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)  # Cohort study with binary outcome
+                    # See for details: help(breastcancer)
 
 # Risk ratio model
-fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat)
+fit_rr <- riskratio(formula = death ~ stage + receptor, data = breastcancer)
 fit_rr
 summary(fit_rr)
 
 # Risk difference model
-fit_rd <- riskdiff(formula = death ~ stage + receptor, data = dat)
+fit_rd <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
 fit_rd
 summary(fit_rd)
 }

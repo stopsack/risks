@@ -92,10 +92,10 @@ rr_rd_mantel_haenszel <- function(data, exposure, outcome, confounders,
                   b0 = dplyr::if_else(.data$exp == 0,
                                       true = .data$b, false = NA_real_)) %>%
     dplyr::group_by_at(dplyr::vars(dplyr::all_of(confounder_vars))) %>%
-    tidyr::fill(c(.data$a0, .data$b0), .direction = "downup") %>%
+    tidyr::fill(c("a0", "b0"), .direction = "downup") %>%
     dplyr::ungroup() %>%
     dplyr::filter(.data$exp != 0) %>%
-    dplyr::select(-.data$exp) %>%
+    dplyr::select(-"exp") %>%
     dplyr::mutate(n = .data$a + .data$b,
                   n0 = .data$a0 + .data$b0,
                   n_total = .data$n + .data$n0,

@@ -29,10 +29,10 @@ The following models are implemented in the risks package:
 -- | `glm_cem`   | `riskratio` | --- | Binomial model with log-link fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. logbin: An R Package for Relative Risk Regression Using the Log-Binomial Model. [J Stat Softw 2018;86(9)](http://dx.doi.org/10.18637/jss.v086.i09).
 -- | `glm_cem`   | --- | `riskdiff` | Additive binomial model (identity link) fitted via combinatorial expectation maximization instead of Fisher scoring | Donoghoe MW, Marschner IC. Stable computational methods for additive binomial models with application to adjusted risk differences. [Comput Stat Data Anal 2014;80:184-96](https://doi.org/10.1016/j.csda.2014.06.019).
 --| `robpoisson` | `riskratio` | `riskdiff` | Log-linear (Poisson) model with robust/sandwich/empirical standard errors | Zou G. A modified Poisson regression approach to prospective studies with binary data. [Am J Epidemiol 2004;159(7):702-6](https://www.ncbi.nlm.nih.gov/pubmed/15033648)
---| `duplicate` | `riskratio` | `riskdiff` | Case-duplication approach, fitting a logistic model with cluster-robust standard errors | Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC, Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in case-cohort designs: hypertension and cardiovascular mortality. [Stat Med 1993;12:1733–45](https://pubmed.ncbi.nlm.nih.gov/8248665).
+--| `duplicate` | `riskratio` | -- | Case-duplication approach, fitting a logistic model with cluster-robust standard errors | Schouten EG, Dekker JM, Kok FJ, Le Cessie S, Van Houwelingen HC, Pool J, Vandenbroucke JP. Risk ratio and rate ratio estimation in case-cohort designs: hypertension and cardiovascular mortality. [Stat Med 1993;12:1733–45](https://pubmed.ncbi.nlm.nih.gov/8248665).
 --| `glm_startd` | `riskratio` | --- | Binomial model with a log link, convergence-assisted by starting values from case-duplication logistic model | This package.
 --| `logistic`   | `riskratio`, for comparison only  | --- | Binomial model with logit link (*i.e.*, the logistic model), returning odds ratios | Included for comparison purposes only.
-^1^  Indicates the priority with which the default modelling strategy (`approach = "auto"`) attempts  model fitting (`glm_startp`: only for RR).
+^1^  Indicates the priority with which the legacy modelling strategy (`approach = "legacy"`) attempts  model fitting (`glm_startp`: only for RR).
 
 Which model was fitted is always indicated in the first line of the output of `summary()` and in the `model` column of `tidy()`. In methods sections of manuscripts, the approach can be described in detail as follows: "Risk ratios (or risk differences) were obtained via (method listed in the first line of model `summary.risks(...)`) using the `risks` R package (reference to this package and/or the article listed in the column 'reference')."
 
@@ -41,7 +41,7 @@ For example: "Risk ratios were obtained from binomial models with a log link, co
 
 # Model choice
 
-By default, automatic model fitting according to the priority listed in the table above is attempted. Alternatively, any of the options listed under `approach =` in the table can be requested directly. However, unlike with `approach = "auto"` (the default), the selected model may not converge.
+By default, automatic model fitting (`approach = "auto"`) reports results from marginal standardization using a logistic model with delta method standard errors (equivalent to `approach = "margstd_delta"`). An exception is made if interaction terms between exposure and confounders are included. This theis case, confidence intervals are calculated using bootstrapping (equivalent to `approach = "margstd_boot"`). Alternatively, any of the options listed under `approach =` in the table can be requested directly. However, unlike with `approach = "auto"` (the default) or `approach = "legacy"`, the selected model may not converge.
 
 
 We load the same example data as in the [Get Started vignette](risks.html#an-example-cohort-study).
@@ -50,20 +50,14 @@ We load the same example data as in the [Get Started vignette](risks.html#an-exa
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 library(dplyr)  # For data handling
 library(broom)  # For tidy() model summaries
-dat <- tibble::tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)
 ```
 
 We then select a binomial model with starting values from the Poisson model:
 
 ```{r selectapproach}
 riskratio(formula = death ~ stage + receptor, 
-          data = dat, 
+          data = breastcancer, 
           approach = "glm_startp")
 ```
 
@@ -72,7 +66,7 @@ However, the binomial model without starting values does not converge:
 
 ```{r selectapproach2, error = TRUE}
 riskratio(formula = death ~ stage + receptor, 
-          data = dat, 
+          data = breastcancer, 
           approach = "glm")
 ```
 
@@ -84,8 +78,8 @@ With `approach = "all"`, all model types listed in the tables are fitted. The fi
 
 ```{r allmodels}
 fit_all <- riskratio(formula = death ~ stage + receptor, 
-                    data = dat, 
-                    approach = "all")
+                     data = breastcancer, 
+                     approach = "all")
 summary(fit_all)
 ```
 

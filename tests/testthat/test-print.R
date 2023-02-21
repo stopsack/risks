@@ -1,17 +1,14 @@
 context("printing functions")
 
-dat <- data.frame(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)
+dat <- breastcancer
 
 test_that("printing functions give output", {
   fit_all <- riskratio(formula = death ~ stage + receptor, data = dat,
                        approach = "all")
   fit_risks <- riskratio(formula = death ~ stage + receptor, data = dat)
+  fit_risks_startp <- riskratio(formula = death ~ stage + receptor, data = dat,
+                                approach = "glm_startp")
   fit_margstd_boot <- riskratio(formula = death ~ stage + receptor, data = dat,
                                 approach = "margstd_boot", variable = "stage",
                                 at = c("Stage I", "Stage III"))
@@ -22,17 +19,16 @@ test_that("printing functions give output", {
                               approach = "robpoisson")
   fit_logistic <- riskratio(formula = death ~ stage + receptor, data = dat,
                             approach = "logistic")
-  fit_addreg <- riskdiff(formula = death ~ stage + receptor, data = dat,
-                         approach = "glm_cem")
   expect_output(print.summary.risks(summary(fit_all)), "All fitted models")
   expect_output(print.risks(fit_risks), "Risk ratio model")
-  expect_output(print.risks(fit_risks), "(from Poisson model)")
+  expect_output(print.risks(fit_risks), "no starting values")
   expect_output(print.risks(fit_risks), "188 Residual")
   expect_output(print.summary.risks(summary(fit_risks)),
-                "model with starting values")
+                "model with delta method")
   expect_output(print.summary.risks(summary.risks(fit_risks)),
                 "Confidence interval")
-  expect_output(print.summary.risks(summary.risks(fit_risks, default = FALSE)),
+  expect_output(print.summary.risks(summary.risks(fit_risks_startp,
+                                                  default = FALSE)),
                 "profiling")
   expect_output(print.risks(fit_margstd_boot), "Risk ratio model")
   expect_output(print.risks(fit_margstd_boot), "(no starting values)")
@@ -44,6 +40,11 @@ test_that("printing functions give output", {
                 "poisson")
   expect_output(print(summary(fit_logistic)),
                 "logistic model")
-  expect_output(print(summary(fit_addreg)),
-                "addreg::addreg")
+
+  if(requireNamespace("addreg", quietly = TRUE)) {
+    fit_addreg <- riskdiff(formula = death ~ stage + receptor, data = dat,
+                           approach = "glm_cem")
+    expect_output(print(summary(fit_addreg)),
+                  "addreg::addreg")
+  }
 })

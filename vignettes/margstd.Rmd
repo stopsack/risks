@@ -27,19 +27,14 @@ We use the same example data as in the [Get Started vignette](risks.html#an-exam
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 library(dplyr)  # For data handling
 library(broom)  # For tidy() model summaries
-dat <- tibble::tibble(
-  death    = c(rep(1, 54), rep(0, 138)),
-  stage    = c(rep("Stage I", 7),  rep("Stage II", 26), rep("Stage III", 21),
-               rep("Stage I", 60), rep("Stage II", 70), rep("Stage III", 8)),
-  receptor = c(rep("Low", 2),  rep("High", 5),  rep("Low", 9),  rep("High", 17),
-               rep("Low", 12), rep("High", 9),  rep("Low", 10), rep("High", 50),
-               rep("Low", 13), rep("High", 57), rep("Low", 2),  rep("High", 6)))
+data(breastcancer)
 ```
 
-We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time specifying `approach = "margstd_delta"`:
+We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time explicitly specifying `approach = "margstd_delta"`:
 
 ```{r margstd}
-fit_margstd <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+fit_margstd <- riskdiff(formula = death ~ stage + receptor, 
+                        data = breastcancer, 
                         approach = "margstd_delta")
 summary(fit_margstd)
 ```
@@ -51,7 +46,7 @@ Note that coefficients and standard errors are only estimated for the exposure v
 
 # Choice of exposure variable
 
-Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model.
+Standardization can only be done over one exposure variable, and thus no coefficients are estimated for other variables in the model.
 
 * By default, the first right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, `ordered`, and `character` are taken to represent categorical variables.
 * Using `variable =`, a different variable can be specified.
@@ -61,7 +56,8 @@ Standardization can only be done over one exposure variable, and thus no coffici
 Requesting estimates for a different exposure variable, using `variable = "receptor"`:
 
 ```{r margstd2}
-fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+fit_margstd2 <- riskdiff(formula = death ~ stage + receptor, 
+                         data = breastcancer, 
                          approach = "margstd_delta", variable = "receptor")
 summary(fit_margstd2)
 ```
@@ -81,7 +77,8 @@ For comparison purposes, alternative approaches to bootstrapping and confidence 
 When using `tidy()` to access model results, the parameter `bootverbose = TRUE` will add bootstrapping parameters and properties to tibble
 
 ```{r margstd_bootverbose}
-fit_margstd3 <- riskdiff(formula = death ~ stage + receptor, data = dat, 
+fit_margstd3 <- riskdiff(formula = death ~ stage + receptor, 
+                         data = breastcancer, 
                          approach = "margstd_boot")
 summary(fit_margstd3)
 

@@ -1,16 +1,20 @@
 # Marginal standardization with delta method standard errors
-estimate_margstd_delta <- function(formula,
-                          data,
-                          estimand   = c("rr", "rd"),
-                          variable = NULL,
-                          at = NULL) {
+estimate_margstd_delta <- function(
+    formula,
+    data,
+    estimand   = c("rr", "rd"),
+    variable = NULL,
+    at = NULL,
+    interaction_warning = TRUE) {
   estimand <- match.arg(estimand)
-  fit <- stats::glm(formula = formula,
-                    family = binomial(link = "logit"),
-                    data = data)
-  exposure <- find_margstd_exposure(fit = fit,
-                                    variable = variable,
-                                    at = at)
+  fit <- stats::glm(
+    formula = formula,
+    family = binomial(link = "logit"),
+    data = data)
+  exposure <- find_margstd_exposure(
+    fit = fit,
+    variable = variable,
+    at = at)
   all_levels <- paste0(exposure$predictor, exposure$all_levels)[-1]
 
   # Check and, if need be, reorder categorical exposure
@@ -19,28 +23,40 @@ estimate_margstd_delta <- function(formula,
     if(exposure$margstd_levels[1] != exposure$all_levels[1]) {
       data <- data %>%
         dplyr::rename(expos = dplyr::one_of(exposure$predictor)) %>%
-        dplyr::mutate(expos = relevel(factor(.data$expos),
-                                      ref = exposure$margstd_levels[1])) %>%
-        dplyr::rename(!!exposure$predictor := .data$expos)
-      fit <- stats::glm(formula = formula,
-                        family = binomial(link = "logit"),
-                        data = data)
-      exposure <- find_margstd_exposure(fit = fit,
-                                        variable = variable,
-                                        at = at)
+        dplyr::mutate(
+          expos = relevel(factor(.data$expos),
+                          ref = exposure$margstd_levels[1])) %>%
+        dplyr::rename(!!exposure$predictor := "expos")
+      fit <- stats::glm(
+        formula = formula,
+        family = binomial(link = "logit"),
+        data = data)
+      exposure <- find_margstd_exposure(
+        fit = fit,
+        variable = variable,
+        at = at)
       all_levels <- paste0(exposure$predictor, levels(exposure$all_levels))[-1]
     }
   } else {
     if(!is.null(exposure$margstd_levels))
-      stop(paste("Levels for marginal standardization for a continuous",
-                 "exposure are not supposed with approach = 'margstd_delta'.",
-                 "Use approach = 'margstd_boot'."))
+      stop(paste(
+        "Levels for marginal standardization for a continuous",
+        "exposure are not supported with approach = 'margstd_delta'.",
+        "Use approach = 'margstd_boot'."))
   }
 
+  if(exposure$interaction & interaction_warning)
+    warning(paste0(
+      "The formula appears to contain an interaction term involving the ",
+      "exposure variable '", exposure$predictor, "'. ",
+      'Such terms may not have a marginal interpretation with approach = ',
+      '"margstd_delta". Consider using: approach = "margstd_boot".'))
+
   n <- nrow(model.matrix(fit))
-  Nvec <- matrix(data = rep(c(1 / n, 0, 0, 1 / n), each = n),
-                 nrow = n * 2,
-                 ncol = 2)
+  Nvec <- matrix(
+    data = rep(c(1 / n, 0, 0, 1 / n), each = n),
+    nrow = n * 2,
+    ncol = 2)
 
   delta_fun <- function(model_matrix, fit, estimand, Nvec, term) {
     allpreds <- family(fit)$linkinv(model_matrix %*% coef(fit))
@@ -60,66 +76,79 @@ estimate_margstd_delta <- function(formula,
     dxdy <- matrix(attr(eval(derivation, list(x = avgpreds[1],
                                               y = avgpreds[2])),
                         "gradient"))
-    tibble::tibble(term = term,
-                   estimate = estimate,
-                   std.error = as.numeric(sqrt(t(dxdy) %*% V %*% dxdy)),
-                   statistic = .data$estimate / .data$std.error)
+    tibble::tibble(
+      term = term,
+      estimate = estimate,
+      std.error = as.numeric(sqrt(t(dxdy) %*% V %*% dxdy)),
+      statistic = .data$estimate / .data$std.error)
   }
 
   if(exposure$categorical == TRUE) {
     res <- dplyr::bind_rows(
-      tibble::tibble(term = paste0(exposure$predictor,
-                                   exposure$margstd_levels)[1],
-                     estimate = 0,
-                     std.error = 0,
-                     statistic = NA_real_),
+      tibble::tibble(
+        term = paste0(exposure$predictor,
+                      exposure$margstd_levels)[1],
+        estimate = 0,
+        std.error = 0,
+        statistic = NA_real_),
       purrr::map_dfr(
-      .x = paste0(exposure$predictor, exposure$margstd_levels)[-1],
-      .f = ~{
-        model_matrix <- model.matrix(fit)
-        model_matrix[, all_levels] <- 0
-        model_matrix0 <- model_matrix1 <- model_matrix
-        model_matrix0[, .x] <- 0
-        model_matrix1[, .x] <- 1
-        model_matrix <- rbind(model_matrix0, model_matrix1)
-        delta_fun(model_matrix = model_matrix,
-                  fit = fit,
-                  estimand = estimand,
-                  Nvec = Nvec,
-                  term = .x)
-      }))
+        .x = paste0(exposure$predictor, exposure$margstd_levels)[-1],
+        .f = ~{
+          model_matrix <- model.matrix(fit)
+          model_matrix[, all_levels] <- 0
+          model_matrix0 <- model_matrix1 <- model_matrix
+          model_matrix0[, .x] <- 0
+          model_matrix1[, .x] <- 1
+          model_matrix <- rbind(model_matrix0, model_matrix1)
+          delta_fun(
+            model_matrix = model_matrix,
+            fit = fit,
+            estimand = estimand,
+            Nvec = Nvec,
+            term = .x)
+        }))
   } else {
     delta <- sd(as.data.frame(data)[, exposure$predictor]) / 1000
     model_matrix0 <- model_matrix1 <- model.matrix(fit)
     model_matrix1[, exposure$predictor] <- model_matrix1[, exposure$predictor] +
       delta
-    res <- delta_fun(model_matrix = rbind(model_matrix0, model_matrix1),
-                     fit = fit,
-                     estimand = estimand,
-                     Nvec = Nvec,
-                     term = exposure$predictor) %>%
-      dplyr::mutate(dplyr::across(.cols = c(.data$estimate, .data$std.error),
-                                  .fns = ~. / delta))
+    res <- delta_fun(
+      model_matrix = rbind(model_matrix0, model_matrix1),
+      fit = fit,
+      estimand = estimand,
+      Nvec = Nvec,
+      term = exposure$predictor) %>%
+      dplyr::mutate(
+        dplyr::across(
+          .cols = c("estimate", "std.error"),
+          .fns = ~. / delta))
   }
 
   coefs <- res$estimate
   names(coefs) <- res$term
-  newfit <- list(coefficients      = coefs,
-                 estimand          = estimand[1],
-                 margstd_predictor = exposure$predictor,
-                 margstd_levels    = exposure$margstd_levels,
-                 margstd_delta_res = res,
-                 rank              = 1)
-  newfit <- append(newfit, fit[c("residuals", "fitted.values", "weights",
-                                 "prior.weights", "family", "deviance", "aic",
-                                 "null.deviance", "iter", "df.residual",
-                                 "df.null", "y", "converged", "boundary",
-                                 "model", "call", "formula", "terms", "data",
-                                 "offset", "control", "method", "xlevels",
-                                 "qr")])
+  newfit <- list(
+    coefficients      = coefs,
+    estimand          = estimand[1],
+    margstd_predictor = exposure$predictor,
+    margstd_levels    = exposure$margstd_levels,
+    margstd_delta_res = res,
+    margstd_delta_interaction = exposure$interaction,
+    rank              = 1)
+  newfit <- append(
+    newfit,
+    fit[c("residuals", "fitted.values", "weights",
+          "prior.weights", "family", "deviance", "aic",
+          "null.deviance", "iter", "df.residual",
+          "df.null", "y", "converged", "boundary",
+          "model", "call", "formula", "terms", "data",
+          "offset", "control", "method", "xlevels",
+          "qr")])
   class(newfit) <- c("margstd_delta", "glm", "lm")
-  newfit <- estimate_maxprob(fit = newfit, formula = formula,
-                             data = data, link = "logit")
+  newfit <- estimate_maxprob(
+    fit = newfit,
+    formula = formula,
+    data = data,
+    link = "logit")
   return(newfit)
 }
 
@@ -136,17 +165,26 @@ estimate_margstd_delta <- function(formula,
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
-confint.margstd_delta <- function(object,
-                                  parm = NULL,
-                                  level = 0.95,
-                                  ...) {
+confint.margstd_delta <- function(
+    object,
+    parm = NULL,
+    level = 0.95,
+    ...) {
   cf <- coef(object)
   pnames <- names(cf)
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
-               "%")
-  ci <- array(NA, dim = c(length(pnames), 2L), dimnames = list(pnames, pct))
+  pct <- paste(
+    format(
+      100 * a,
+      trim = TRUE,
+      scientific = FALSE,
+      digits = 3),
+    "%")
+  ci <- array(
+    data = NA,
+    dim = c(length(pnames), 2L),
+    dimnames = list(pnames, pct))
 
   ci[] <- object$margstd_delta_res %>%
     dplyr::transmute(
@@ -167,11 +205,14 @@ confint.margstd_delta <- function(object,
 #' @param ... Not used
 #'
 #' @return Model summary (list)
-#' @return
 #' @export
-summary.margstd_delta <- function(object, dispersion = NULL,
-                                  correlation = FALSE, symbolic.cor = FALSE,
-                                  level = 0.95, ...) {
+summary.margstd_delta <- function(
+    object,
+    dispersion = NULL,
+    correlation = FALSE,
+    symbolic.cor = FALSE,
+    level = 0.95,
+    ...) {
   est.disp <- FALSE
   df.r <- object$df.residual
   if (is.null(dispersion))
@@ -226,7 +267,8 @@ summary.margstd_delta <- function(object, dispersion = NULL,
                   "contrasts", "df.residual", "null.deviance", "df.null",
                   "iter", "na.action"), names(object), 0L)
   ans <- c(object[keep],
-           list(#deviance.resid = residuals(object, type = "deviance"),
+           list(
+             #deviance.resid = residuals(object, type = "deviance"),
              coefficients = coef.table, aliased = aliased,
              dispersion = dispersion, df = c(object$rank, df.r, df.f),
              conf.int = object$margstd_delta_res$std.error,
