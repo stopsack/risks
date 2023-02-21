@@ -19,7 +19,7 @@ and p-values. A column with the type of model fitted is added."><!-- mathjax -->
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -171,13 +171,13 @@ column of the tibble includes the name of the model. See examples.</p>
 <span class="r-in"><span><span class="co"># Fit and tidy the model</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_rr</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   term           estimate std.error statistic  p.value conf.low conf.high model </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> (Intercept)      -<span style="color: #BB0000;">2.35</span>      0.360     -<span style="color: #BB0000;">6.53</span> 6.55<span style="color: #949494;">e</span><span style="color: #BB0000;">-11</span>  -<span style="color: #BB0000;">3.06</span>      -<span style="color: #BB0000;">1.65</span>  glm_s…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.931     0.393      2.37 1.78<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>   0.161      1.70  glm_s…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.77      0.385      4.60 4.33<span style="color: #949494;">e</span><span style="color: #BB0000;">- 6</span>   1.01       2.52  glm_s…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> receptorLow       0.444     0.197      2.25 2.42<span style="color: #949494;">e</span><span style="color: #BB0000;">- 2</span>   0.057<span style="text-decoration: underline;">8</span>     0.829 glm_s…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   term           estimate std.error statistic      p.value conf.…¹ conf.…² model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I      0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>            0        0    marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.899     0.387      2.32   0.020<span style="text-decoration: underline;">3</span>       0.140    1.66 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.81      0.378      4.78   0.000<span style="text-decoration: underline;">001</span>75   1.07     2.55 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​conf.low, ²​conf.high</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Marginal standardization,</span></span></span>
 <span class="r-in"><span><span class="co"># increase number of bootstrap repeats:</span></span></span>
@@ -185,12 +185,12 @@ column of the tibble includes the name of the model. See examples.</p>
 <span class="r-in"><span>                    approach <span class="op">=</span> <span class="st">"margstd_boot"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_rr</span>, bootrepeats <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   term            estimate std.error statistic   p.value conf.low conf.h…¹ model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I       0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>         <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II      0.899     0.680      1.32   0.186      0.198     1.83 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III     1.81      0.680      2.66   0.007<span style="text-decoration: underline;">80</span>    1.14      2.73 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable name ¹​conf.high</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   term            estimate std.error statistic     p.value conf.…¹ conf.…² model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I       0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>          <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II      0.899     0.441      2.04   0.041<span style="text-decoration: underline;">6</span>      0.204    1.78 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III     1.81      0.437      4.14   0.000<span style="text-decoration: underline;">034</span>4   1.13     2.72 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​conf.low, ²​conf.high</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple types of models fitted:</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>,</span></span>
@@ -241,7 +241,7 @@ column of the tibble includes the name of the model. See examples.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

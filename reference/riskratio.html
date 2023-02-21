@@ -34,7 +34,7 @@ Adjusting for covariates (e.g., confounders) in the model specification
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -108,7 +108,7 @@ regression with bootstrapped or delta method for confidence intervals.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  approach <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"all"</span>, <span class="st">"robpoisson"</span>, <span class="st">"duplicate"</span>, <span class="st">"glm"</span>, <span class="st">"glm_startp"</span>,</span>
 <span>    <span class="st">"glm_startd"</span>, <span class="st">"glm_cem"</span>, <span class="st">"glm_cem_startp"</span>, <span class="st">"margstd_boot"</span>, <span class="st">"margstd_delta"</span>,</span>
-<span>    <span class="st">"logistic"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"logistic"</span>, <span class="st">"legacy"</span><span class="op">)</span>,</span>
 <span>  variable <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -118,7 +118,7 @@ regression with bootstrapped or delta method for confidence intervals.</p>
 <span>  <span class="va">formula</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  approach <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"all"</span>, <span class="st">"robpoisson"</span>, <span class="st">"glm"</span>, <span class="st">"glm_startp"</span>, <span class="st">"glm_cem"</span>,</span>
-<span>    <span class="st">"glm_cem_startp"</span>, <span class="st">"margstd_boot"</span>, <span class="st">"margstd_delta"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"glm_cem_startp"</span>, <span class="st">"margstd_boot"</span>, <span class="st">"margstd_delta"</span>, <span class="st">"legacy"</span><span class="op">)</span>,</span>
 <span>  variable <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  at <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -136,16 +136,20 @@ regression with bootstrapped or delta method for confidence intervals.</p>
 
 
 <dt>approach</dt>
-<dd><p>Optional: Method for model fitting.</p><ul><li><p><code>"auto"</code> (default) is recommended; it selects the most efficient
-approach that converges and ensures that predicted probabilities are
-within range (&lt; 1; see Details).</p></li>
+<dd><p>Optional: Method for model fitting.</p><ul><li><p><code>"auto"</code> (default) is recommended; it will return results of
+<code>"margstd_delta"</code> unless interaction terms between exposure and
+confounders are included. This these cases, results from
+<code>"margstd_boot"</code> are returned.</p></li>
 <li><p><code>"all"</code> will attempt to fit
 the model via all implemented approaches to allow for comparisons.</p></li>
+<li><p><code>"legacy"</code> selects the most efficient approach that converges and
+ensures that predicted probabilities are within range (&lt; 1).</p></li>
 </ul><p>The other options allow for directly selecting a fitting approach,
-some of which may not converge or yield out-of-range predicted probabilities.
-See full documentation (currently at
+some of which may not converge or yield out-of-range predicted
+probabilities. See full documentation (currently at
 <a href="https://stopsack.github.io/risks" class="external-link">https://stopsack.github.io/risks</a>) for details.</p><ul><li><p><code>"glm"</code> Binomial model.</p></li>
-<li><p><code>"glm_startp"</code> Binomial model with starting values from Poisson model.</p></li>
+<li><p><code>"glm_startp"</code> Binomial model with starting values from Poisson
+model.</p></li>
 <li><p><code>"glm_startd"</code> Binomial model with starting values from logistic
 model with case duplication.</p></li>
 <li><p><code>"robpoisson"</code> Poisson model with robust covariance.</p></li>
@@ -214,8 +218,8 @@ list <code>all_models</code> in the returned object (e.g.,
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>riskratio</code>: Fit risk ratio models</p></li>
-<li><p><code>riskdiff</code>: Fit risk difference models</p></li>
+<ul><li><p><code>riskratio()</code>: Fit risk ratio models</p></li>
+<li><p><code>riskdiff()</code>: Fit risk difference models</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>
@@ -253,116 +257,104 @@ a logistic model; <code>approach = "margstd_boot"</code>)</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Newman SC. Biostatistical methods in epidemiology.</span></span></span>
-<span class="r-in"><span><span class="co"># New York, NY: Wiley, 2001, table 5.3</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span>  <span class="co"># used to set up example data</span></span></span>
-<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  death    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">54</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">138</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  stage    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">7</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">26</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">21</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage I"</span>, <span class="fl">60</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage II"</span>, <span class="fl">70</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Stage III"</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  receptor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">5</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">17</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">12</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">9</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">50</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">13</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">57</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"Low"</span>, <span class="fl">2</span><span class="op">)</span>,  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"High"</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">breastcancer</span><span class="op">)</span>  <span class="co"># Cohort study with binary outcome</span></span></span>
+<span class="r-in"><span>                    <span class="co"># See for details: help(breastcancer)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Risk ratio model</span></span></span>
-<span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu">riskratio</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu">riskratio</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">breastcancer</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Risk ratio model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  stats::glm(formula = death ~ stage + receptor, family = stats::binomial(link = "log"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data = dat, start = "(from Poisson model)")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data = breastcancer, start = "(no starting values)")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    (Intercept)   stageStage II  stageStage III     receptorLow  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        -2.3521          0.9314          1.7695          0.4436  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   stageStage I   stageStage II  stageStage III  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         0.0000          0.8989          1.8087  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degrees of Freedom: 191 Total (i.e. Null);  188 Residual</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null Deviance:	    228.1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Residual Deviance: 185.9 	AIC: 193.9</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_rr</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Risk ratio model, fitted as binomial model with starting values from Poisson model (glm_startp).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Risk ratio model, fitted via marginal standardization of a logistic model with delta method (margstd_delta).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = death ~ stage + receptor, family = stats::binomial(link = "log"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data = dat, start = "(from Poisson model)")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data = breastcancer, start = "(no starting values)")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Deviance Residuals: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Min       1Q   Median       3Q      Max  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -2.0209  -0.7436  -0.4472   0.5272   2.1689  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Min      1Q  Median      3Q     Max  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients: (3 not defined because of singularities)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)     -2.3521     0.3602  -6.531 6.55e-11 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II    0.9314     0.3930   2.370   0.0178 *  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III   1.7695     0.3851   4.595 4.33e-06 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> receptorLow      0.4436     0.1968   2.254   0.0242 *  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage I     0.0000     0.0000     NaN      NaN    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II    0.8989     0.3875   2.320   0.0203 *  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III   1.8087     0.3783   4.781 1.75e-06 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 185.85  on 188  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 193.85</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 185.88  on 188  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 193.88</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence intervals for coefficients: (normality-based)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      2.5 %     97.5 %</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)    -3.05805977 -1.6461981</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II   0.16107688  1.7018004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III  1.01475475  2.5242885</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> receptorLow     0.05781282  0.8294095</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence intervals for coefficients: (delta method)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                    2.5 %   97.5 %</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage I   0.0000000 0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II  0.1395299 1.658324</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III 1.0671711 2.550242</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Risk difference model</span></span></span>
-<span class="r-in"><span><span class="va">fit_rd</span> <span class="op">&lt;-</span> <span class="fu">riskdiff</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit_rd</span> <span class="op">&lt;-</span> <span class="fu">riskdiff</span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">breastcancer</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit_rd</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Risk difference model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  stats::glm(formula = death ~ stage + receptor, family = stats::binomial(link = "identity"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data = dat, start = "(no starting values)")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:  stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data = breastcancer, start = "(no starting values)")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    (Intercept)   stageStage II  stageStage III     receptorLow  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        0.08381         0.14921         0.57227         0.16131  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   stageStage I   stageStage II  stageStage III  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          0.000           0.163           0.571  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degrees of Freedom: 191 Total (i.e. Null);  188 Residual</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null Deviance:	    228.1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual Deviance: 186.4 	AIC: 194.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual Deviance: 185.9 	AIC: 193.9</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_rd</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Risk difference model, fitted as binomial model (glm).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Risk difference model, fitted via marginal standardization of a logistic model with delta method (margstd_delta).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = death ~ stage + receptor, family = stats::binomial(link = "identity"), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     data = dat, start = "(no starting values)")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     data = breastcancer, start = "(no starting values)")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Deviance Residuals: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Min       1Q   Median       3Q      Max  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -1.8441  -0.7284  -0.4184   0.6350   2.2268  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Min      1Q  Median      3Q     Max  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients: (3 not defined because of singularities)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                Estimate Std. Error z value Pr(&gt;|z|)    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)     0.08381    0.03633   2.307  0.02107 *  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II   0.14921    0.05755   2.593  0.00953 ** </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III  0.57227    0.09472   6.042 1.52e-09 ***</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> receptorLow     0.16131    0.07587   2.126  0.03349 *  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage I    0.00000    0.00000     NaN      NaN    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II   0.16303    0.05964   2.734  0.00626 ** </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III  0.57097    0.09962   5.732 9.95e-09 ***</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Dispersion parameter for binomial family taken to be 1)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Null deviance: 228.15  on 191  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 186.38  on 188  degrees of freedom</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 194.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Residual deviance: 185.88  on 188  degrees of freedom</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> AIC: 193.88</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of Fisher Scoring iterations: 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence intervals for coefficients: (normality-based)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Confidence intervals for coefficients: (delta method)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     2.5 %    97.5 %</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)    0.01260046 0.1550111</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II  0.03640945 0.2620070</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III 0.38663167 0.7579168</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> receptorLow    0.01261165 0.3100162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage I   0.00000000 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage II  0.04614515 0.2799187</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> stageStage III 0.37571719 0.7662158</span>
 </code></pre></div>
     </div>
   </div>
@@ -377,7 +369,7 @@ a logistic model; <code>approach = "margstd_boot"</code>)</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
