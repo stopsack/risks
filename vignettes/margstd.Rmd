@@ -30,7 +30,7 @@ library(broom)  # For tidy() model summaries
 data(breastcancer)
 ```
 
-We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time specifying `approach = "margstd_delta"`:
+We fit the same risk difference model as in the [Get Started vignette](risks.html#adjusted-risk-differences), this time explicitly specifying `approach = "margstd_delta"`:
 
 ```{r margstd}
 fit_margstd <- riskdiff(formula = death ~ stage + receptor, 

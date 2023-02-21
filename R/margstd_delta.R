@@ -131,6 +131,7 @@ estimate_margstd_delta <- function(
     margstd_predictor = exposure$predictor,
     margstd_levels    = exposure$margstd_levels,
     margstd_delta_res = res,
+    margstd_delta_interaction = exposure$interaction,
     rank              = 1)
   newfit <- append(
     newfit,

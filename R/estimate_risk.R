@@ -29,11 +29,14 @@
 #' @param formula A formula object of the form \code{response ~ predictors}.
 #' @param data A \code{tibble} or \code{data.frame} object.
 #' @param approach Optional: Method for model fitting.
-#'   * \code{"auto"} (default) is recommended; it selects the most efficient
-#'     approach that converges and ensures that predicted probabilities are
-#'     within range (< 1; see Details).
+#'   * \code{"auto"} (default) is recommended; it will return results of
+#'     \code{"margstd_delta"} unless interaction terms between exposure and
+#'     confounders are included. This these cases, results from
+#'     \code{"margstd_boot"} are returned.
 #'   * \code{"all"} will attempt to fit
 #'     the model via all implemented approaches to allow for comparisons.
+#'   * \code{"legacy"} selects the most efficient approach that converges and
+#'     ensures that predicted probabilities are within range (< 1).
 #'
 #'   The other options allow for directly selecting a fitting approach,
 #'   some of which may not converge or yield out-of-range predicted
@@ -159,7 +162,8 @@ riskratio <- function(
       "glm_cem_startp",
       "margstd_boot",
       "margstd_delta",
-      "logistic"),
+      "logistic",
+      "legacy"),
     variable = NULL,
     at = NULL,
     ...) {
@@ -187,7 +191,8 @@ riskdiff <- function(
       "glm_cem",
       "glm_cem_startp",
       "margstd_boot",
-      "margstd_delta"),
+      "margstd_delta",
+      "legacy"),
     variable = NULL,
     at = NULL, ...) {
   estimate_risk(
@@ -230,13 +235,55 @@ estimate_risk <- function(
 
   fit <- switch(
     EXPR = approach[1],
-    # Automated model fitting
+    # Automated model fitting, new approach, always choosing consistent model
     auto = {
+      # 1) check if marginal standardization with delta CIs is feasible
+      fit <- possibly_estimate_margstd_delta(
+        formula = formula,
+        data = data,
+        estimand = estimand,
+        variable = variable,
+        at = at,
+        ...)
+      if(fit$converged == TRUE &
+         fit$maxprob < implausible &
+         fit$boundary == FALSE &
+         fit$margstd_delta_interaction == FALSE)
+        return(fit)
+
+      # 2) default to marginal standardization with bootstrap CIs
+      fit <- possibly_estimate_margstd_boot(
+        formula = formula,
+        data = data,
+        estimand = estimand,
+        variable = variable,
+        at = at,
+        ...)
+
+      if(fit$converged == TRUE &
+         fit$maxprob < implausible &
+         fit$boundary == FALSE)
+        return(fit)
+
+      # 3) Check if a logistic model can be fitted
+      fit <- stats::glm(
+        formula = formula,
+        data = data,
+        family = stats::binomial(link = "logit"))
+      # Typically, execution will stop with a non-converged logistic model.
+      # If, surprisingly, only a logistic model converges, return an error.
+      stop(paste(
+        "No model besides the logistic model converged and had",
+        "within-range predicted probabilities of < 1."))
+    },
+    # Automated model fitting, legacy approach, choosing different models
+    legacy = {
       # 1) try regular GLM with Fisher scoring
       fit_glm <- possibly_estimate_glm(
         formula = formula,
         data = data,
-        link = link, ...)
+        link = link,
+        ...)
       if(fit_glm$converged == TRUE &
          fit_glm$maxprob < implausible &
          fit_glm$boundary == FALSE)
@@ -269,6 +316,8 @@ estimate_risk <- function(
         formula = formula,
         data = data,
         estimand = estimand,
+        variable = variable,
+        at = at,
         ...)
       if(fit_margstd_delta$converged == TRUE &
          fit_margstd_delta$maxprob < implausible &
