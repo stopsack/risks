@@ -1,3 +1,22 @@
+# risks 0.4.0
+
+* **Breaking change:** For consistency, the default option for model fitting 
+  (`approach = "auto"`) now always uses marginal standardization after fitting
+  a logistic model. The previous approach, which relied on different models 
+  fitted, is available as `approach = "legacy"`.
+* If requesting `approach = "margstd_delta"` in presence of interaction
+  terms involving the exposure variable, a warning is displayed. Model fitting
+  with `"auto"` uses the bootstrap (i.e., `"margstd_boot"`) in that case.
+* `approach = "margstd_boot"` bug fix: Keep categorical exposures of type factor
+  in the correct order.
+* Include `breastcancer` dataset in the package.
+* Internal changes:
+  + {addreg} and {logbin} are now soft dependencies (`Suggests:` instead of
+    `Imports:`)
+  + Remove {lifecycle} dependency
+  + Compatibility with tidyselect 1.2.0 variable selection
+
+
 # risks 0.3.0
 
 * **Breaking changes:**

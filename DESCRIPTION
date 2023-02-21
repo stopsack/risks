@@ -1,6 +1,6 @@
 Package: risks
 Title: Estimate risk ratios and risk differences using regression
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     c(person(given = "Konrad",
            family = "Stopsack",
@@ -18,7 +18,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 URL: https://stopsack.github.io/risks
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
@@ -41,3 +41,5 @@ Imports:
     tibble,
     tidyr
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.5.0)
