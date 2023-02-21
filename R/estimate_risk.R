@@ -312,7 +312,7 @@ estimate_risk <- function(
         }
       }
 
-      # 3) Try marginal standardization after logistic model
+      # 3) Try marginal standardization with delta method SEs
       fit_margstd_delta <- possibly_estimate_margstd_delta(
         formula = formula,
         data = data,
@@ -323,8 +323,23 @@ estimate_risk <- function(
         ...)
       if(fit_margstd_delta$converged == TRUE &
          fit_margstd_delta$maxprob < implausible &
-         fit_margstd_delta$boundary == FALSE)
+         fit_margstd_delta$boundary == FALSE &
+         fit_margstd_delta$margstd_delta_interaction == FALSE)
         return(fit_margstd_delta)
+
+      # 4) try marginal standardization with bootstrap SEs
+      fit <- possibly_estimate_margstd_boot(
+        formula = formula,
+        data = data,
+        estimand = estimand,
+        variable = variable,
+        at = at,
+        ...)
+
+      if(fit$converged == TRUE &
+         fit$maxprob < implausible &
+         fit$boundary == FALSE)
+        return(fit)
 
       # 4) Check if a logistic model can be fitted
       res <- stats::glm(
