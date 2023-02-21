@@ -4,8 +4,6 @@ data(breastcancer)
 dat <- breastcancer
 
 test_that("RD coefficients for receptorLow are the same", {
-
-
   rd_glm        <- coef(riskdiff(formula = death ~ receptor, data = dat,
                                  approach = "glm"))
   rd_glm_startp  <- coef(riskdiff(formula = death ~ receptor, data = dat,
@@ -55,7 +53,6 @@ test_that("RD coefficients for receptorLow are the same", {
 })
 
 test_that("RR coefficients for receptorLow are the same", {
-
   rr_glm        <- coef(riskratio(formula = death ~ receptor, data = dat,
                                   approach = "glm"))
   rr_glm_startp  <- coef(riskratio(formula = death ~ receptor, data = dat,
@@ -134,4 +131,11 @@ test_that("Continuous and implicit binary variables pass in marg std", {
                                 at = c("High", "Low"),
                                 data = dat, approach = "margstd_delta")),
                 "Low")
+})
+
+test_that("approach = 'legacy' works", {
+  expect_output(print(summary(riskratio(formula = death ~ stage + receptor,
+                                        data = dat,
+                                        approach = "legacy"))),
+                "starting values from Poisson")
 })
