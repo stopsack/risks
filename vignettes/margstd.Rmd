@@ -46,7 +46,7 @@ Note that coefficients and standard errors are only estimated for the exposure v
 
 # Choice of exposure variable
 
-Standardization can only be done over one exposure variable, and thus no cofficients are estimated for other variables in the model.
+Standardization can only be done over one exposure variable, and thus no coefficients are estimated for other variables in the model.
 
 * By default, the first right-hand variable in the model formula will be assumed to be the exposure. The variable types `logical`, `factor`, `ordered`, and `character` are taken to represent categorical variables.
 * Using `variable =`, a different variable can be specified.

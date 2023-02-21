@@ -42,7 +42,7 @@ breastcancer %>%  # Display the sample data
 
 # Adjusted risk ratios
 
-The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. No options for model `family` or `link` need to be supplied:
+The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. As customary in R, log(RR) is returned; see below for how to obtain exponentiated values. No options for model `family` or `link` need to be supplied:
 
 ```{r basic}
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = breastcancer)
