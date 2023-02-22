@@ -4,7 +4,7 @@
 <!-- badges: end -->
 
 
-# risks
+# risks: Estimating risk ratios and risk differences using regression
 
 ## Installation
 
@@ -17,7 +17,7 @@ installed from [GitHub](https://github.com/) using:
 remotes::install_github("stopsack/risks")
 ```
 
-# Summary
+## Summary
 
 The **risks** package fits regression models for risk ratios (RR) and risk
 differences (RD). For brevity, the package refers to “risk,” but
@@ -33,13 +33,13 @@ are easily obtained from logistic regression models. Obtaining risk ratios or
 risk differences, especially adjusting for confounders, has typically required
 more advanced biostatistics and programming skills, including in R.
 
-The **risks** package makes estimatng adjusted risk ratios and risk differences 
+The **risks** package makes estimating adjusted risk ratios and risk differences 
 as simple as fitting a logistic regression model. No advanced programming or
 biostatistics skills are required. Risk ratios or risk differences are returned
 whenever the data would allow for fitting a logistic model.
 
 
-# Further reading
+## Further reading
 
 -   [Get started with the risks package](articles/risks.html)
 -   [Models and model comparisons](articles/models.html)

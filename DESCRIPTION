@@ -3,15 +3,15 @@ Title: Estimate risk ratios and risk differences using regression
 Version: 0.4.0
 Authors@R: 
     c(person(given = "Konrad",
-           family = "Stopsack",
-           role = c("aut", "cre"),
-           email = "stopsack@post.harvard.edu",
-           comment = c(ORCID = "0000-0002-0722-1311")),
-    person(given = "Travis",
-           family = "Gerke",
-           role = c("aut"),
-           email = "travis.gerke@moffitt.org",
-           comment = c(ORCID = "0000-0002-9500-8907")))
+             family = "Stopsack",
+             role = c("aut", "cre"),
+             email = "stopsack@post.harvard.edu",
+             comment = c(ORCID = "0000-0002-0722-1311")),
+      person(given = "Travis",
+             family = "Gerke",
+             role = c("aut"),
+             email = "travis.gerke@moffitt.org",
+             comment = c(ORCID = "0000-0002-9500-8907")))
 Description: The risks package fits risk ratio and risk difference models using 
   regression.
 License: GPL-3

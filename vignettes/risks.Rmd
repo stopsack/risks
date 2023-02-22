@@ -59,7 +59,7 @@ fit_rd <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
 summary(fit_rd)
 ```
 
-For example, the risk of death was 57 percentage points higher in women with stage III breast cancer compared to stage I (95% confidence interval, 39 to 76 percentage points), adjusting for hormone receptor status.
+For example, the risk of death was 57 percentage points higher in women with stage III breast cancer compared to stage I (95% confidence interval, 38 to 77 percentage points), adjusting for hormone receptor status.
 
 The model summary in `riskratio()` and `riskdiff()` includes to two additions compared to a regular `glm()` model:
 
@@ -82,7 +82,7 @@ In accordance with `glm()` standards, coefficients for relative risks are shown 
 tidy(fit_rr, exponentiate = TRUE)
 ```
 
-For example, the risk of death was 5.9 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 2.8 to 12 times), adjusting for hormone receptor status.
+For example, the risk of death was 6 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 3 to 13 times), adjusting for hormone receptor status.
 
 
 # More post-estimation commands
