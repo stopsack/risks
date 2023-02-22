@@ -1,3 +1,9 @@
+# risks 0.4.1
+
+* `tidy.risks()`: Increase default `bootrepeats` to 1000, consistent with 
+  `summary()`.
+
+
 # risks 0.4.0
 
 * **Breaking change:** For consistency, the default option for model fitting 
