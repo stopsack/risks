@@ -8,7 +8,7 @@
   x,
   conf.int = TRUE,
   conf.level = 0.95,
-  bootrepeats = 200,
+  bootrepeats = 1000,
   bootci = c("bca", "normal", "nonpar"),
   bootverbose = FALSE,
   exponentiate = FALSE,
@@ -25,8 +25,8 @@
 
 \item{bootrepeats}{Optional. Number of bootstrap repeats.
 Applicable to models fitted via marginal standardization and bootstrapping
-(\code{approach = "margstd_boot"}). Defaults to 200. Strongly recommended
-to increase repeats to >1000.}
+(\code{approach = "margstd_boot"}). Defaults to 1000. Strongly recommended
+to increase repeats to >>1000.}
 
 \item{bootci}{Optional and applicable for \code{approach = "margstd_boot"}
 only. Type of bootstrap confidence interval:
@@ -87,7 +87,7 @@ tidy(fit_rr)
 # increase number of bootstrap repeats:
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
                     approach = "margstd_boot")
-tidy(fit_rr, bootrepeats = 1000)
+tidy(fit_rr, bootrepeats = 2000)
 
 # Multiple types of models fitted:
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,

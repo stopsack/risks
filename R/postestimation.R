@@ -133,8 +133,8 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' @param conf.level Optional. Confidence level. Defaults to \code{0.95}.
 #' @param bootrepeats Optional. Number of bootstrap repeats.
 #'   Applicable to models fitted via marginal standardization and bootstrapping
-#'   (\code{approach = "margstd_boot"}). Defaults to 200. Strongly recommended
-#'   to increase repeats to >1000.
+#'   (\code{approach = "margstd_boot"}). Defaults to 1000. Strongly recommended
+#'   to increase repeats to >>1000.
 #' @param bootci Optional and applicable for \code{approach = "margstd_boot"}
 #'   only. Type of bootstrap confidence interval:
 #'
@@ -180,7 +180,7 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' # increase number of bootstrap repeats:
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
 #'                     approach = "margstd_boot")
-#' tidy(fit_rr, bootrepeats = 1000)
+#' tidy(fit_rr, bootrepeats = 2000)
 #'
 #' # Multiple types of models fitted:
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
@@ -190,7 +190,7 @@ tidy.risks <- function(
   x,
   conf.int     = TRUE,
   conf.level   = 0.95,
-  bootrepeats  = 200,
+  bootrepeats  = 1000,
   bootci = c("bca", "normal", "nonpar"),
   bootverbose  = FALSE,
   exponentiate = FALSE,
