@@ -19,7 +19,7 @@ and p-values. A column with the type of model fitted is added."><!-- mathjax -->
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.1</span>
       </span>
     </div>
 
@@ -78,7 +78,7 @@ and p-values. A column with the type of model fitted is added.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  conf.int <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  conf.level <span class="op">=</span> <span class="fl">0.95</span>,</span>
-<span>  bootrepeats <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  bootrepeats <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  bootci <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bca"</span>, <span class="st">"normal"</span>, <span class="st">"nonpar"</span><span class="op">)</span>,</span>
 <span>  bootverbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  exponentiate <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -104,8 +104,8 @@ and p-values. A column with the type of model fitted is added.</p>
 <dt>bootrepeats</dt>
 <dd><p>Optional. Number of bootstrap repeats.
 Applicable to models fitted via marginal standardization and bootstrapping
-(<code>approach = "margstd_boot"</code>). Defaults to 200. Strongly recommended
-to increase repeats to &gt;1000.</p></dd>
+(<code>approach = "margstd_boot"</code>). Defaults to 1000. Strongly recommended
+to increase repeats to &gt;&gt;1000.</p></dd>
 
 
 <dt>bootci</dt>
@@ -183,14 +183,14 @@ column of the tibble includes the name of the model. See examples.</p>
 <span class="r-in"><span><span class="co"># increase number of bootstrap repeats:</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>,</span></span>
 <span class="r-in"><span>                    approach <span class="op">=</span> <span class="st">"margstd_boot"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_rr</span>, bootrepeats <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_rr</span>, bootrepeats <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   term            estimate std.error statistic     p.value conf.…¹ conf.…² model</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I       0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>          <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>    marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II      0.899     0.441      2.04   0.041<span style="text-decoration: underline;">6</span>      0.204    1.78 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III     1.81      0.437      4.14   0.000<span style="text-decoration: underline;">034</span>4   1.13     2.72 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​conf.low, ²​conf.high</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   term            estimate std.error statistic   p.value conf.low conf.h…¹ model</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl[1d]&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I       0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>         <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>    marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II      0.899     0.692      1.30   0.194      0.172     1.79 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III     1.81      0.686      2.64   0.008<span style="text-decoration: underline;">35</span>    1.06      2.65 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable name ¹​conf.high</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple types of models fitted:</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>,</span></span>

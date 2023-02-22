@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.1</span>
       </span>
     </div>
 
@@ -272,8 +272,8 @@ properties to tibble</p>
 <span><span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span></span>
 <span><span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
 <span><span class="co">#&gt; stageStage I    0.00000    0.00000     NaN      NaN    </span></span>
-<span><span class="co">#&gt; stageStage II   0.16303    0.05919   2.754  0.00588 ** </span></span>
-<span><span class="co">#&gt; stageStage III  0.57097    0.09844   5.800 6.63e-09 ***</span></span>
+<span><span class="co">#&gt; stageStage II   0.16303    0.05927   2.751  0.00595 ** </span></span>
+<span><span class="co">#&gt; stageStage III  0.57097    0.10083   5.663 1.49e-08 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -288,17 +288,17 @@ properties to tibble</p>
 <span><span class="co">#&gt; Confidence intervals for coefficients: (1000 BCa bootstrap repeats)</span></span>
 <span><span class="co">#&gt;                      2.5%     97.5%</span></span>
 <span><span class="co">#&gt; stageStage I           NA        NA</span></span>
-<span><span class="co">#&gt; stageStage II  0.04218262 0.2687070</span></span>
-<span><span class="co">#&gt; stageStage III 0.33837265 0.7279537</span></span>
+<span><span class="co">#&gt; stageStage II  0.04449745 0.2721241</span></span>
+<span><span class="co">#&gt; stageStage III 0.37716815 0.7753796</span></span>
 <span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_margstd3</span>, bootverbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">statistic</span>, <span class="op">-</span><span class="va">p.value</span><span class="op">)</span>  <span class="co"># allow the other columns to get printed instead</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
-<span><span class="co">#&gt;   term     estim…¹ std.e…² conf.…³ conf.…⁴ bootr…⁵ bootci jacks…⁶ jacksd…⁷ model</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl[1&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> stageSt…   0      0      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>         200 bca    <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>       marg…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageSt…   0.163  0.055<span style="text-decoration: underline;">3</span>  0.059<span style="text-decoration: underline;">1</span>   0.273     200 bca     0.013<span style="text-decoration: underline;">5</span>  0.009<span style="text-decoration: underline;">76</span> marg…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageSt…   0.571  0.097<span style="text-decoration: underline;">1</span>  0.361    0.748     200 bca     0.019<span style="text-decoration: underline;">9</span>  0.020<span style="text-decoration: underline;">9</span>  marg…</span></span>
+<span><span class="co">#&gt;   term    estim…¹ std.e…² conf.…³ conf.…⁴ bootr…⁵ bootci jacksd…⁶ jacksd…⁷ model</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl[1&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> stageS…   0      0      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>        <span style="text-decoration: underline;">1</span>000 bca    <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       marg…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageS…   0.163  0.061<span style="text-decoration: underline;">1</span>  0.030<span style="text-decoration: underline;">3</span>   0.279    <span style="text-decoration: underline;">1</span>000 bca     0.015<span style="text-decoration: underline;">2</span>   0.006<span style="text-decoration: underline;">27</span> marg…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageS…   0.571  0.098<span style="text-decoration: underline;">3</span>  0.359    0.739    <span style="text-decoration: underline;">1</span>000 bca     0.008<span style="text-decoration: underline;">25</span>  0.008<span style="text-decoration: underline;">45</span> marg…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​estimate, ²​std.error, ³​conf.low,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​conf.high, ⁵​bootrepeats, ⁶​jacksd.low, ⁷​jacksd.high</span></span></span></code></pre></div>
 <ul>

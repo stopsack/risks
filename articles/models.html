@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">risks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.1</span>
       </span>
     </div>
 
@@ -156,7 +156,7 @@ method.</td>
 <td>This package.</td>
 </tr>
 <tr class="even">
-<td>–</td>
+<td>4</td>
 <td><code>margstd_boot</code></td>
 <td><code>riskratio</code></td>
 <td><code>riskdiff</code></td>
@@ -259,10 +259,10 @@ reports results from marginal standardization using a logistic model
 with delta method standard errors (equivalent to
 <code>approach = "margstd_delta"</code>). An exception is made if
 interaction terms between exposure and confounders are included. This
-theis case, confidence intervals are calculated using bootstrapping
-(equivalent to <code>approach = "margstd_boot"</code>). Alternatively,
-any of the options listed under <code>approach =</code> in the table can
-be requested directly. However, unlike with
+case, confidence intervals are calculated using bootstrapping
+(equivalent to requesting <code>approach = "margstd_boot"</code>).
+Alternatively, any of the options listed under <code>approach =</code>
+in the table can be requested directly. However, unlike with
 <code>approach = "auto"</code> (the default) or
 <code>approach = "legacy"</code>, the selected model may not
 converge.</p>
@@ -404,8 +404,8 @@ confidence intervals from all models that converged:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> stageStage III     1.77      0.385   1.01       2.52  logbin_start </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> receptorLow        0.444     0.197   0.057<span style="text-decoration: underline;">8</span>     0.829 logbin_start </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> stageStage I       0         0      <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>     margstd_boot </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> stageStage II      0.899     0.708   0.017<span style="text-decoration: underline;">8</span>     1.79  margstd_boot </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> stageStage III     1.81      0.706   1.17       2.82  margstd_boot </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> stageStage II      0.899     0.429   0.133      1.74  margstd_boot </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> stageStage III     1.81      0.432   1.05       2.67  margstd_boot </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> stageStage I       0         0       0          0     margstd_delta</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> stageStage II      0.899     0.387   0.140      1.66  margstd_delta</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">22</span> stageStage III     1.81      0.378   1.07       2.55  margstd_delta</span></span>
