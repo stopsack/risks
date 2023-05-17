@@ -260,8 +260,8 @@ properties to tibble</p>
 <span><span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span></span>
 <span><span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
 <span><span class="co">#&gt; stageStage I    0.00000    0.00000     NaN      NaN    </span></span>
-<span><span class="co">#&gt; stageStage II   0.16303    0.06236   2.614  0.00894 ** </span></span>
-<span><span class="co">#&gt; stageStage III  0.57097    0.09721   5.873 4.27e-09 ***</span></span>
+<span><span class="co">#&gt; stageStage II   0.16303    0.05847   2.788   0.0053 ** </span></span>
+<span><span class="co">#&gt; stageStage III  0.57097    0.09981   5.721 1.06e-08 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -274,10 +274,10 @@ properties to tibble</p>
 <span><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Confidence intervals for coefficients: (1000 BCa bootstrap repeats)</span></span>
-<span><span class="co">#&gt;                      2.5%     97.5%</span></span>
-<span><span class="co">#&gt; stageStage I           NA        NA</span></span>
-<span><span class="co">#&gt; stageStage II  0.04573327 0.2792360</span></span>
-<span><span class="co">#&gt; stageStage III 0.39075883 0.7684096</span></span>
+<span><span class="co">#&gt;                     2.5%     97.5%</span></span>
+<span><span class="co">#&gt; stageStage I          NA        NA</span></span>
+<span><span class="co">#&gt; stageStage II  0.0498644 0.2784882</span></span>
+<span><span class="co">#&gt; stageStage III 0.3741985 0.7462845</span></span>
 <span></span>
 <span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_margstd3</span>, bootverbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">statistic</span>, <span class="op">-</span><span class="va">p.value</span><span class="op">)</span>  <span class="co"># allow the other columns to get printed instead</span></span>
@@ -285,8 +285,8 @@ properties to tibble</p>
 <span><span class="co">#&gt;   term       estimate std.error conf.low conf.high bootrepeats bootci jacksd.low</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl[1d&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> stageStag…    0        0       <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>            <span style="text-decoration: underline;">1</span>000 bca      <span style="color: #BB0000;">NA</span>      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageStag…    0.163    0.057<span style="text-decoration: underline;">6</span>   0.054<span style="text-decoration: underline;">6</span>     0.277        <span style="text-decoration: underline;">1</span>000 bca       0.007<span style="text-decoration: underline;">17</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageStag…    0.571    0.100    0.355      0.754        <span style="text-decoration: underline;">1</span>000 bca       0.017<span style="text-decoration: underline;">5</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageStag…    0.163    0.058<span style="text-decoration: underline;">5</span>   0.056<span style="text-decoration: underline;">6</span>     0.286        <span style="text-decoration: underline;">1</span>000 bca       0.006<span style="text-decoration: underline;">58</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageStag…    0.571    0.097<span style="text-decoration: underline;">7</span>   0.370      0.749        <span style="text-decoration: underline;">1</span>000 bca       0.012<span style="text-decoration: underline;">7</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: jacksd.high &lt;dbl&gt;, model &lt;chr&gt;</span></span></span></code></pre></div>
 <ul>
 <li>
