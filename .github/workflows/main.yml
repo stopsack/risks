@@ -26,10 +26,10 @@ jobs:
       - name: Checkout V2
         uses: actions/checkout@v2
 
-      - name: Set up R ${{ matrix.r-version }}
+      - name: Set up R ${{ matrix.config.r }}
         uses: r-lib/actions/setup-r@HEAD
         with:
-          r-version: ${{ matrix.r-version }}
+          r-version: ${{ matrix.config.r }}
 
       - name: Set up pandoc
         uses: r-lib/actions/setup-pandoc@HEAD
