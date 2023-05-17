@@ -154,10 +154,6 @@ for how to obtain exponentiated values. No options for model
 <span><span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span></span>
 <span><span class="co">#&gt;     data = breastcancer, start = "(no starting values)")</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Residuals: </span></span>
-<span><span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span></span>
-<span><span class="co">#&gt;                                         </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span></span>
 <span><span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
 <span><span class="co">#&gt; stageStage I     0.0000     0.0000     NaN      NaN    </span></span>
@@ -193,10 +189,6 @@ same syntax:</p>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; stats::glm(formula = death ~ stage + receptor, family = binomial(link = "logit"), </span></span>
 <span><span class="co">#&gt;     data = breastcancer, start = "(no starting values)")</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Residuals: </span></span>
-<span><span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span></span>
-<span><span class="co">#&gt;                                         </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients: (3 not defined because of singularities)</span></span>
 <span><span class="co">#&gt;                Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
@@ -257,12 +249,11 @@ coefficients for risk ratios are easily obtained via
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fit_rr</span>, exponentiate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span></span>
-<span><span class="co">#&gt;   term           estimate std.error statistic      p.value conf.…¹ conf.…² model</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> stageStage I       1        0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>             1       1    marg…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageStage II      2.46     0.387      2.32   0.020<span style="text-decoration: underline;">3</span>        1.15    5.25 marg…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageStage III     6.10     0.378      4.78   0.000<span style="text-decoration: underline;">001</span>75    2.91   12.8  marg…</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​conf.low, ²​conf.high</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   term           estimate std.error statistic   p.value conf.low conf.high model</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> stageStage I       1        0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>   <span style="color: #949494;"> </span>       1         1    marg…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> stageStage II      2.46     0.387      2.32   2.03<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>     1.15      5.25 marg…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> stageStage III     6.10     0.378      4.78   1.75<span style="color: #949494;">e</span><span style="color: #BB0000;">-6</span>     2.91     12.8  marg…</span></span></code></pre></div>
 <p>For example, the risk of death was 6 times higher in women with stage
 III breast cancer compared to stage I (95% confidence interval, 3 to 13
 times), adjusting for hormone receptor status.</p>
