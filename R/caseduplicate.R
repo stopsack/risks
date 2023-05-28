@@ -8,6 +8,8 @@
 estimate_duplicate <- function(formula, data, ...) {
   yvar <- as.character(all.vars(formula)[1])
 
+  #TODO the following assumes that outc is coded as 0/1. We should throw an
+  # error when this is not true
   data <- data |>
     dplyr::mutate(.clusterid = dplyr::row_number()) |>
     dplyr::rename(outc = dplyr::one_of(!!yvar)) |>
@@ -17,12 +19,21 @@ estimate_duplicate <- function(formula, data, ...) {
     dplyr::ungroup() |>
     dplyr::rename(!!yvar := "outc")
 
-  fit <- eval(substitute(stats::glm(formula = formula,
-                                    family = binomial(link = "logit"),
-                                    data = data)))
+  fit <- eval(substitute(
+    stats::glm(
+      formula = formula,
+      family = binomial(link = "logit"),
+      data = data
+    )
+  ))
   class(fit) <- c("duplicate", class(fit))
-  fit <- estimate_maxprob(fit = fit, formula = formula, data = data,
-                          link = "logit")
+  fit <- estimate_maxprob(
+    fit = fit,
+    formula = formula,
+    data = data,
+    link = "logit"
+  )
+
   return(fit)
 }
 
@@ -48,19 +59,24 @@ confint.duplicate <- function(object, parm = NULL, level = 0.95, ...) {
   #  parm <- pnames[parm]
   a <- (1 - level)/2
   a <- c(a, 1 - a)
-  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
-               "%")
+  pct <- paste(
+    format(100 * a, trim = TRUE, scientific = FALSE, digits = 3),
+    "%"
+  )
   fac <- qnorm(a)
   ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, pct))
   # Robust covariance accounting for clustering
   obj_sandwich <- object
   class(obj_sandwich) <- "glm"
-  ses <- sqrt(diag(sandwich::sandwich(
-    x = obj_sandwich,
-    bread. = sandwich::bread(obj_sandwich),
-    meat. = sandwich::meatCL(obj_sandwich,
-                             type = "HC0",
-                             cluster = object$data$.clusterid))))
+  ses <- sqrt(diag(
+    sandwich::sandwich(
+      x = obj_sandwich,
+      bread. = sandwich::bread(obj_sandwich),
+      meat. = sandwich::meatCL(
+        obj_sandwich, type = "HC0", cluster = object$data$.clusterid
+      )
+    )
+  ))
   ci[] <- cf[parm] + ses %o% fac
   return(ci)
 }
@@ -79,13 +95,14 @@ confint.duplicate <- function(object, parm = NULL, level = 0.95, ...) {
 #' @param symbolic.cor Not used
 #' @param ... Other arguments, not used
 #' @export
-summary.duplicate <- function(object, dispersion = NULL, correlation = FALSE,
-                              symbolic.cor = FALSE, ...) {
+summary.duplicate <- function(
+    object, dispersion = NULL, correlation = FALSE, symbolic.cor = FALSE, ...
+) {
   # a modification of summary.glm()
   est.disp <- FALSE
   df.r <- object$df.residual
-  if (is.null(dispersion))
-    dispersion <- if (object$family$family %in% c("poisson", "binomial"))
+  if(is.null(dispersion))
+    dispersion <- if(object$family$family %in% c("poisson", "binomial"))
       1
   else if (df.r > 0) {
     est.disp <- TRUE
@@ -113,9 +130,9 @@ summary.duplicate <- function(object, dispersion = NULL, correlation = FALSE,
     covmat.unscaled <- sandwich::sandwich(
       x = obj_sandwich,
       bread. = sandwich::bread(x = obj_sandwich),
-      meat. = sandwich::meatCL(x = obj_sandwich,
-                               type = "HC0",
-                               cluster = object$data$.clusterid))
+      meat. = sandwich::meatCL(
+        x = obj_sandwich, type = "HC0", cluster = object$data$.clusterid)
+    )
     ###### end changes ########
     covmat <- dispersion * covmat.unscaled
     var.cf <- diag(covmat)
@@ -125,26 +142,29 @@ summary.duplicate <- function(object, dispersion = NULL, correlation = FALSE,
     if (!est.disp) {
       pvalue <- 2 * pnorm(-abs(tvalue))
       coef.table <- cbind(coef.p, s.err, tvalue, pvalue)
-      dimnames(coef.table) <- list(names(coef.p), c(dn,
-                                                    "z value", "Pr(>|z|)"))
+      dimnames(coef.table) <- list(
+        names(coef.p), c(dn, "z value", "Pr(>|z|)")
+      )
     }
     else if (df.r > 0) {
       pvalue <- 2 * pt(-abs(tvalue), df.r)
       coef.table <- cbind(coef.p, s.err, tvalue, pvalue)
-      dimnames(coef.table) <- list(names(coef.p), c(dn,
-                                                    "t value", "Pr(>|t|)"))
+      dimnames(coef.table) <- list(
+        names(coef.p), c(dn, "t value", "Pr(>|t|)")
+      )
     }
     else {
       coef.table <- cbind(coef.p, NaN, NaN, NaN)
-      dimnames(coef.table) <- list(names(coef.p), c(dn,
-                                                    "t value", "Pr(>|t|)"))
+      dimnames(coef.table) <- list(
+        names(coef.p), c(dn, "t value", "Pr(>|t|)")
+      )
     }
     df.f <- NCOL(Qr$qr)
   }
   else {
-    coef.table <- matrix(, 0L, 4L)
+    coef.table <- matrix(data = NA, 0L, 4L)
     dimnames(coef.table) <- list(NULL, c("Estimate", "Std. Error", "t value", "Pr(>|t|)"))
-    covmat.unscaled <- covmat <- matrix(, 0L, 0L)
+    covmat.unscaled <- covmat <- matrix(data = NA, 0L, 0L)
     df.f <- length(aliased)
   }
   keep <- match(c("call", "terms", "family", "deviance", "aic",
