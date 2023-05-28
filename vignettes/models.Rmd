@@ -50,24 +50,27 @@ We load the same example data as in the [Get Started vignette](risks.html#an-exa
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 library(dplyr)  # For data handling
 library(broom)  # For tidy() model summaries
-data(breastcancer)
 ```
 
 We then select a binomial model with starting values from the Poisson model:
 
 ```{r selectapproach}
-riskratio(formula = death ~ stage + receptor, 
-          data = breastcancer, 
-          approach = "glm_startp")
+riskratio(
+  formula = death ~ stage + receptor, 
+  data = breastcancer, 
+  approach = "glm_startp"
+)
 ```
 
 \
 However, the binomial model without starting values does not converge:
 
 ```{r selectapproach2, error = TRUE}
-riskratio(formula = death ~ stage + receptor, 
-          data = breastcancer, 
-          approach = "glm")
+riskratio(
+  formula = death ~ stage + receptor, 
+  data = breastcancer, 
+  approach = "glm"
+)
 ```
 
 
@@ -77,9 +80,11 @@ riskratio(formula = death ~ stage + receptor,
 With `approach = "all"`, all model types listed in the tables are fitted. The fitted object, *e.g.*, `fit`, is one of the converged models. A summary of the convergence status of all models is displayed at the beginning of `summary(fit)`:
 
 ```{r allmodels}
-fit_all <- riskratio(formula = death ~ stage + receptor, 
-                     data = breastcancer, 
-                     approach = "all")
+fit_all <- riskratio(
+  formula = death ~ stage + receptor, 
+  data = breastcancer, 
+  approach = "all"
+)
 summary(fit_all)
 ```
 
@@ -87,7 +92,7 @@ summary(fit_all)
 Individual models can be accessed as `fit$all_models[[1]]` through `fit$all_models[[6]]` (or `[[7]]` if fitting a risk ratio model). `tidy()` shows coefficients and confidence intervals from all models that converged:
 
 ```{r allmodels2}
-tidy(fit_all) %>%
-  select(-statistic, -p.value) %>%
+tidy(fit_all) |> 
+  select(-statistic, -p.value) |> 
   print(n = 50)
 ```
