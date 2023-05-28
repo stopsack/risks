@@ -7,14 +7,16 @@
 # (Miettinen/Schouten approach to directly estimating relative risks)
 estimate_duplicate <- function(formula, data, ...) {
   yvar <- as.character(all.vars(formula)[1])
-  data <- data %>%
-    dplyr::mutate(.clusterid = dplyr::row_number())
-  data <- dplyr::bind_rows(data,
-                           data %>%
-                             dplyr::rename(outc = dplyr::one_of(!!yvar)) %>%
-                             dplyr::filter(.data$outc == 1) %>%
-                             dplyr::mutate(outc = 0) %>%
-                             dplyr::rename(!!yvar := "outc"))
+
+  data <- data |>
+    dplyr::mutate(.clusterid = dplyr::row_number()) |>
+    dplyr::rename(outc = dplyr::one_of(!!yvar)) |>
+    tidyr::uncount(outc + 1) |>
+    dplyr::group_by(.clusterid) |>
+    dplyr::mutate(outc = floor(outc / dplyr::row_number())) |>
+    dplyr::ungroup() |>
+    dplyr::rename(!!yvar := "outc")
+
   fit <- eval(substitute(stats::glm(formula = formula,
                                     family = binomial(link = "logit"),
                                     data = data)))
