@@ -381,7 +381,7 @@ estimate_risk <- function(
     ))
   }
 
-  if(approach[1] == "legacy") {
+  if(approach[1] == "all") {
 
     fit1 <- possibly_estimate_poisson(
       formula = formula,
