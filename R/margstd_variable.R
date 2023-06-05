@@ -108,3 +108,16 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
         x = names_effects,
         fixed = TRUE)))
 }
+
+#' Check a model fit object for interaction terms
+#'
+#' @param fit A returned model fit
+#'
+#' @return A logical (TRUE for detection of an interaction)
+#' @noRd
+has_interaction <- function(fit) {
+  fit$call |>
+    all.vars(functions = TRUE) |>
+    sapply(function(x) x %in% c(":", "*", "interaction")) |>
+    sum() > 0
+}
