@@ -1,4 +1,14 @@
-# Marginal standardization with delta method standard errors
+#' Marginal standardization with delta method standard errors
+#'
+#' @param formula A formula
+#' @param data Data
+#' @param estimand Estimand
+#' @param variable Variable
+#' @param at At
+#' @param interaction_warning Warning for interaction
+#'
+#' @return A model fit by estimate_maxprob()
+#' @noRd
 estimate_margstd_delta <- function(
     formula,
     data,
