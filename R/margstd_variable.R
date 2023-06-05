@@ -1,7 +1,16 @@
-# For marginal standardization:
-# Find exposure variable by is given name vs. position;
-# type of exposure variable (categorical vs. continuous);
-# levels of categorical variable if applicable
+#' Parse exposure properties
+#'
+#' @details
+#' For marginal standardization:Find exposure variable by is
+#' given name vs. position; type of exposure variable (categorical
+#' vs. continuous); levels of categorical variable if applicable
+#'
+#' @param fit fit
+#' @param variable variable
+#' @param at at
+#'
+#' @return A list
+#' @noRd
 find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
   # Find variable to standardize over
   if(!is.null(variable)) {  # If variable is given, check it exists in the model
