@@ -1,7 +1,16 @@
-# For marginal standardization:
-# Find exposure variable by is given name vs. position;
-# type of exposure variable (categorical vs. continuous);
-# levels of categorical variable if applicable
+#' Parse exposure properties
+#'
+#' @details
+#' For marginal standardization:Find exposure variable by is
+#' given name vs. position; type of exposure variable (categorical
+#' vs. continuous); levels of categorical variable if applicable
+#'
+#' @param fit fit
+#' @param variable variable
+#' @param at at
+#'
+#' @return A list
+#' @noRd
 find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
   # Find variable to standardize over
   if(!is.null(variable)) {  # If variable is given, check it exists in the model
@@ -98,4 +107,17 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
         pattern = paste0(":", predictor_replaced),
         x = names_effects,
         fixed = TRUE)))
+}
+
+#' Check a model fit object for interaction terms
+#'
+#' @param fit A returned model fit
+#'
+#' @return A logical (TRUE for detection of an interaction)
+#' @noRd
+has_interaction <- function(fit) {
+  fit$call |>
+    all.vars(functions = TRUE) |>
+    sapply(function(x) x %in% c(":", "*", "interaction")) |>
+    sum() > 0
 }
