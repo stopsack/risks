@@ -4,7 +4,7 @@
 [![R CMD Check Windows/MacOS/Ubuntu](https://github.com/stopsack/risks/actions/workflows/main.yml/badge.svg)](https://github.com/stopsack/risks/actions/workflows/main.yml)
 <!-- badges: end -->
   
-# risks
+# risks <a href="https://stopsack.github.io/risks"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 ## Installation
 
