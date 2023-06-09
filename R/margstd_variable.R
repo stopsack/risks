@@ -115,7 +115,7 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
 #'
 #' @return A logical (TRUE for detection of an interaction)
 #' @noRd
-has_exp_interaction <- function(fit, expsosure) {
+has_exp_interaction <- function(fit, exposure) {
   # specify vector of formula terms
   fit_terms <- fit$call |>
     all.vars(functions = TRUE)
@@ -128,11 +128,13 @@ has_exp_interaction <- function(fit, expsosure) {
   # if interactions exist, return TRUE if exposure is involved
   if (has_interaction) {
     # when interactions exist, the next two terms after the interaction
-    # symbol are those involved. note that this doesn't handle 3-ways
-    int_symbol_ind <- which(fit_terms %in% c(":", "*", "interaction"))
-    int_vars <- fit_terms[int_symbol_ind + 1:2]
+    # symbol are those involved. note that this doesn't handle 3-ways and
+    # assumes that the exposure*variable interaction is the first one written
+    fit_vars <- fit_terms[! fit_terms == "as.factor"]
+    int_symbol_ind <- which(fit_vars %in% c(":", "*", "interaction"))[1]
+    int_vars <- fit_vars[int_symbol_ind + 1:2]
 
-    if (expsosure %in% int_vars) { return(TRUE) }
+    if (exposure %in% int_vars) { return(TRUE) }
   }
 
   # if FALSE if no interactions overall or no interactions with exposure

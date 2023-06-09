@@ -64,3 +64,59 @@ test_that("bad parameter values are caught", {
                          at = c(0.1, 0.3)),
                "Levels for marginal standardization")
 })
+
+test_that(
+  "interactions with exposure are correctly detected", {
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ as.factor(stage) * receptor,
+          data = risks::breastcancer,
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ stage * receptor,
+          data = risks::breastcancer,
+          family = binomial
+        ),
+        exposure = "receptor"
+      )
+    )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ as.factor(stage) * receptor + var3,
+          data = risks::breastcancer |>
+            dplyr::mutate(var3 = rep(1:2, times = dplyr::n() / 2)),
+          family = binomial),
+        exposure = "stage"
+      )
+    )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ as.factor(stage) * receptor,
+          data = risks::breastcancer |>
+            dplyr::mutate(var3 = rep(1:2, times = dplyr::n() / 2)),
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
+    expect_false(
+      has_exp_interaction(
+        glm(
+          formula = death ~ as.factor(stage) + receptor,
+          data = risks::breastcancer,
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
+  }
+)
