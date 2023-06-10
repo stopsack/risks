@@ -116,27 +116,27 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
 #' @return A logical (TRUE for detection of an interaction)
 #' @noRd
 has_exp_interaction <- function(fit, exposure) {
+
   # specify vector of formula terms
-  fit_terms <- fit$call |>
-    all.vars(functions = TRUE)
+  formula_attr <- terms(fit$formula) %>%
+    attributes()
+  fit_terms <- formula_attr$term.labels
 
-  # detect if any interaction exists
-  has_interaction <- fit_terms |>
-    sapply(function(x) x %in% c(":", "*", "interaction")) |>
+  # remove the as.factor() bits if they appear
+  fit_terms <- fit_terms %>%
+    sapply(function(x) gsub("as\\.factor\\((.*?)\\)", "\\1", x))
+
+  # look for interactions with exposure, recognizing that all interactions are
+  # specified as var1:var2 or var2:var1
+  if (
+    sapply(fit_terms, function(x) grepl(paste0(exposure, ":"), x)) %>%
     sum() > 0
+  ) { return(TRUE) }
+  if (
+    sapply(fit_terms, function(x) grepl(paste0(":", exposure), x)) %>%
+    sum() > 0
+  ) { return(TRUE) }
 
-  # if interactions exist, return TRUE if exposure is involved
-  if (has_interaction) {
-    # when interactions exist, the next two terms after the interaction
-    # symbol are those involved. note that this doesn't handle 3-ways and
-    # assumes that the exposure*variable interaction is the first one written
-    fit_vars <- fit_terms[! fit_terms == "as.factor"]
-    int_symbol_ind <- which(fit_vars %in% c(":", "*", "interaction"))[1]
-    int_vars <- fit_vars[int_symbol_ind + 1:2]
-
-    if (exposure %in% int_vars) { return(TRUE) }
-  }
-
-  # if FALSE if no interactions overall or no interactions with exposure
+  # if FALSE if no interactions with exposure
   return(FALSE)
 }

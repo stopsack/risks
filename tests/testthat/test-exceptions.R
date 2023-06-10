@@ -91,7 +91,7 @@ test_that(
       has_exp_interaction(
         glm(
           formula = death ~ as.factor(stage) * receptor + var3,
-          data = risks::breastcancer |>
+          data = risks::breastcancer %>%
             dplyr::mutate(var3 = rep(1:2, times = dplyr::n() / 2)),
           family = binomial),
         exposure = "stage"
@@ -101,7 +101,7 @@ test_that(
       has_exp_interaction(
         glm(
           formula = death ~ as.factor(stage) * receptor,
-          data = risks::breastcancer |>
+          data = risks::breastcancer %>%
             dplyr::mutate(var3 = rep(1:2, times = dplyr::n() / 2)),
           family = binomial
         ),
@@ -113,6 +113,17 @@ test_that(
         glm(
           formula = death ~ as.factor(stage) + receptor,
           data = risks::breastcancer,
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ age*receptor + receptor*stage,
+          data = risks::breastcancer %>%
+            dplyr::mutate(age = sample(50:90, replace = TRUE, size = dplyr::n())),
           family = binomial
         ),
         exposure = "stage"
