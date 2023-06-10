@@ -129,5 +129,16 @@ test_that(
         exposure = "stage"
       )
     )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ age*receptor + receptor*stage*age,
+          data = risks::breastcancer %>%
+            dplyr::mutate(age = sample(50:90, replace = TRUE, size = dplyr::n())),
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
   }
 )
