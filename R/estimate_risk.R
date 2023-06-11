@@ -40,8 +40,7 @@
 #'
 #'   The other options allow for directly selecting a fitting approach,
 #'   some of which may not converge or yield out-of-range predicted
-#'   probabilities. See full documentation (currently at
-#'   \url{https://stopsack.github.io/risks}) for details.
+#'   probabilities. See full documentation for details.
 #'
 #'   * \code{"glm"} Binomial model.
 #'   * \code{"glm_startp"} Binomial model with starting values from Poisson

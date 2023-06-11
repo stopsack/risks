@@ -67,7 +67,7 @@ summary(fit_margstd2)
 
 Marginal standardization cannot rely on analytical standard error formulae. One approach (`"margstd_delta"`) is the delta method. Alternatively, parametric bootstrapping (`"margstd_boot"` with the default, `bootci = "bca"`) can be used: given the initial maximum-likelihood estimates of the coefficients and the observed predictors, the outcome vector is predicted from a binomial distribution. The model is fit again using the predicted outcomes and observed predictors. Repeating this process generates the empirical distribution of the coefficients. 
 
-Confidence intervals for coefficients are calculated based on BC~a~ confidence intervals for parametric bootstrapping (Efron B, Narasimhan B. The Automatic Construction of Bootstrap Confidence Intervals. [J Comput Graph Stat 2020;29(3):608-619](https://doi.org/10.1080/10618600.2020.1714633)).
+Confidence intervals for coefficients are calculated based on BC~a~ confidence intervals for parametric bootstrapping (Efron B, Narasimhan B. The Automatic Construction of Bootstrap Confidence Intervals. [J Comput Graph Stat 2020;29(3):608-619](https://pubmed.ncbi.nlm.nih.gov/33727780/)).
 
 For comparison purposes, alternative approaches to bootstrapping and confidence interval estimation can requested in `tidy()`, `summary.margstd()`, and `confint()`:
 

@@ -20,7 +20,7 @@ install.packages("risks")
 ```
 
 The development version of `risks` can be installed from
-[GitHub](https://stopsack.github.io/risks) using:
+[GitHub](https://stopsack.github.io/risks/) using:
 
 ``` r
 # If the "remotes" package is missing:  install.packages("remotes")

@@ -178,9 +178,12 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' # Marginal standardization,
 #' # increase number of bootstrap repeats:
-#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
-#'                     approach = "margstd_boot")
+#' \dontrun{
+#' fit_rr <- riskratio(
+#'   formula = death ~ stage + receptor, data = dat,
+#'   approach = "margstd_boot")
 #' tidy(fit_rr, bootrepeats = 2000)
+#' }
 #'
 #' # Multiple types of models fitted:
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
