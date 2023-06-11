@@ -1,9 +1,9 @@
 #' Parse exposure properties
 #'
 #' @details
-#' For marginal standardization:Find exposure variable by is
+#' For marginal standardization: Find exposure variable by is
 #' given name vs. position; type of exposure variable (categorical
-#' vs. continuous); levels of categorical variable if applicable
+#' vs. continuous); levels of categorical variable if categorical
 #'
 #' @param fit fit
 #' @param variable variable
@@ -96,16 +96,23 @@ find_margstd_exposure <- function(fit, variable = NULL, at = NULL) {
     categorical = model_vars$categorical[1],
     margstd_levels = margstd_levels,
     all_levels = all_levels,
-    interaction = any(
-      grepl(
-        pattern = ":",
-        x = grep(
-          pattern = paste0("^", predictor_replaced),
-          x = names_effects,
-          value = TRUE))) |
+    interaction = (
+      sum(
+        grepl(
+          pattern = ":",
+          x = grep(
+            pattern = paste0("^", predictor_replaced),
+            x = names_effects,
+            value = TRUE))) >
+        sum(
+          grepl(
+            pattern = ":",
+            x = as.character(
+              unique(
+                fit$model %>%
+                  dplyr::pull(predictor)))))) |
       any(grepl(
         pattern = paste0(":", predictor_replaced),
         x = names_effects,
         fixed = TRUE)))
 }
-
