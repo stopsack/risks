@@ -1,6 +1,6 @@
 df <- breastcancer
 df$rand <- runif(n = 192, min = 0, max = 1)
-df$stage_colon = fct_recode(
+df$stage_colon = forcats::fct_recode(
   factor(df$stage),
   `1: Stage I` = "Stage I",
   `2: Stage II` = "Stage II",
