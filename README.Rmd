@@ -1,0 +1,83 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# risks: Estimating risk ratios and risk differences using regression
+
+<!-- badges: start -->
+  [![Codecov test coverage](https://codecov.io/gh/stopsack/risks/branch/master/graph/badge.svg)](https://codecov.io/gh/stopsack/risks?branch=master)
+  [![R CMD CHECK](https://github.com/stopsack/risks/actions/workflows/main.yml/badge.svg)](https://github.com/stopsack/risks/actions/workflows/main.yml)
+<!-- badges: end -->
+
+## Installation
+
+Once **risks** is released on CRAN, install with: 
+
+```{r, eval = FALSE}
+install.packages("risks")
+```
+
+The development version of `risks` can be installed from 
+[GitHub](https://stopsack.github.io/risks) using:
+
+```{r, eval = FALSE}
+# If the "remotes" package is missing:  install.packages("remotes")
+remotes::install_github("stopsack/risks")
+```
+
+## Summary
+
+The **risks** package fits regression models for risk ratios (RR) and risk
+differences (RD). The package refers to “risk,” but “prevalence” can be
+substituted throughout.
+
+What is the association between an exposure (smoker/nonsmoker, age in years, or
+underweight/lean/overweight/obese) and the risk of a binary outcome
+(dead/alive, disease/healthy), perhaps adjusting for confounders
+(men/women, years of education)? For such questions, many
+studies default to reporting odds ratios, which may exaggerate 
+associations when the outcome is common. Odds ratios are often used because they
+are easily obtained from logistic regression models. Obtaining risk ratios or
+risk differences, especially adjusting for confounders, has typically required
+more advanced biostatistics and programming skills, including in R.
+
+The **risks** package makes estimating adjusted risk ratios and risk differences 
+as simple as fitting a logistic regression model. No advanced programming or
+biostatistics skills are required. Risk ratios or risk differences are returned
+whenever the data would allow for fitting a logistic model.
+
+
+## Basic example
+
+The example data stem from a [cohort of women with breast cancer](https://pubmed.ncbi.nlm.nih.gov/15286014). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
+
+```{r basic_example}
+library(risks)  # provides riskratio(), riskdiff(), postestimation functions
+
+# Fit a risk difference model
+fit <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
+
+# The "fit" object can be used in R commands for generalized linear model, e.g.:
+summary(fit)
+
+# The tidy() function from the broom package provides access to coefficients
+broom::tidy(fit)
+```
+
+
+## Further reading
+
+-   [Get started with the risks package](https://stopsack.github.io/risks/articles/risks.html)
+-   [Models and model comparisons](https://stopsack.github.io/risks/articles/models.html)
+-   [More on marginal standardization](https://stopsack.github.io/risks/articles/margstd.html)
