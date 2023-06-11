@@ -35,7 +35,7 @@ test_that("exposure interactions get picked up", {
   expect_true(
     find_margstd_exposure(
       fit = glm(
-        formula = death ~ as.factor(stage) * receptor,
+        formula = death ~ as.character(stage) * receptor,
         data = df,
         family = binomial()))$interaction)
 
