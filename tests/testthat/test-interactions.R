@@ -1,10 +1,9 @@
+context("interactions")
+
 df <- breastcancer
 df$rand <- runif(n = 192, min = 0, max = 1)
-df$stage_colon = forcats::fct_recode(
-  factor(df$stage),
-  `1: Stage I` = "Stage I",
-  `2: Stage II` = "Stage II",
-  `3: Stage III` = "Stage III")
+df$stage_colon = df$stage
+levels(df$stage_colon) <- c("1: Stage I", "2: Stage II", "3: Stage III")
 
 test_that("exposure interactions get picked up", {
   # No interaction
