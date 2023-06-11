@@ -186,9 +186,11 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #' }
 #'
 #' # Multiple types of models fitted:
+#' \dontrun{
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
 #'                     approach = "all")
 #' tidy(fit_rr)
+#' }
 tidy.risks <- function(
   x,
   conf.int     = TRUE,

@@ -93,7 +93,9 @@ tidy(fit_rr, bootrepeats = 2000)
 }
 
 # Multiple types of models fitted:
+\dontrun{
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
                     approach = "all")
 tidy(fit_rr)
+}
 }
