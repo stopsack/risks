@@ -125,6 +125,9 @@ has_exp_interaction <- function(fit, exposure) {
   # remove the as.factor() bits if they appear
   fit_terms <- fit_terms %>%
     sapply(function(x) gsub("as\\.factor\\((.*?)\\)", "\\1", x))
+  # remove any as.numeric() specs as well
+  fit_terms <- fit_terms %>%
+    sapply(function(x) gsub("as\\.numeric\\((.*?)\\)", "\\1", x))
 
   # look for interactions with exposure, recognizing that all interactions are
   # specified as var1:var2 or var2:var1

@@ -140,5 +140,15 @@ test_that(
         exposure = "stage"
       )
     )
+    expect_true(
+      has_exp_interaction(
+        glm(
+          formula = death ~ as.numeric(as.factor(stage)) * receptor,
+          data = risks::breastcancer,
+          family = binomial
+        ),
+        exposure = "stage"
+      )
+    )
   }
 )
