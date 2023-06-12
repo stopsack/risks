@@ -63,7 +63,7 @@ library(risks)  # provides riskratio(), riskdiff(), postestimation functions
 # Fit a risk difference model
 fit <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
 
-# The "fit" object can be used in R commands for generalized linear model, e.g.:
+# Fitted objects can be used by commands for generalized linear models, e.g.:
 summary(fit)
 #> 
 #> Risk difference model, fitted via marginal standardization of a logistic model with delta method (margstd_delta).
@@ -97,7 +97,7 @@ summary(fit)
 #> stageStage II  0.04614515 0.2799187
 #> stageStage III 0.37571719 0.7662158
 
-# The tidy() function from the broom package provides access to coefficients
+# tidy() from the broom package provides easy access to coefficients:
 broom::tidy(fit)
 #> # A tibble: 3 × 8
 #>   term           estimate std.error statistic   p.value conf.low conf.high model

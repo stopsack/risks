@@ -11,6 +11,9 @@
 
 \item{...}{Passed on}
 }
+\value{
+No return value, called for printing
+}
 \description{
 Print summaries for "risks" models. The printout is the same as
 for regular summaries of generalized linear models fit via

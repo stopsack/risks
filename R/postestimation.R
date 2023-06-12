@@ -265,6 +265,7 @@ tidy.risks <- function(
 #' @param x Fitted model
 #' @param ... Passed to print.glm()
 #'
+#' @return No return value, called for printing
 #' @export
 print.risks <- function(x, ...) {
   if(x$converged == FALSE & !is.null(x$all_models)) {
@@ -386,6 +387,7 @@ summary.risks <- function(object,
 #' @param x Model
 #' @param ... Passed on
 #'
+#' @return No return value, called for printing
 #' @export
 print.summary.risks <- function(x, ...) {
   # If estimate_risk(approach = "all") was called:

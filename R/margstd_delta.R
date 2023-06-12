@@ -1,5 +1,9 @@
 #' Marginal standardization with delta method standard errors
 #'
+#' Delta method implementation modified after \code{probratio} from the
+#' \code{epitools} package, also allowing for categorical and continuous
+#' exposures.
+#'
 #' @param formula A formula
 #' @param data Data
 #' @param estimand Estimand
@@ -7,7 +11,7 @@
 #' @param at At
 #' @param interaction_warning Warning for interaction
 #'
-#' @return A model fit by estimate_maxprob()
+#' @return A model fit, passed by estimate_maxprob()
 #' @noRd
 estimate_margstd_delta <- function(
     formula,
