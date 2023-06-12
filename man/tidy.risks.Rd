@@ -85,7 +85,7 @@ tidy(fit_rr)
 
 # Marginal standardization,
 # increase number of bootstrap repeats:
-\dontrun{
+\donttest{
 fit_rr <- riskratio(
   formula = death ~ stage + receptor, data = dat,
   approach = "margstd_boot")
@@ -93,7 +93,7 @@ tidy(fit_rr, bootrepeats = 2000)
 }
 
 # Multiple types of models fitted:
-\dontrun{
+\donttest{
 fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
                     approach = "all")
 tidy(fit_rr)
