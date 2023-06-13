@@ -22,17 +22,16 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-Once **risks** is released on CRAN, install with: 
+The **risks** package can be installed from CRAN:
 
 ```{r, eval = FALSE}
 install.packages("risks")
 ```
 
-The development version of `risks` can be installed from 
+Development versions can be installed from 
 [GitHub](https://stopsack.github.io/risks/) using:
 
 ```{r, eval = FALSE}
-# If the "remotes" package is missing:  install.packages("remotes")
 remotes::install_github("stopsack/risks")
 ```
 
@@ -62,16 +61,22 @@ whenever the data would allow for fitting a logistic model.
 
 The example data stem from a [cohort of women with breast cancer](https://pubmed.ncbi.nlm.nih.gov/15286014). The the categorical exposure is `stage`, the binary outcome is `death`, and the binary confounder is `receptor`.
 
+Fit a risk difference model:
+
 ```{r basic_example}
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
-
-# Fit a risk difference model
 fit <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
+```
 
-# Fitted objects can be used by commands for generalized linear models, e.g.:
+Fitted objects can be used in the usual commands for generalized linear models, such as:
+
+```{r basic_example2}
 summary(fit)
+```
 
-# tidy() from the broom package provides easy access to coefficients:
+`tidy()` from the broom package provides easy access to coefficients:
+
+```{r basic_example3}
 broom::tidy(fit)
 ```
 

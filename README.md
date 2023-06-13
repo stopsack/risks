@@ -13,17 +13,16 @@ CHECK](https://github.com/stopsack/risks/actions/workflows/main.yml/badge.svg)](
 
 ## Installation
 
-Once **risks** is released on CRAN, install with:
+The **risks** package can be installed from CRAN:
 
 ``` r
 install.packages("risks")
 ```
 
-The development version of `risks` can be installed from
+Development versions can be installed from
 [GitHub](https://stopsack.github.io/risks/) using:
 
 ``` r
-# If the "remotes" package is missing:  install.packages("remotes")
 remotes::install_github("stopsack/risks")
 ```
 
@@ -57,13 +56,17 @@ cancer](https://pubmed.ncbi.nlm.nih.gov/15286014). The the categorical
 exposure is `stage`, the binary outcome is `death`, and the binary
 confounder is `receptor`.
 
+Fit a risk difference model:
+
 ``` r
 library(risks)  # provides riskratio(), riskdiff(), postestimation functions
-
-# Fit a risk difference model
 fit <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
+```
 
-# Fitted objects can be used by commands for generalized linear models, e.g.:
+Fitted objects can be used in the usual commands for generalized linear
+models, such as:
+
+``` r
 summary(fit)
 #> 
 #> Risk difference model, fitted via marginal standardization of a logistic model with delta method (margstd_delta).
@@ -96,8 +99,11 @@ summary(fit)
 #> stageStage I   0.00000000 0.0000000
 #> stageStage II  0.04614515 0.2799187
 #> stageStage III 0.37571719 0.7662158
+```
 
-# tidy() from the broom package provides easy access to coefficients:
+`tidy()` from the broom package provides easy access to coefficients:
+
+``` r
 broom::tidy(fit)
 #> # A tibble: 3 × 8
 #>   term           estimate std.error statistic   p.value conf.low conf.high model
