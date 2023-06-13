@@ -1,3 +1,10 @@
+# risks 0.4.2
+
+* First CRAN submission.
+* Improve detection of interactions involving the exposure variable for 
+  `"margstd_delta"`.
+
+
 # risks 0.4.1
 
 * `tidy.risks()`: Increase default `bootrepeats` to 1000, consistent with 

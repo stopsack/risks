@@ -23,6 +23,9 @@
 
 \item{...}{Other arguments, not used}
 }
+\value{
+Model summary (list)
+}
 \description{
 Summarize results from fitting a logistic model with case duplication and
 cluster-robust covariance.

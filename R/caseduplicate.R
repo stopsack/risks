@@ -76,6 +76,8 @@ confint.duplicate <- function(object, parm = NULL, level = 0.95, ...) {
 #' @param correlation Not used
 #' @param symbolic.cor Not used
 #' @param ... Other arguments, not used
+#'
+#' @return Model summary (list)
 #' @export
 summary.duplicate <- function(object, dispersion = NULL, correlation = FALSE,
                               symbolic.cor = FALSE, ...) {

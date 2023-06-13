@@ -11,6 +11,9 @@
 
 \item{...}{Passed to print.glm()}
 }
+\value{
+No return value, called for printing
+}
 \description{
 Print fitted risks model. The only change, compared to \code{print.glm()},
 is the addition of the main type of model: relative risk or risk difference.

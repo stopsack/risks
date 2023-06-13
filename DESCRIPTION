@@ -1,6 +1,6 @@
 Package: risks
-Title: Estimate risk ratios and risk differences using regression
-Version: 0.4.1
+Title: Estimate Risk Ratios and Risk Differences using Regression
+Version: 0.4.2
 Authors@R: 
     c(person(given = "Konrad",
              family = "Stopsack",
@@ -10,16 +10,23 @@ Authors@R:
       person(given = "Travis",
              family = "Gerke",
              role = c("aut"),
-             email = "travis.gerke@moffitt.org",
+             email = "tgerke@mail.harvard.edu",
              comment = c(ORCID = "0000-0002-9500-8907")))
-Description: The risks package fits risk ratio and risk difference models using 
-  regression.
+Description: Risk ratios and risk differences are estimated using regression 
+  models that allow for binary, categorical, and continuous exposures and 
+  confounders. Implemented are marginal standardization after fitting logistic 
+  models (g-computation) with delta-method and bootstrap standard errors, 
+  Miettinen's case-duplication approach (Schouten et al. 1993, 
+  <doi:10.1002/sim.4780121808>), log-binomial (Poisson) models with empirical 
+  variance (Zou 2004, <doi:10.1093/aje/kwh090>), binomial models with starting 
+  values from Poisson models (Spiegelman and Hertzmark 2005, 
+  <doi:10.1093/aje/kwi188>), and others.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-URL: https://stopsack.github.io/risks
+URL: https://stopsack.github.io/risks/
 BugReports: https://github.com/stopsack/risks/issues
 Suggests: 
     addreg,

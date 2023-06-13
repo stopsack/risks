@@ -39,7 +39,7 @@ fit_margstd <- riskdiff(formula = death ~ stage + receptor,
 summary(fit_margstd)
 ```
 
-Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death, adjusting for hormone receptor status (with slightly different bootstrapped 95% confidence intervals).
+Consistent with earlier results, we observed that women with stage III breast cancer have a 57 percentage points higher risk of death, adjusting for hormone receptor status.
 
 Note that coefficients and standard errors are only estimated for the exposure variable. Model fit characteristics and predicted values stem directly from the underlying logistic model.
 
@@ -65,16 +65,16 @@ summary(fit_margstd2)
 
 # Bootstrap confidence intervals
 
-Marginal standardization cannot rely on analytical standard error formulae. One approach (`"margstd_delta"`) is the delta method. Alternatively, (parametric) bootstrapping (`"margstd_boot"`) can be used: given the initial maximum-likelihood estimates of the coefficients and the observed predictors, the outcome vector is predicted from a binomial distribution. The model is fit again using the predicted outcomes and observed predictors. Repeating this process generates the empirical distribution of the coefficients. 
+Marginal standardization cannot rely on analytical standard error formulae. One approach (`"margstd_delta"`) is the delta method. Alternatively, parametric bootstrapping (`"margstd_boot"` with the default, `bootci = "bca"`) can be used: given the initial maximum-likelihood estimates of the coefficients and the observed predictors, the outcome vector is predicted from a binomial distribution. The model is fit again using the predicted outcomes and observed predictors. Repeating this process generates the empirical distribution of the coefficients. 
 
-Confidence intervals for coefficients are calculated based on BC~a~ confidence intervals for parametric bootstrapping (Efron B, Narasimhan B. The Automatic Construction of Bootstrap Confidence Intervals. [J Comput Graph Stat 2020;29(3):608-619](https://doi.org/10.1080/10618600.2020.1714633)).
+Confidence intervals for coefficients are calculated based on BC~a~ confidence intervals for parametric bootstrapping (Efron B, Narasimhan B. The Automatic Construction of Bootstrap Confidence Intervals. [J Comput Graph Stat 2020;29(3):608-619](https://pubmed.ncbi.nlm.nih.gov/33727780/)).
 
 For comparison purposes, alternative approaches to bootstrapping and confidence interval estimation can requested in `tidy()`, `summary.margstd()`, and `confint()`:
 
 * `bootci = "normal"`: Normality-based confidence intervals after parametric bootstrapping. These may give out-of-range estimates for confidence limits.
 * `bootci = "nonpar"`: BC~a~ intervals after *nonparametric* bootstrapping. Here, the data are resampled, rather than the outcome predicted from the model. Especially in the small datasets in which regular binomial models with log links may not converge and marginal standardization may be the only option, resampling the data comes with the risk of empty strata in the resamples, resulting in sparse-data bias or model nonconvergence. The resulting confidence intervals may be too narrow. This option should be used with caution.
 
-When using `tidy()` to access model results, the parameter `bootverbose = TRUE` will add bootstrapping parameters and properties to tibble
+When using `tidy()` to access model results, the parameter `bootverbose = TRUE` will add bootstrapping parameters and properties to the tibble:
 
 ```{r margstd_bootverbose}
 fit_margstd3 <- riskdiff(formula = death ~ stage + receptor, 
