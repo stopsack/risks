@@ -115,9 +115,11 @@ broom::tidy(fit)
 
 ## Further reading
 
-- [Get started with the risks
+- [Get started with the **risks**
   package](https://stopsack.github.io/risks/articles/risks.html)
 - [Models and model
   comparisons](https://stopsack.github.io/risks/articles/models.html)
 - [More on marginal
   standardization](https://stopsack.github.io/risks/articles/margstd.html)
+- [Reporting results with the **rifttable**
+  package](https://stopsack.github.io/rifttable/)
