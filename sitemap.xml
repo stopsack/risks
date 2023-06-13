@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://stopsack.github.io/risks/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://stopsack.github.io/risks/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://stopsack.github.io/risks/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/margstd.html</loc>
+    <loc>https://stopsack.github.io/risks/articles/margstd.html</loc>
   </url>
   <url>
-    <loc>/articles/models.html</loc>
+    <loc>https://stopsack.github.io/risks/articles/models.html</loc>
   </url>
   <url>
-    <loc>/articles/risks.html</loc>
+    <loc>https://stopsack.github.io/risks/articles/risks.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://stopsack.github.io/risks/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://stopsack.github.io/risks/index.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://stopsack.github.io/risks/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/breastcancer.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/breastcancer.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.duplicate.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/confint.duplicate.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.margstd_boot.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/confint.margstd_boot.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.margstd_delta.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/confint.margstd_delta.html</loc>
   </url>
   <url>
-    <loc>/reference/confint.robpoisson.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/confint.robpoisson.html</loc>
   </url>
   <url>
-    <loc>/reference/conv.test.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/conv.test.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/print.risks.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/print.risks.html</loc>
   </url>
   <url>
-    <loc>/reference/print.summary.risks.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/print.summary.risks.html</loc>
   </url>
   <url>
-    <loc>/reference/riskratio.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/riskratio.html</loc>
   </url>
   <url>
-    <loc>/reference/risks.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/risks.html</loc>
   </url>
   <url>
-    <loc>/reference/rr_rd_mantel_haenszel.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/rr_rd_mantel_haenszel.html</loc>
   </url>
   <url>
-    <loc>/reference/summary.duplicate.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/summary.duplicate.html</loc>
   </url>
   <url>
-    <loc>/reference/summary.margstd_boot.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/summary.margstd_boot.html</loc>
   </url>
   <url>
-    <loc>/reference/summary.margstd_delta.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/summary.margstd_delta.html</loc>
   </url>
   <url>
-    <loc>/reference/summary.risks.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/summary.risks.html</loc>
   </url>
   <url>
-    <loc>/reference/summary.robpoisson.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/summary.robpoisson.html</loc>
   </url>
   <url>
-    <loc>/reference/tidy.risks.html</loc>
+    <loc>https://stopsack.github.io/risks/reference/tidy.risks.html</loc>
   </url>
 </urlset>
