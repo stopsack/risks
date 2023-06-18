@@ -179,6 +179,7 @@ estimate_margstd_delta <- function(
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
+#' @noRd
 confint.margstd_delta <- function(
     object,
     parm = NULL,

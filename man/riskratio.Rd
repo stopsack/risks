@@ -99,10 +99,7 @@ intervals.
 Standard post-processing functions can also be used:
 \itemize{
 \item \code{\link[stats]{coef}}: a vector of coefficients.
-\item \code{\link[stats]{confint}}: a matrix of confidence intervals
-(risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
-\code{\link[risks]{confint.margstd_boot}},
-\code{\link[risks]{confint.margstd_delta}}).
+\item \code{\link[risks]{confint.risks}}: a matrix of confidence intervals
 \item \code{\link[stats]{predict.glm}(type = "response")}: fitted values
 (predictions).
 \item \code{\link[stats]{residuals}}: residuals.

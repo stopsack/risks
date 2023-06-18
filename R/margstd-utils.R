@@ -346,6 +346,7 @@ bootci_bcapar <- function(
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
+#' @noRd
 confint.margstd_boot <- function(
     object,
     parm = NULL,

@@ -119,10 +119,7 @@
 #'   Standard post-processing functions can also be used:
 #'
 #'   * \code{\link[stats]{coef}}: a vector of coefficients.
-#'   * \code{\link[stats]{confint}}: a matrix of confidence intervals
-#'      (risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
-#'      \code{\link[risks]{confint.margstd_boot}},
-#'      \code{\link[risks]{confint.margstd_delta}}).
+#'   * \code{\link[risks]{confint.risks}}: a matrix of confidence intervals
 #'   * \code{\link[stats]{predict.glm}(type = "response")}: fitted values
 #'     (predictions).
 #'   * \code{\link[stats]{residuals}}: residuals.
