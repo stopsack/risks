@@ -483,3 +483,13 @@ print.summary.risks <- function(x, ...) {
     print(ci)
   }
 }
+
+#' Check Risks Class
+#'
+#' @param x Object
+#'
+#' @return Boolean
+#'
+is.risks <- function(x) {
+  inherits(x, "risks")
+}
