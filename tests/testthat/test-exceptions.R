@@ -64,3 +64,11 @@ test_that("bad parameter values are caught", {
                          at = c(0.1, 0.3)),
                "Levels for marginal standardization")
 })
+
+test_that("empty data set fails with correct message", {
+  expect_error(
+    suppressWarnings(riskratio(
+      formula = death ~ stage + receptor,
+      data = dat[0:0, ])),
+    "contrasts can be applied only to factors with 2 or more levels")
+})

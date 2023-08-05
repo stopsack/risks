@@ -263,6 +263,12 @@ estimate_risk <- function(
         return(fit)
 
       # 3) Check if a logistic model can be fitted
+      warning(paste(
+        "risks: No",
+        toupper(estimand),
+        "model could be fit. Are the data intact and the",
+        "formula correct? Any error messages stem directly from fitting a",
+        "logistic model on the data."))
       fit <- stats::glm(
         formula = formula,
         data = data,
@@ -338,6 +344,12 @@ estimate_risk <- function(
         return(fit)
 
       # 4) Check if a logistic model can be fitted
+      warning(paste(
+        "risks: No",
+        toupper(estimand),
+        "model could be fit. Are the data intact and the",
+        "formula correct? Any error messages stem directly from fitting a",
+        "logistic model on the data."))
       res <- stats::glm(
         formula = formula,
         data = data,
