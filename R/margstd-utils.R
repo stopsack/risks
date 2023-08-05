@@ -148,7 +148,7 @@ bootci_nonpar <- function(
 
   if(parameters > 1) {
     dplyr::bind_rows(
-      c(conf.low = NA, conf.high = NA),
+      c(conf.low = 0, conf.high = 0),
       purrr::map_dfr(
         .x = 2:parameters,
         .f = getbcaci_nonpar,
@@ -219,7 +219,7 @@ bootci_norm <- function(
 
   if(parameters > 1) {
   dplyr::bind_rows(
-    c(conf.low = NA, conf.high = NA),
+    c(conf.low = 0, conf.high = 0),
     purrr::map_dfr(
       .x = 2:parameters,
       .f = getbootci_norm,
@@ -305,7 +305,7 @@ bootci_bcapar <- function(
   }
   if(parameters > 1) {  # categorical variables with reference level
     dplyr::bind_rows(
-      c(conf.low = NA, conf.high = NA),
+      c(conf.low = 0, conf.high = 0),
       purrr::map_dfr(
         .x = 2:parameters,
         .f = ~getbootci_bcapar(
