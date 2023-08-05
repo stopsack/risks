@@ -38,16 +38,19 @@ fit_and_predict <- function(
       formula = formula,
       data = data,
       family = binomial(link = "logit"))
-    delta <- sd(data[, predictor]) / 1000
+    delta <- sd(model.matrix(fit)[, predictor]) / 1000
     newdata <- data
     newdata[, predictor] <- newdata[, predictor] + delta
     pred1 <- predict(
       object = fit,
-      type = "response")
+      newdata = data,
+      type = "response",
+      na.action = stats::na.omit)
     pred2 <- predict(
       object = fit,
       newdata = newdata,
-      type = "response")
+      type = "response",
+      na.action = stats::na.omit)
     if(estimand == "rd")
       res <- mean((pred2 - pred1) / delta)
     else

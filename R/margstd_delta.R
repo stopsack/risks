@@ -122,8 +122,8 @@ estimate_margstd_delta <- function(
             term = .x)
         }))
   } else {
-    delta <- sd(as.data.frame(data)[, exposure$predictor]) / 1000
     model_matrix0 <- model_matrix1 <- model.matrix(fit)
+    delta <- sd(model_matrix0[, exposure$predictor]) / 1000
     model_matrix1[, exposure$predictor] <- model_matrix1[, exposure$predictor] +
       delta
     res <- delta_fun(
