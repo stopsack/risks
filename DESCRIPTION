@@ -1,6 +1,6 @@
 Package: risks
 Title: Estimate Risk Ratios and Risk Differences using Regression
-Version: 0.4.2
+Version: 0.4.2-9001
 Authors@R: 
     c(person(given = "Konrad",
              family = "Stopsack",
