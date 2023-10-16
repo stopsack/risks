@@ -39,9 +39,6 @@ test_that("confint has the same results as tidy", {
     object = conf_low_tidy(approach = "glm_startd"),
     expected = conf_low_confint(approach = "glm_startd"))
   expect_equal(
-    object = conf_low_tidy(approach = "glm_cem_startp"),
-    expected = conf_low_confint(approach = "glm_cem_startp"))
-  expect_equal(
     object = conf_low_tidy(approach = "margstd_boot"),
     expected = conf_low_confint(approach = "margstd_boot"))
   expect_equal(
@@ -57,5 +54,8 @@ test_that("confint has the same results as tidy", {
     expect_equal(
       object = conf_low_tidy(approach = "glm_cem"),
       expected = conf_low_confint(approach = "glm_cem"))
+    expect_equal(
+      object = conf_low_tidy(approach = "glm_cem_startp"),
+      expected = conf_low_confint(approach = "glm_cem_startp"))
   }
 })
