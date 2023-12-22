@@ -69,6 +69,7 @@
 rr_rd_mantel_haenszel <- function(data, exposure, outcome, confounders,
                                   estimand = c("rr", "rd"),
                                   conf.level = 0.95) {
+  estimand <- match.arg(estimand)
   zval <- stats::qnorm(1 - (1 - conf.level) / 2)
   expname <- data %>%
     dplyr::select({{ exposure }}) %>%
@@ -101,7 +102,7 @@ rr_rd_mantel_haenszel <- function(data, exposure, outcome, confounders,
                   n_total = .data$n + .data$n0,
                   w = (.data$n * .data$n0) / .data$n_total) %>%
     dplyr::group_by({{ exposure }})
-  if(match.arg(estimand) == "rd") {
+  if(estimand == "rd") {
     data %>%
       dplyr::mutate(num_rd = (.data$a * .data$n0 - .data$a0 * .data$n) /
                       .data$n_total,

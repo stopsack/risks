@@ -23,6 +23,9 @@
 
 \item{...}{Other arguments, not used}
 }
+\value{
+Model summary (list)
+}
 \description{
 Summarize results from fitting a Poisson model with
 robust/empirical/sandwich covariance.

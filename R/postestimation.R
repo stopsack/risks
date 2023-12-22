@@ -178,14 +178,19 @@ risks_process_lm <- function(ret, x, conf.int = FALSE, conf.level = 0.95,
 #'
 #' # Marginal standardization,
 #' # increase number of bootstrap repeats:
-#' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
-#'                     approach = "margstd_boot")
+#' \donttest{
+#' fit_rr <- riskratio(
+#'   formula = death ~ stage + receptor, data = dat,
+#'   approach = "margstd_boot")
 #' tidy(fit_rr, bootrepeats = 2000)
+#' }
 #'
 #' # Multiple types of models fitted:
+#' \donttest{
 #' fit_rr <- riskratio(formula = death ~ stage + receptor, data = dat,
 #'                     approach = "all")
 #' tidy(fit_rr)
+#' }
 tidy.risks <- function(
   x,
   conf.int     = TRUE,
@@ -260,6 +265,7 @@ tidy.risks <- function(
 #' @param x Fitted model
 #' @param ... Passed to print.glm()
 #'
+#' @return No return value, called for printing
 #' @export
 print.risks <- function(x, ...) {
   if(x$converged == FALSE & !is.null(x$all_models)) {
@@ -381,6 +387,7 @@ summary.risks <- function(object,
 #' @param x Model
 #' @param ... Passed on
 #'
+#' @return No return value, called for printing
 #' @export
 print.summary.risks <- function(x, ...) {
   # If estimate_risk(approach = "all") was called:

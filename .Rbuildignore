@@ -15,3 +15,6 @@
 ^index\.Rmd$
 ^codecov\.yml$
 ^data-raw$
+README.md$
+README.Rmd$
+NEWS.md$
