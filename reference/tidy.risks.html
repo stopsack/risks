@@ -10,7 +10,7 @@ and p-values. A column with the type of model fitted is added."><meta property="
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">risks</a>
 
@@ -182,16 +182,15 @@ column of the tibble includes the name of the model. See examples.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   term           estimate std.error statistic   p.value conf.low conf.high model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl[1d&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I      0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>         <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>    marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.899     0.687      1.31   0.191      0.142      1.74 marg…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.81      0.681      2.65   0.007<span style="text-decoration: underline;">95</span>    1.02       2.57 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> stageStage I      0         0        <span style="color: #BB0000;">NaN</span>    <span style="color: #BB0000;">NaN</span>   <span style="color: #949494;"> </span>    <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>    marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> stageStage II     0.899     0.441      2.04   4.15<span style="color: #949494;">e</span><span style="color: #BB0000;">-2</span>   0.096<span style="text-decoration: underline;">6</span>      1.78 marg…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> stageStage III    1.81      0.425      4.25   2.11<span style="color: #949494;">e</span><span style="color: #BB0000;">-5</span>   1.07        2.69 marg…</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Multiple types of models fitted:</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">fit_rr</span> <span class="op">&lt;-</span> <span class="fu"><a href="riskratio.html">riskratio</a></span><span class="op">(</span>formula <span class="op">=</span> <span class="va">death</span> <span class="op">~</span> <span class="va">stage</span> <span class="op">+</span> <span class="va">receptor</span>, data <span class="op">=</span> <span class="va">dat</span>,</span></span>
 <span class="r-in"><span>                    approach <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>undefined subclass "ndiMatrix" of class "replValueSp"; definition not updated</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: doParallel</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: foreach</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: iterators</span>
@@ -236,7 +235,7 @@ column of the tibble includes the name of the model. See examples.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>
