@@ -62,14 +62,7 @@ riskratio(formula = death ~ stage + receptor,
 ```
 
 \
-However, the binomial model without starting values does not converge:
-
-```{r selectapproach2, error = TRUE}
-riskratio(formula = death ~ stage + receptor, 
-          data = breastcancer, 
-          approach = "glm")
-```
-
+However, the binomial model without starting values (`approach = "glm"`) does not converge, as expected.
 
 
 # Model comparisons
