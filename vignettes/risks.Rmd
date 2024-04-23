@@ -16,10 +16,16 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Once risks is released on CRAN, `install.packages("risks")` will be available. Currently, the development version of `risks` can be installed from [GitHub](https://github.com/) using:
+The **risks** package can be installed from CRAN:
 
-```r
-# install.packages("remotes")  # The "remotes" package needs to be installed
+```{r cran_install, eval = FALSE}
+install.packages("risks")
+```
+
+Development versions can be installed from 
+[GitHub](https://stopsack.github.io/risks/):
+
+```{r github_install, eval = FALSE}
 remotes::install_github("stopsack/risks")
 ```
 
