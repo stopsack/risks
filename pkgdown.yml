@@ -1,12 +1,11 @@
 pandoc: 3.1.11
-pkgdown: 2.0.8
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   margstd: margstd.html
   models: models.html
   risks: risks.html
-last_built: 2024-04-16T20:42Z
+last_built: 2025-03-20T15:10Z
 urls:
   reference: https://stopsack.github.io/risks/reference
   article: https://stopsack.github.io/risks/articles
-
