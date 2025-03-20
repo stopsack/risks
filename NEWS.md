@@ -7,6 +7,7 @@
   `"margstd_boot"` and `"margstd_delta"`.
 * Report confidence limits for a reference category as `0` in `"margstd_boot"`,
   as in `"margstd_delta"`.
+* Add hex logo, thanks to @tgerke.
 
 
 # risks 0.4.2
