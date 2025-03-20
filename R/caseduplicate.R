@@ -36,6 +36,7 @@ estimate_duplicate <- function(formula, data, ...) {
 #' @param ... Additional arguments, not used
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
+#' @noRd
 confint.duplicate <- function(object, parm = NULL, level = 0.95, ...) {
   # modified after stats:::confint.default()
   cf <- coef(object)

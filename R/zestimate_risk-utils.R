@@ -59,8 +59,12 @@ ext_possibly <- function(.f, otherwise, quiet = TRUE) {
 # Return values if model fitting failed.
 # Still assign the class/type of the model that was meant to be fitted.
 return_failure <- function(family, classname) {
-  ret <- list(family = family,
-              converged = FALSE, boundary = FALSE, maxprob = NA_real_)
+  ret <- list(
+    family = family,
+    converged = FALSE,
+    boundary = FALSE,
+    maxprob = NA_real_,
+    margstd_delta_interaction = FALSE)
   class(ret) <- c("risks", classname, "glm", "lm")
   return(ret)
 }

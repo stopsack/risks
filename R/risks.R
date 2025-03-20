@@ -14,15 +14,8 @@
 #' \code{\link[risks]{tidy.risks}}: Tibble (data frame) of parameters,
 #'   coefficients, standard errors, confidence intervals.
 #'
-#' \code{\link[risks]{confint.robpoisson}},
-#' \code{\link[risks]{confint.duplicate}},
-#' \code{\link[risks]{confint.margstd_boot}},
-#' \code{\link[risks]{confint.margstd_delta}}: Confidence intervals. (Standard
-#'   confidence intervals for generalized linear models are used for other
-#'   models.)
+#' \code{\link[risks]{confint.risks}}: Confidence intervals.
 #'
-#' @docType package
 #' @name risks
 #' @seealso \url{https://github.com/stopsack/risks}
-NULL
-#> NULL
+"_PACKAGE"

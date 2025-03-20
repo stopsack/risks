@@ -2,6 +2,7 @@
 % Please edit documentation in R/risks.R
 \docType{package}
 \name{risks}
+\alias{risks-package}
 \alias{risks}
 \title{risks: Estimate risk ratios and risk differences using regression}
 \description{
@@ -20,14 +21,18 @@ models using regression.
 \code{\link[risks]{tidy.risks}}: Tibble (data frame) of parameters,
 coefficients, standard errors, confidence intervals.
 
-\code{\link[risks]{confint.robpoisson}},
-\code{\link[risks]{confint.duplicate}},
-\code{\link[risks]{confint.margstd_boot}},
-\code{\link[risks]{confint.margstd_delta}}: Confidence intervals. (Standard
-confidence intervals for generalized linear models are used for other
-models.)
+\code{\link[risks]{confint.risks}}: Confidence intervals.
 }
 
 \seealso{
 \url{https://github.com/stopsack/risks}
+}
+\author{
+\strong{Maintainer}: Konrad Stopsack \email{stopsack@post.harvard.edu} (\href{https://orcid.org/0000-0002-0722-1311}{ORCID})
+
+Authors:
+\itemize{
+  \item Travis Gerke \email{tgerke@mail.harvard.edu} (\href{https://orcid.org/0000-0002-9500-8907}{ORCID})
+}
+
 }

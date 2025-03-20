@@ -38,16 +38,19 @@ fit_and_predict <- function(
       formula = formula,
       data = data,
       family = binomial(link = "logit"))
-    delta <- sd(data[, predictor]) / 1000
+    delta <- sd(model.matrix(fit)[, predictor]) / 1000
     newdata <- data
     newdata[, predictor] <- newdata[, predictor] + delta
     pred1 <- predict(
       object = fit,
-      type = "response")
+      newdata = data,
+      type = "response",
+      na.action = stats::na.omit)
     pred2 <- predict(
       object = fit,
       newdata = newdata,
-      type = "response")
+      type = "response",
+      na.action = stats::na.omit)
     if(estimand == "rd")
       res <- mean((pred2 - pred1) / delta)
     else
@@ -145,7 +148,7 @@ bootci_nonpar <- function(
 
   if(parameters > 1) {
     dplyr::bind_rows(
-      c(conf.low = NA, conf.high = NA),
+      c(conf.low = 0, conf.high = 0),
       purrr::map_dfr(
         .x = 2:parameters,
         .f = getbcaci_nonpar,
@@ -216,7 +219,7 @@ bootci_norm <- function(
 
   if(parameters > 1) {
   dplyr::bind_rows(
-    c(conf.low = NA, conf.high = NA),
+    c(conf.low = 0, conf.high = 0),
     purrr::map_dfr(
       .x = 2:parameters,
       .f = getbootci_norm,
@@ -302,7 +305,7 @@ bootci_bcapar <- function(
   }
   if(parameters > 1) {  # categorical variables with reference level
     dplyr::bind_rows(
-      c(conf.low = NA, conf.high = NA),
+      c(conf.low = 0, conf.high = 0),
       purrr::map_dfr(
         .x = 2:parameters,
         .f = ~getbootci_bcapar(
@@ -346,6 +349,7 @@ bootci_bcapar <- function(
 #'
 #' @return Matrix: First column, lower bound; second column, upper bound.
 #' @export
+#' @noRd
 confint.margstd_boot <- function(
     object,
     parm = NULL,

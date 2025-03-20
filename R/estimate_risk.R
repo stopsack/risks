@@ -119,10 +119,7 @@
 #'   Standard post-processing functions can also be used:
 #'
 #'   * \code{\link[stats]{coef}}: a vector of coefficients.
-#'   * \code{\link[stats]{confint}}: a matrix of confidence intervals
-#'      (risks-specific S3 methods: \code{\link[risks]{confint.robpoisson}},
-#'      \code{\link[risks]{confint.margstd_boot}},
-#'      \code{\link[risks]{confint.margstd_delta}}).
+#'   * \code{\link[risks]{confint.risks}}: a matrix of confidence intervals
 #'   * \code{\link[stats]{predict.glm}(type = "response")}: fitted values
 #'     (predictions).
 #'   * \code{\link[stats]{residuals}}: residuals.
@@ -266,6 +263,12 @@ estimate_risk <- function(
         return(fit)
 
       # 3) Check if a logistic model can be fitted
+      warning(paste(
+        "risks: No",
+        toupper(estimand),
+        "model could be fit. Are the data intact and the",
+        "formula correct? Any error messages stem directly from fitting a",
+        "logistic model on the data."))
       fit <- stats::glm(
         formula = formula,
         data = data,
@@ -341,6 +344,12 @@ estimate_risk <- function(
         return(fit)
 
       # 4) Check if a logistic model can be fitted
+      warning(paste(
+        "risks: No",
+        toupper(estimand),
+        "model could be fit. Are the data intact and the",
+        "formula correct? Any error messages stem directly from fitting a",
+        "logistic model on the data."))
       res <- stats::glm(
         formula = formula,
         data = data,

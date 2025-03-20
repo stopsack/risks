@@ -1,3 +1,15 @@
+# risks 0.4.3
+
+* One combined user-facing `confint.risks()` function (#7).
+* More intelligible alert about potential data/formula error if no model at all 
+  can be fit.
+* Always accept missing values in continuous exposures and in covariates in
+  `"margstd_boot"` and `"margstd_delta"`.
+* Report confidence limits for a reference category as `0` in `"margstd_boot"`,
+  as in `"margstd_delta"`.
+* Add hex logo, thanks to @tgerke.
+
+
 # risks 0.4.2
 
 * First CRAN submission.
