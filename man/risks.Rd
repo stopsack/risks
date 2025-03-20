@@ -2,6 +2,7 @@
 % Please edit documentation in R/risks.R
 \docType{package}
 \name{risks}
+\alias{risks-package}
 \alias{risks}
 \title{risks: Estimate risk ratios and risk differences using regression}
 \description{
@@ -25,4 +26,13 @@ coefficients, standard errors, confidence intervals.
 
 \seealso{
 \url{https://github.com/stopsack/risks}
+}
+\author{
+\strong{Maintainer}: Konrad Stopsack \email{stopsack@post.harvard.edu} (\href{https://orcid.org/0000-0002-0722-1311}{ORCID})
+
+Authors:
+\itemize{
+  \item Travis Gerke \email{tgerke@mail.harvard.edu} (\href{https://orcid.org/0000-0002-9500-8907}{ORCID})
+}
+
 }

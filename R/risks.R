@@ -16,8 +16,6 @@
 #'
 #' \code{\link[risks]{confint.risks}}: Confidence intervals.
 #'
-#' @docType package
 #' @name risks
 #' @seealso \url{https://github.com/stopsack/risks}
-NULL
-#> NULL
+"_PACKAGE"
