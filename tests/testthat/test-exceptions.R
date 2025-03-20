@@ -64,3 +64,63 @@ test_that("bad parameter values are caught", {
                          at = c(0.1, 0.3)),
                "Levels for marginal standardization")
 })
+
+test_that("empty data set fails with correct message", {
+  expect_error(
+    suppressWarnings(riskratio(
+      formula = death ~ stage + receptor,
+      data = dat[0:0, ])),
+    "contrasts can be applied only to factors with 2 or more levels")
+})
+
+test_that("margstd_delta, _boot accept NA in exposure, covariates, outcome", {
+  dat$stage_miss <- dat$stage
+  dat$stage_miss[101:130] <- NA
+  dat$stage_miss_num <- as.numeric(dat$stage_miss)
+  dat$receptor_miss <- dat$receptor
+  dat$receptor_miss[150:160] <- NA
+  dat$death_miss <- dat$death
+  dat$death_miss[50:60] <- NA
+
+  expect_equal(
+    riskratio(
+    formula = death ~ stage_miss_num,
+    data = dat,
+    approach = "margstd_delta")$coefficients[["stage_miss_num"]],
+    expected = 0.7857696,
+    tolerance = 0.0000001)
+
+  expect_equal(
+    riskratio(
+      formula = death ~ stage_miss_num,
+      data = dat,
+      approach = "margstd_boot")$coefficients[["stage_miss_num"]],
+    expected = 0.9518342,
+    tolerance = 0.0000001)
+
+  expect_equal(
+    riskratio(
+      formula = death ~ stage_miss_num + receptor_miss,
+      data = dat,
+      approach = "margstd_delta")$coefficients[["stage_miss_num"]],
+    expected = 0.6593813,
+    tolerance = 0.0000001)
+
+  expect_equal(
+    riskratio(
+      formula = death ~ stage_miss_num + receptor_miss,
+      data = dat,
+      approach = "margstd_boot")$coefficients[["stage_miss_num"]],
+    expected = 0.9009893,
+    tolerance = 0.0000001)
+
+  expect_equal(
+    riskratio(
+      formula = death_miss ~ stage,
+      data = dat,
+      approach = "margstd_delta")$coefficients[["stageStage II"]],
+    riskratio(
+      formula = death_miss ~ stage,
+      data = dat,
+      approach = "margstd_boot")$coefficients[["stageStage II"]])
+})

@@ -3,6 +3,7 @@
 S3method(confint,duplicate)
 S3method(confint,margstd_boot)
 S3method(confint,margstd_delta)
+S3method(confint,risks)
 S3method(confint,robpoisson)
 S3method(print,risks)
 S3method(print,summary.risks)

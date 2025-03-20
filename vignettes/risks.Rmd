@@ -16,10 +16,16 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Once risks is released on CRAN, `install.packages("risks")` will be available. Currently, the development version of `risks` can be installed from [GitHub](https://github.com/) using:
+The **risks** package can be installed from CRAN:
 
-```r
-# install.packages("remotes")  # The "remotes" package needs to be installed
+```{r cran_install, eval = FALSE}
+install.packages("risks")
+```
+
+Development versions can be installed from 
+[GitHub](https://stopsack.github.io/risks/):
+
+```{r github_install, eval = FALSE}
 remotes::install_github("stopsack/risks")
 ```
 
@@ -36,7 +42,11 @@ data(breastcancer)  # Load sample data
 
 breastcancer %>%  # Display the sample data
   group_by(receptor, stage) %>% 
-  summarize(deaths = sum(death), total = n(), risk = deaths/total)
+  summarize(
+    deaths = sum(death), 
+    total = n(), 
+    risk = deaths / total
+  )
 ```
 
 
@@ -45,7 +55,10 @@ breastcancer %>%  # Display the sample data
 The risk of death is higher among women with higher-stage and hormone receptor-low cancers, which also tend to be of higher stage. Using `risks` models to obtain (possibly multivariable-adjusted) risk ratios or risk differences is similar to the standard code for logistic models in R. As customary in R, log(RR) is returned; see below for how to obtain exponentiated values. No options for model `family` or `link` need to be supplied:
 
 ```{r basic}
-fit_rr <- riskratio(formula = death ~ stage + receptor, data = breastcancer)
+fit_rr <- riskratio(
+  formula = death ~ stage + receptor, 
+  data = breastcancer
+)
 summary(fit_rr)
 ```
 
@@ -55,7 +68,10 @@ summary(fit_rr)
 To obtain risk differences, use `riskdiff`, which has the same syntax:
 
 ```{r basic2}
-fit_rd <- riskdiff(formula = death ~ stage + receptor, data = breastcancer)
+fit_rd <- riskdiff(
+  formula = death ~ stage + receptor, 
+  data = breastcancer
+)
 summary(fit_rd)
 ```
 
@@ -79,7 +95,10 @@ tidy(fit_rd)
 In accordance with `glm()` standards, coefficients for relative risks are shown on the logarithmic scale. Exponentiated coefficients for risk ratios are easily obtained via `tidy(..., exponentiate = TRUE)`:
 
 ```{r basic4}
-tidy(fit_rr, exponentiate = TRUE)
+tidy(
+  fit_rr, 
+  exponentiate = TRUE
+)
 ```
 
 For example, the risk of death was 6 times higher in women with stage III breast cancer compared to stage I (95% confidence interval, 3 to 13 times), adjusting for hormone receptor status.
