@@ -28,7 +28,7 @@ coefficients, standard errors, confidence intervals.
 \url{https://github.com/stopsack/risks}
 }
 \author{
-\strong{Maintainer}: Konrad Stopsack \email{stopsack@post.harvard.edu} (\href{https://orcid.org/0000-0002-0722-1311}{ORCID})
+\strong{Maintainer}: Konrad Stopsack \email{stopsack@post.harvard.edu} (\href{https://orcid.org/0000-0002-0722-1311}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
